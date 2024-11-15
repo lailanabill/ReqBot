@@ -42,8 +42,8 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             const Text('Notifications', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 8),
-            const NotificationTile(message: 'Feedback requested on Project Alpha'),
-            const NotificationTile(message: 'Validation issue detected in Project Beta'),
+            const NotificationTile(message: 'Feedback requested on Project x'),
+            const NotificationTile(message: 'Validation issue detected in Project y'),
             // Bottom Section - Single Large Button
             const SizedBox(height: 16),
             Center(

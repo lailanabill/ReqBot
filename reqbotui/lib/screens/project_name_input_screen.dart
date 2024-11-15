@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reqbotui/screens/upload_convert.dart';
 
 class ProjectNameInputScreen extends StatelessWidget {
   const ProjectNameInputScreen({super.key});
@@ -18,7 +19,7 @@ class ProjectNameInputScreen extends StatelessWidget {
             TextField(
               decoration: InputDecoration(
                 labelText: 'Project Name',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: Colors.grey[200], // Subtle background color
               ),
@@ -27,10 +28,16 @@ class ProjectNameInputScreen extends StatelessWidget {
 
             // Upload Buttons
             UploadButton(
-                label: 'Upload Audio',
-                onPressed: () {
-                  // Implement audio upload functionality
-                }),
+              label: 'Upload Audio',
+              onPressed: () {
+                // Navigate to the Project Name Input Screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const UploadConvertScreen()),
+                );
+              },
+            ),
             const SizedBox(height: 16),
             UploadButton(
                 label: 'Upload Text',
@@ -38,11 +45,6 @@ class ProjectNameInputScreen extends StatelessWidget {
                   // Implement text upload functionality
                 }),
             const SizedBox(height: 16),
-            UploadButton(
-                label: 'Upload Chat Logs',
-                onPressed: () {
-                  // Implement chat logs upload functionality
-                }),
 
             const Spacer(), // Push buttons to the bottom
 
@@ -75,8 +77,7 @@ class UploadButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const UploadButton({required this.label, required this.onPressed, Key? key})
-      : super(key: key);
+  const UploadButton({required this.label, required this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +94,7 @@ class UploadButton extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8), // Space between button and status icon
-        Icon(Icons.check_circle,
+        const Icon(Icons.check_circle,
             color: Colors.green), // Placeholder for upload status
         // You can change the icon based on upload status
       ],
