@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'project_name_input_screen.dart'; // Import the new screen
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,12 +19,23 @@ class HomeScreen extends StatelessWidget {
             const Text('Recent Projects', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView(
-                children: const [
-                  ProjectCard(projectName: 'Project Alpha', status: 'completed'),
-                  ProjectCard(projectName: 'Project Beta', status: 'attention_needed'),
-                  ProjectCard(projectName: 'Project Gamma', status: 'in_progress'),
-                ],
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Number of columns
+                  childAspectRatio: 2, // Aspect ratio of each card
+                  crossAxisSpacing: 16, // Spacing between columns
+                  mainAxisSpacing: 16, // Spacing between rows
+                ),
+                itemCount: 4, // Number of projects
+                itemBuilder: (context, index) {
+                  final projectNames = ['Project x', 'Project y', 'Project z', 'Project l'];
+                  final projectStatuses = ['completed', 'attention_needed', 'in_progress'];
+                  
+                  return ProjectCard(
+                    projectName: projectNames[index],
+                    status: projectStatuses[index],
+                  );
+                },
               ),
             ),
             // Middle Section - Notifications
@@ -31,16 +43,24 @@ class HomeScreen extends StatelessWidget {
             const Text('Notifications', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 8),
             const NotificationTile(message: 'Feedback requested on Project Alpha'),
-            NotificationTile(message: 'Validation issue detected in Project Beta'),
-            // Bottom Section - Quick Actions
+            const NotificationTile(message: 'Validation issue detected in Project Beta'),
+            // Bottom Section - Single Large Button
             const SizedBox(height: 16),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                QuickActionButton(label: 'New Conversation'),
-                QuickActionButton(label: 'Analyze Transcript'),
-                QuickActionButton(label: 'View Specifications'),
-              ],
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Navigate to the Project Name Input Screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProjectNameInputScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20), // Adjust padding for size
+                  textStyle: const TextStyle(fontSize: 20), // Increase font size for better readability
+                ),
+                child: const Text('New Project'),
+              ),
             ),
           ],
         ),
@@ -53,7 +73,8 @@ class ProjectCard extends StatelessWidget {
   final String projectName;
   final String status;
 
-  const ProjectCard({required this.projectName, required this.status, super.key});
+  const ProjectCard(
+      {required this.projectName, required this.status, super.key});
 
   @override
   Widget build(BuildContext context) {
