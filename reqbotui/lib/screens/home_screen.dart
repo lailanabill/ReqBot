@@ -16,7 +16,8 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Top Section - Recent Projects
-            const Text('Recent Projects', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const Text('Recent Projects',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             Expanded(
               child: GridView.builder(
@@ -26,11 +27,15 @@ class HomeScreen extends StatelessWidget {
                   crossAxisSpacing: 16, // Spacing between columns
                   mainAxisSpacing: 16, // Spacing between rows
                 ),
-                itemCount: 4, // Number of projects
+                itemCount: 3, // Number of projects
                 itemBuilder: (context, index) {
-                  final projectNames = ['Project x', 'Project y', 'Project z', 'Project l'];
-                  final projectStatuses = ['completed', 'attention_needed', 'in_progress'];
-                  
+                  final projectNames = ['Project x', 'Project y', 'Project z'];
+                  final projectStatuses = [
+                    'completed',
+                    'attention_needed',
+                    'in_progress'
+                  ];
+
                   return ProjectCard(
                     projectName: projectNames[index],
                     status: projectStatuses[index],
@@ -43,7 +48,8 @@ class HomeScreen extends StatelessWidget {
             const Text('Notifications', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 8),
             const NotificationTile(message: 'Feedback requested on Project x'),
-            const NotificationTile(message: 'Validation issue detected in Project y'),
+            const NotificationTile(
+                message: 'Validation issue detected in Project y'),
             // Bottom Section - Single Large Button
             const SizedBox(height: 16),
             Center(
@@ -52,12 +58,16 @@ class HomeScreen extends StatelessWidget {
                   // Navigate to the Project Name Input Screen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ProjectNameInputScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const ProjectNameInputScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20), // Adjust padding for size
-                  textStyle: const TextStyle(fontSize: 20), // Increase font size for better readability
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 40, vertical: 20), // Adjust padding for size
+                  textStyle: const TextStyle(
+                      fontSize:
+                          20), // Increase font size for better readability
                 ),
                 child: const Text('New Project'),
               ),
