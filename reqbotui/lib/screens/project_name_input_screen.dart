@@ -54,13 +54,17 @@ class ProjectNameInputScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Implement back action
+                    Navigator.pop(context); // Navigate back to HomeScreen
                   },
                   child: const Text('Back'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Implement continue action
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const UploadConvertScreen()),
+                    ); // Navigate to UploadConvertScreen
                   },
                   child: const Text('Continue'),
                 ),
