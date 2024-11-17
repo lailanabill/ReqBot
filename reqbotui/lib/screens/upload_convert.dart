@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reqbotui/screens/Structuredreq.dart';
 
 class UploadConvertScreen extends StatelessWidget {
   const UploadConvertScreen({super.key});
@@ -19,20 +20,21 @@ class UploadConvertScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             UploadButton(
-                label: 'Upload Audio',
-                icon: Icons.mic,
-                onPressed: () {
-                  // Implement audio upload functionality
-                }),
+              label: 'Upload Audio',
+              icon: Icons.mic,
+              onPressed: () {
+                // Implement audio upload functionality
+              },
+            ),
             const SizedBox(height: 16),
             UploadButton(
-                label: 'Upload Text',
-                icon: Icons.text_fields,
-                onPressed: () {
-                  // Implement text upload functionality
-                }),
+              label: 'Upload Text',
+              icon: Icons.text_fields,
+              onPressed: () {
+                // Implement text upload functionality
+              },
+            ),
             const SizedBox(height: 16),
-
             const SizedBox(height: 24), // Space before file status
             // File Processing Status
             const Text('Uploaded Files',
@@ -42,18 +44,21 @@ class UploadConvertScreen extends StatelessWidget {
               child: ListView(
                 children: const [
                   FileStatusItem(
-                      fileName: 'Meeting Notes Audio', isConverting: true),
+                    fileName: 'Meeting Notes Audio',
+                    isConverting: true,
+                  ),
                   FileStatusItem(
-                      fileName: 'Project Requirements Document',
-                      isConverting: false,
-                      isCompleted: true),
+                    fileName: 'Project Requirements Document',
+                    isConverting: false,
+                    isCompleted: true,
+                  ),
                   FileStatusItem(
-                      fileName: 'Chat Log from Stakeholders',
-                      isConverting: false),
+                    fileName: 'Chat Log from Stakeholders',
+                    isConverting: false,
+                  ),
                 ],
               ),
             ),
-
             const SizedBox(height: 24), // Space before navigation buttons
             // Navigation Buttons
             Row(
@@ -61,13 +66,18 @@ class UploadConvertScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Implement back action
+                    Navigator.pop(context); // Navigate back
                   },
                   child: const Text('Back'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Implement next action
+                    // Navigate to StructuredRequirementsScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StructuredRequirementsScreen()),
+                    );
                   },
                   child: const Text('Next'),
                 ),
