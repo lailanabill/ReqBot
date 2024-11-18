@@ -12,6 +12,7 @@ class ReqBotApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'ReqBot',
       theme: ThemeData(
         primarySwatch: Colors.blue, // Primary color for the app
