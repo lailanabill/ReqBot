@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
-import 'screens/welcome_page.dart';
-import 'screens/sign_up_page.dart';
-import 'screens/sign_in_page.dart';
+import 'package:reqbotui/screens/sign_in_page.dart';
+import 'package:reqbotui/screens/sign_up_page.dart';
+import 'package:reqbotui/screens/welcome_page.dart';
+import 'package:reqbotui/screens/home_screen.dart'; // Import the HomeScreen
 
 void main() {
-  runApp(MyApp());
+  runApp(const ReqBotApp());
 }
 
-class MyApp extends StatelessWidget {
+class ReqBotApp extends StatelessWidget {
+  const ReqBotApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'ReqBot',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => WelcomePage(),
-        '/sign-up': (context) => SignUpPage(),
         '/sign-in': (context) => SignInPage(),
+        '/sign-up': (context) => SignUpPage(),
+        '/HomeScreen': (context) => HomeScreen(), // Add HomeScreen route
       },
     );
   }

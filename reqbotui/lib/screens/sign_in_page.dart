@@ -108,7 +108,9 @@ class SignInPage extends StatelessWidget {
                   SizedBox(height: 20),
                   // Sign In Button
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/HomeScreen'); // Navigate to HomePage
+                    },
                     child: Center(
                       child: Text(
                         "Sign in",
