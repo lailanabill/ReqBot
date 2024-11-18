@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 
 class UploadConvertScreen extends StatefulWidget {
   const UploadConvertScreen({Key? key}) : super(key: key);
+
   @override
   _UploadConvertScreenState createState() => _UploadConvertScreenState();
 }
@@ -19,9 +20,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
         type: type == 'audio'
             ? FileType.audio
             : FileType.custom, // Use FileType.custom for text
-        allowedExtensions: type == 'text'
-            ? ['txt', 'md']
-            : null, // Specify allowed text file extensions
+        allowedExtensions: type == 'text' ? ['txt', 'md'] : null,
       );
 
       if (result != null && result.files.isNotEmpty) {
@@ -57,110 +56,230 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Upload Options',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            UploadButton(
-              label: 'Upload Audio',
-              icon: Icons.mic,
-              onPressed: () => pickFile('audio'),
-            ),
-            const SizedBox(height: 16),
-            UploadButton(
-              label: 'Upload Text',
-              icon: Icons.text_fields,
-              onPressed: () => pickFile('text'),
-            ),
-            const SizedBox(height: 24),
-            const Text('Uploaded Files',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: uploadedFiles.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(uploadedFiles[index]),
-                    trailing:
-                        const Icon(Icons.check_circle, color: Colors.green),
-                  );
-                },
+      body: Stack(
+        children: [
+          // Background Gradient
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF3F51B5), Color(0xFFF6F7FB)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
+                // Title
+                TweenAnimationBuilder(
+                  duration: const Duration(milliseconds: 700),
+                  tween: Tween<double>(begin: 0, end: 1),
+                  builder: (context, double opacity, child) {
+                    return Opacity(opacity: opacity, child: child);
                   },
-                  child: const Text('Back'),
+                  child: const Text(
+                    'Upload Options',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (uploadedFiles.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Please upload at least one file.')),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const StructuredRequirementsScreen()),
-                      );
-                    }
+                const SizedBox(height: 16),
+
+                // Upload Buttons
+                TweenAnimationBuilder(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween<double>(begin: 0, end: 1),
+                  builder: (context, double scale, child) {
+                    return Transform.scale(scale: scale, child: child);
                   },
-                  child: const Text('Next'),
+                  child: UploadButton(
+                    label: 'Upload Audio',
+                    icon: Icons.mic,
+                    onPressed: () => pickFile('audio'),
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                TweenAnimationBuilder(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween<double>(begin: 0, end: 1),
+                  builder: (context, double scale, child) {
+                    return Transform.scale(scale: scale, child: child);
+                  },
+                  child: UploadButton(
+                    label: 'Upload Text',
+                    icon: Icons.text_fields,
+                    onPressed: () => pickFile('text'),
+                    color: Colors.orangeAccent,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Uploaded Files Section
+                TweenAnimationBuilder(
+                  duration: const Duration(milliseconds: 800),
+                  tween: Tween<double>(begin: 0, end: 1),
+                  builder: (context, double opacity, child) {
+                    return Opacity(opacity: opacity, child: child);
+                  },
+                  child: const Text(
+                    'Uploaded Files',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // File List with Animated Items
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: uploadedFiles.length,
+                    itemBuilder: (context, index) {
+                      return TweenAnimationBuilder(
+                        duration: const Duration(milliseconds: 500),
+                        tween: Tween<double>(begin: 0, end: 1),
+                        curve: Curves.easeOut,
+                        builder: (context, double scale, child) {
+                          return Transform.scale(scale: scale, child: child);
+                        },
+                        child: ListTile(
+                          title: Text(uploadedFiles[index]),
+                          trailing: const Icon(Icons.check_circle,
+                              color: Colors.green),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Navigation Buttons with Animation
+                TweenAnimationBuilder(
+                  duration: const Duration(milliseconds: 800),
+                  tween: Tween<Offset>(
+                    begin: const Offset(0, 0.5),
+                    end: const Offset(0, 0),
+                  ),
+                  curve: Curves.easeOut,
+                  builder: (context, Offset offset, child) {
+                    return Transform.translate(offset: offset, child: child);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                        child: const Text('Back'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (uploadedFiles.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Please upload at least one file.')),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const StructuredRequirementsScreen()),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
+                          backgroundColor: Colors.green,
+                        ),
+                        child: const Text('Next'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Error Message
+                if (errorMessage.isNotEmpty) ...[
+                  Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                const Text(
+                  'Tip: You can upload multiple files for batch processing. All transcripts will be editable.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            if (errorMessage.isNotEmpty) ...[
-              Text(
-                errorMessage,
-                style: const TextStyle(color: Colors.red),
-              ),
-            ],
-            const SizedBox(height: 8),
-            const Text(
-              'Tip: You can upload multiple files for batch processing. All transcripts will be editable.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
+// Upload Button with Animations
 class UploadButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onPressed;
+  final Color color;
 
-  const UploadButton(
-      {required this.label,
-      required this.icon,
-      required this.onPressed,
-      Key? key})
-      : super(key: key);
+  const UploadButton({
+    Key? key,
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+    required this.color,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 24),
-      label: Text(label, style: const TextStyle(fontSize: 18)),
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      splashColor: color.withOpacity(0.3),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.4),
+              blurRadius: 10,
+              spreadRadius: 1,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 24),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
