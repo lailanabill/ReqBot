@@ -6,7 +6,7 @@ void main() {
 }
 
 class ReqBotApp extends StatelessWidget {
-  const ReqBotApp({super.key});
+  const ReqBotApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
