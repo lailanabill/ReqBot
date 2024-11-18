@@ -1,88 +1,134 @@
 import 'package:flutter/material.dart';
-import 'package:reqbotui/screens/Structuredreq.dart';
+import 'structured_requirements.dart';
+import 'package:file_picker/file_picker.dart';
 
-class UploadConvertScreen extends StatelessWidget {
-  const UploadConvertScreen({super.key});
+class UploadConvertScreen extends StatefulWidget {
+  const UploadConvertScreen({Key? key}) : super(key: key);
+  @override
+  _UploadConvertScreenState createState() => _UploadConvertScreenState();
+}
+
+class _UploadConvertScreenState extends State<UploadConvertScreen> {
+  List<String> uploadedFiles = [];
+  String errorMessage = '';
+
+  Future<void> pickFile(String type) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: type == 'audio'
+            ? FileType.audio
+            : FileType.custom, // Use FileType.custom for text
+        allowedExtensions: type == 'text'
+            ? ['txt', 'md']
+            : null, // Specify allowed text file extensions
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          uploadedFiles.add(result.files.first.name);
+          errorMessage = ''; // Clear any previous error message
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${result.files.first.name} uploaded successfully!'),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error uploading file: $e';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Upload & Convert'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Upload Options
             const Text('Upload Options',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             UploadButton(
               label: 'Upload Audio',
               icon: Icons.mic,
-              onPressed: () {
-                // Implement audio upload functionality
-              },
+              onPressed: () => pickFile('audio'),
             ),
             const SizedBox(height: 16),
             UploadButton(
               label: 'Upload Text',
               icon: Icons.text_fields,
-              onPressed: () {
-                // Implement text upload functionality
-              },
+              onPressed: () => pickFile('text'),
             ),
-            const SizedBox(height: 16),
-            const SizedBox(height: 24), // Space before file status
-            // File Processing Status
+            const SizedBox(height: 24),
             const Text('Uploaded Files',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView(
-                children: const [
-                  FileStatusItem(
-                    fileName: 'Meeting Notes Audio',
-                    isConverting: true,
-                  ),
-                  FileStatusItem(
-                    fileName: 'Project Requirements Document',
-                    isConverting: false,
-                    isCompleted: true,
-                  ),
-                  FileStatusItem(
-                    fileName: 'Chat Log from Stakeholders',
-                    isConverting: false,
-                  ),
-                ],
+              child: ListView.builder(
+                itemCount: uploadedFiles.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(uploadedFiles[index]),
+                    trailing:
+                        const Icon(Icons.check_circle, color: Colors.green),
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 24), // Space before navigation buttons
-            // Navigation Buttons
+            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context); // Navigate back
+                    Navigator.pop(context);
                   },
                   child: const Text('Back'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Navigate to StructuredRequirementsScreen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => StructuredRequirementsScreen()),
-                    );
+                    if (uploadedFiles.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Please upload at least one file.')),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const StructuredRequirementsScreen()),
+                      );
+                    }
                   },
                   child: const Text('Next'),
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            if (errorMessage.isNotEmpty) ...[
+              Text(
+                errorMessage,
+                style: const TextStyle(color: Colors.red),
+              ),
+            ],
             const SizedBox(height: 8),
             const Text(
               'Tip: You can upload multiple files for batch processing. All transcripts will be editable.',
@@ -114,35 +160,8 @@ class UploadButton extends StatelessWidget {
       icon: Icon(icon, size: 24),
       label: Text(label, style: const TextStyle(fontSize: 18)),
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 20), // Large button size
+        padding: const EdgeInsets.symmetric(vertical: 20),
       ),
-    );
-  }
-}
-
-class FileStatusItem extends StatelessWidget {
-  final String fileName;
-  final bool isConverting;
-  final bool isCompleted;
-
-  const FileStatusItem({
-    required this.fileName,
-    this.isConverting = false,
-    this.isCompleted = false,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(fileName),
-      trailing: isConverting
-          ? const CircularProgressIndicator() // Show progress indicator while converting
-          : isCompleted
-              ? const Icon(Icons.check_circle,
-                  color: Colors.green) // Success icon
-              : const Icon(Icons.error,
-                  color: Colors.red), // Error icon if not completed
     );
   }
 }
