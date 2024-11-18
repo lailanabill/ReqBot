@@ -128,4 +128,135 @@ class HomeScreen extends StatelessWidget {
                         backgroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 40, vertical: 20),
-            
+                        textStyle: const TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF3F51B5),
+                        ),
+                      ),
+                      child: const Text(
+                        'New Project',
+                        style: TextStyle(color: Color(0xFF3F51B5)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Animated Project Card with InkWell Splash
+class AnimatedProjectCard extends StatelessWidget {
+  final String projectName;
+  final String status;
+
+  const AnimatedProjectCard({required this.projectName, required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    IconData icon;
+    Color color;
+
+    // Determine icon and color based on the project status
+    switch (status) {
+      case 'completed':
+        icon = Icons.check_circle;
+        color = Colors.green;
+        break;
+      case 'attention_needed':
+        icon = Icons.error;
+        color = Colors.red;
+        break;
+      case 'in_progress':
+      default:
+        icon = Icons.access_time;
+        color = Colors.orange;
+        break;
+    }
+
+    return TweenAnimationBuilder(
+      duration: const Duration(milliseconds: 500),
+      tween: Tween<double>(begin: 0.8, end: 1),
+      curve: Curves.easeOut,
+      builder: (context, double scale, child) {
+        return Transform.scale(
+          scale: scale,
+          child: InkWell(
+            onTap: () {
+              // Handle card tap
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('$projectName tapped')),
+              );
+            },
+            splashColor: Colors.blue.withOpacity(0.3), // InkWell splash color
+            borderRadius: BorderRadius.circular(8),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ListTile(
+                title: Text(projectName),
+                trailing: Icon(icon, color: color),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// Notification Buttons with Shadows
+class NotificationButton extends StatelessWidget {
+  final String message;
+
+  const NotificationButton({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$message tapped')),
+        );
+      },
+      splashColor: Colors.blue.withOpacity(0.2),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 8,
+              spreadRadius: 2,
+              offset: const Offset(2, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.notifications, color: Color(0xFF3F51B5)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
