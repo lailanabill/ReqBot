@@ -106,9 +106,9 @@ class ProjectNameInputScreen extends StatelessWidget {
                     );
                   },
                   child: UploadButton(
-                    label: 'Upload Text',
+                    label: 'Upload Textt',
                     icon: Icons.text_fields,
-                    color: Colors.orangeAccent,
+                    color: Colors.blueAccent,
                     onPressed: () {
                       // Implement text upload functionality
                     },
@@ -140,14 +140,17 @@ class ProjectNameInputScreen extends StatelessWidget {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
+                          backgroundColor: Colors.blueAccent,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Back'),
+                        child: const Text(
+                          'Back',
+                          style: TextStyle(color: Colors.white), // White text
+                        ),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -167,14 +170,17 @@ class ProjectNameInputScreen extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: Colors.blueAccent,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Continue'),
+                        child: const Text(
+                          'Continue',
+                          style: TextStyle(color: Colors.white), // White text
+                        ),
                       ),
                     ],
                   ),
