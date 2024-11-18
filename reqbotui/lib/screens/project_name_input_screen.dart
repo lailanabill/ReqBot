@@ -1,70 +1,87 @@
 import 'package:flutter/material.dart';
-import 'package:reqbotui/screens/upload_convert.dart';
+import 'upload_convert.dart';
 
 class ProjectNameInputScreen extends StatelessWidget {
-  const ProjectNameInputScreen({super.key});
+  const ProjectNameInputScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController projectNameController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Project'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Project Name Input Field
             TextField(
+              controller: projectNameController,
               decoration: InputDecoration(
                 labelText: 'Project Name',
                 border: const OutlineInputBorder(),
                 filled: true,
-                fillColor: Colors.grey[200], // Subtle background color
+                fillColor: Colors.grey[200],
               ),
             ),
-            const SizedBox(height: 24), // Space between input and buttons
-
-            // Upload Buttons
+            const SizedBox(height: 24),
             UploadButton(
               label: 'Upload Audio',
               onPressed: () {
-                // Navigate to the Project Name Input Screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const UploadConvertScreen()),
-                );
+                if (projectNameController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please enter a project name.')),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const UploadConvertScreen()),
+                  );
+                }
               },
             ),
             const SizedBox(height: 16),
             UploadButton(
-                label: 'Upload Text',
-                onPressed: () {
-                  // Implement text upload functionality
-                }),
+              label: 'Upload Text',
+              onPressed: () {
+                // Implement text upload functionality
+              },
+            ),
             const SizedBox(height: 16),
-
-            const Spacer(), // Push buttons to the bottom
-
-            // Bottom Navigation Buttons
+            const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context); // Navigate back to HomeScreen
+                    Navigator.pop(context);
                   },
                   child: const Text('Back'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UploadConvertScreen()),
-                    ); // Navigate to UploadConvertScreen
+                    if (projectNameController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Please enter a project name.')),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const UploadConvertScreen()),
+                      );
+                    }
                   },
                   child: const Text('Continue'),
                 ),
@@ -81,7 +98,7 @@ class UploadButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const UploadButton({required this.label, required this.onPressed, super.key});
+  const UploadButton({Key? key, required this.label, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -91,16 +108,13 @@ class UploadButton extends StatelessWidget {
           child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 20), // Large button size
+              padding: const EdgeInsets.symmetric(vertical: 20),
             ),
             child: Text(label),
           ),
         ),
-        const SizedBox(width: 8), // Space between button and status icon
-        const Icon(Icons.check_circle,
-            color: Colors.green), // Placeholder for upload status
-        // You can change the icon based on upload status
+        const SizedBox(width: 8),
+        const Icon(Icons.check_circle, color: Colors.green),
       ],
     );
   }
