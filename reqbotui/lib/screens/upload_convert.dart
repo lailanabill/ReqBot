@@ -47,6 +47,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true, // Removes white area under AppBar
       appBar: AppBar(
         title: const Text('Upload & Convert'),
         leading: IconButton(
@@ -55,6 +56,8 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
             Navigator.pop(context);
           },
         ),
+        backgroundColor: Colors.blueAccent.withOpacity(0.9), // Make AppBar blue
+        elevation: 0, // Remove AppBar shadow
       ),
       body: Stack(
         children: [
@@ -98,7 +101,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                     label: 'Upload Audio',
                     icon: Icons.mic,
                     onPressed: () => pickFile('audio'),
-                    color: Colors.blueAccent,
+                    color: Colors.blueAccent, // Blue button
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -113,7 +116,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                     label: 'Upload Text',
                     icon: Icons.text_fields,
                     onPressed: () => pickFile('text'),
-                    color: Colors.orangeAccent,
+                    color: Colors.blueAccent, // Blue button
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -147,7 +150,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                         child: ListTile(
                           title: Text(uploadedFiles[index]),
                           trailing: const Icon(Icons.check_circle,
-                              color: Colors.green),
+                              color: Colors.blueAccent), // Blue check icon
                         ),
                       );
                     },
@@ -155,7 +158,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Navigation Buttons with Animation
+                // Navigation Buttons
                 TweenAnimationBuilder(
                   duration: const Duration(milliseconds: 800),
                   tween: Tween<Offset>(
@@ -176,9 +179,12 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 16),
-                          backgroundColor: Colors.redAccent,
+                          backgroundColor: Colors.blueAccent, // Blue button
                         ),
-                        child: const Text('Back'),
+                        child: const Text(
+                          'Back',
+                          style: TextStyle(color: Colors.white), // White text
+                        ),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -200,9 +206,12 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 16),
-                          backgroundColor: Colors.green,
+                          backgroundColor: Colors.blueAccent, // Blue button
                         ),
-                        child: const Text('Next'),
+                        child: const Text(
+                          'Next',
+                          style: TextStyle(color: Colors.white), // White text
+                        ),
                       ),
                     ],
                   ),
@@ -230,7 +239,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
   }
 }
 
-// Upload Button with Animations
+// Upload Button with Blue Background
 class UploadButton extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -254,7 +263,7 @@ class UploadButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: color,
+          color: color, // Blue button
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -268,12 +277,12 @@ class UploadButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 24),
+            Icon(icon, color: Colors.white, size: 24), // White icon
             const SizedBox(width: 12),
             Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.white, // White text
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
