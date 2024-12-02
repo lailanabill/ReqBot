@@ -17,6 +17,10 @@ dependencies:
     sdk: flutter
   file_picker: ^8.1.4   # File picker for handling file uploads
   cupertino_icons: ^1.0.8 # For iOS-style icons
+  speech_to_text: ^6.0.1 # Speech to text conversion
+  flutter_sound: ^9.3.7 # Check for the latest version
+  permission_handler: ^11.1.0 # For microphone permissions
+  # permission_handler: ^11.1.0
 
 dev_dependencies:
   flutter_test:

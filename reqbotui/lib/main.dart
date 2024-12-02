@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:reqbotui/screens/record.dart';
 import 'package:reqbotui/screens/sign_in_page.dart';
 import 'package:reqbotui/screens/sign_up_page.dart';
+import 'package:reqbotui/screens/upload_convert.dart';
 import 'package:reqbotui/screens/welcome_page.dart';
 import 'package:reqbotui/screens/home_screen.dart'; // Import the HomeScreen
 
@@ -26,6 +28,7 @@ class ReqBotApp extends StatelessWidget {
         '/sign-in': (context) => SignInPage(),
         '/sign-up': (context) => SignUpPage(),
         '/HomeScreen': (context) => HomeScreen(), // Add HomeScreen route
+        '/record': (context) => Record(), // Add HomeScreen route
       },
     );
   }

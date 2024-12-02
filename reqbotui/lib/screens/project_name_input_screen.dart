@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reqbotui/screens/record.dart';
 import 'upload_convert.dart';
 
 class ProjectNameInputScreen extends StatelessWidget {
@@ -115,6 +116,24 @@ class ProjectNameInputScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                TweenAnimationBuilder(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween<double>(begin: 0, end: 1),
+                  builder: (context, double scale, child) {
+                    return Transform.scale(scale: scale, child: child);
+                  },
+                  child: UploadButton(
+                    label: 'Start Recording',
+                    icon: Icons.text_fields,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Record()),
+                    ),
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                const SizedBox(height: 24),
 
                 const Spacer(),
 

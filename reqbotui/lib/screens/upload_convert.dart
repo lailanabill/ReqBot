@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reqbotui/screens/record.dart';
 import 'structured_requirements.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -16,7 +17,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
   Future<void> pickFile(String type) async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
+        allowMultiple: true,
         type: type == 'audio'
             ? FileType.audio
             : FileType.custom, // Use FileType.custom for text
@@ -25,7 +26,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
 
       if (result != null && result.files.isNotEmpty) {
         setState(() {
-          uploadedFiles.add(result.files.first.name);
+          uploadedFiles.addAll(result.files.map((file) => file.name));
           errorMessage = ''; // Clear any previous error message
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -114,6 +115,24 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                     label: 'Upload Text',
                     icon: Icons.text_fields,
                     onPressed: () => pickFile('text'),
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                TweenAnimationBuilder(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween<double>(begin: 0, end: 1),
+                  builder: (context, double scale, child) {
+                    return Transform.scale(scale: scale, child: child);
+                  },
+                  child: UploadButton(
+                    label: 'Start Recording',
+                    icon: Icons.text_fields,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Record()),
+                    ),
                     color: Colors.blueAccent,
                   ),
                 ),
