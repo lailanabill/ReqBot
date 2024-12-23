@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:reqbotui/screens/record.dart';
-import 'package:reqbotui/screens/upload_convert.dart';
-import 'project_name_input_screen.dart'; // Import the new screen
+import 'package:provider/provider.dart';
+import 'package:reqbotui/providers/favorites_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,7 +10,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient Background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -27,7 +25,6 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // App Bar Section
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -46,8 +43,6 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Recent Projects Section
                   const Text(
                     'Recent Projects',
                     style: TextStyle(
@@ -58,21 +53,20 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    flex: 2,
                     child: GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Number of columns
-                        childAspectRatio: 1.5, // Aspect ratio of each card
-                        crossAxisSpacing: 16, // Spacing between columns
-                        mainAxisSpacing: 16, // Spacing between rows
+                        crossAxisCount: 2,
+                        childAspectRatio: 1.5,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
                       ),
-                      itemCount: 3, // Number of projects
+                      itemCount: 3,
                       itemBuilder: (context, index) {
                         final projectNames = [
-                          'Project x',
-                          'Project y',
-                          'Project z'
+                          'Project X',
+                          'Project Y',
+                          'Project Z'
                         ];
                         final projectStatuses = [
                           'completed',
@@ -80,66 +74,11 @@ class HomeScreen extends StatelessWidget {
                           'in_progress'
                         ];
 
-                        // Add animations to cards
                         return AnimatedProjectCard(
                           projectName: projectNames[index],
                           status: projectStatuses[index],
                         );
                       },
-                    ),
-                  ),
-
-                  // Notifications Section
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Notifications',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    flex: 1,
-                    child: ListView(
-                      children: const [
-                        NotificationButton(
-                            message: 'Feedback requested on Project x'),
-                        SizedBox(height: 10),
-                        NotificationButton(
-                            message: 'Validation issue detected in Project y'),
-                      ],
-                    ),
-                  ),
-
-                  // Bottom Section - Single Large Button
-                  const SizedBox(height: 16),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to the Project Name Input Screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProjectNameInputScreen()),
-                          // const Record()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 20),
-                        textStyle: const TextStyle(
-                          fontSize: 20,
-                          color: Color(0xFF3F51B5),
-                        ),
-                      ),
-                      child: const Text(
-                        'New Project',
-                        style: TextStyle(color: Color(0xFF3F51B5)),
-                      ),
                     ),
                   ),
                 ],
@@ -152,7 +91,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Animated Project Card with InkWell Splash
 class AnimatedProjectCard extends StatelessWidget {
   final String projectName;
   final String status;
@@ -161,25 +99,8 @@ class AnimatedProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IconData icon;
-    Color color;
-
-    // Determine icon and color based on the project status
-    switch (status) {
-      case 'completed':
-        icon = Icons.check_circle;
-        color = Colors.green;
-        break;
-      case 'attention_needed':
-        icon = Icons.error;
-        color = Colors.red;
-        break;
-      case 'in_progress':
-      default:
-        icon = Icons.access_time;
-        color = Colors.orange;
-        break;
-    }
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    final isFavorite = favoritesProvider.isFavorite(projectName);
 
     return TweenAnimationBuilder(
       duration: const Duration(milliseconds: 500),
@@ -190,76 +111,53 @@ class AnimatedProjectCard extends StatelessWidget {
           scale: scale,
           child: InkWell(
             onTap: () {
-              // Handle card tap
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('$projectName tapped')),
               );
             },
-            splashColor: Colors.blue.withOpacity(0.3), // InkWell splash color
-            borderRadius: BorderRadius.circular(8),
             child: Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ListTile(
                 title: Text(projectName),
-                trailing: Icon(icon, color: color),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      status == 'completed'
+                          ? Icons.check_circle
+                          : status == 'attention_needed'
+                              ? Icons.error
+                              : Icons.access_time,
+                      color: status == 'completed'
+                          ? Colors.green
+                          : status == 'attention_needed'
+                              ? Colors.red
+                              : Colors.orange,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: () {
+                        favoritesProvider.toggleFavorite(projectName);
+                        final snackBarMessage = isFavorite
+                            ? '$projectName removed from favorites'
+                            : '$projectName added to favorites';
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(snackBarMessage)),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         );
       },
-    );
-  }
-}
-
-// Notification Buttons with Shadows
-class NotificationButton extends StatelessWidget {
-  final String message;
-
-  const NotificationButton({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$message tapped')),
-        );
-      },
-      splashColor: Colors.blue.withOpacity(0.2),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 8,
-              spreadRadius: 2,
-              offset: const Offset(2, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.notifications, color: Color(0xFF3F51B5)),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

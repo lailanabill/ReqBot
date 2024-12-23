@@ -20,7 +20,7 @@ dependencies:
   speech_to_text: ^6.0.1 # Speech to text conversion
   flutter_sound: ^9.3.7 # Check for the latest version
   permission_handler: ^11.1.0 # For microphone permissions
-    http: ^0.15.0
+  http: ^1.2.2
 
   # permission_handler: ^11.1.0
 
