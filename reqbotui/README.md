@@ -1,4 +1,4 @@
-# reqbotui
+# reqbot
 
 A new Flutter project.
 

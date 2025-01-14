@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reqbotui/screens/record.dart';
+import 'package:reqbot/screens/record.dart';
 import 'structured_requirements.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -131,7 +131,7 @@ class _UploadConvertScreenState extends State<UploadConvertScreen> {
                     icon: Icons.text_fields,
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Record()),
+                      MaterialPageRoute(builder: (context) => Record()),
                     ),
                     color: Colors.blueAccent,
                   ),

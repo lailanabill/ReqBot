@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reqbotui/screens/record.dart';
+import 'package:reqbot/screens/record.dart';
 import 'upload_convert.dart';
 
 class ProjectNameInputScreen extends StatelessWidget {

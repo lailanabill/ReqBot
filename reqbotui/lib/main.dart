@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // For state management
-import 'package:reqbotui/providers/favorites_provider.dart';
-import 'screens/record.dart';
-import 'screens/sign_in_page.dart';
-import 'screens/sign_up_page.dart';
-import 'screens/upload_convert.dart';
-import 'screens/welcome_page.dart';
-import 'screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'views/themes/light_theme.dart';
+import 'views/themes/dark_theme.dart';
+import 'views/widgets/app_routes.dart';
+import 'views/widgets/app_initialization.dart';
+import 'services/providers/favorites_provider.dart';
 
-void main() {
+void main() async {
+  await initializeApp(); // Initialization logic moved to a helper
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => FavoritesProvider()), // Register FavoritesProvider
+          create: (_) => FavoritesProvider(),
+        ),
       ],
       child: const ReqBotApp(),
     ),
@@ -21,25 +21,18 @@ void main() {
 }
 
 class ReqBotApp extends StatelessWidget {
-  const ReqBotApp({Key? key}) : super(key: key);
+  const ReqBotApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ReqBot',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: buildLightTheme(), // Moved light theme logic to a separate file
+      darkTheme: buildDarkTheme(), // Moved dark theme logic to a separate file
+      themeMode: ThemeMode.system,
       initialRoute: '/',
-      routes: {
-        '/': (context) => WelcomePage(),
-        '/sign-in': (context) => SignInPage(),
-        '/sign-up': (context) => SignUpPage(),
-        '/HomeScreen': (context) => HomeScreen(),
-        '/record': (context) => Record(),
-      },
+      routes: AppRoutes.routes, // Moved route logic to a separate file
     );
   }
 }
