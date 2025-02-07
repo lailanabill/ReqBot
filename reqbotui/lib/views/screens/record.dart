@@ -54,7 +54,7 @@ class _RecordState extends State<Record> {
         print('a7a+ ${file}');
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('http://192.168.1.3:8080/whisper/'),
+          Uri.parse('http://192.168.1.11:8081/whisper/'),
         );
         request.files.add(await http.MultipartFile.fromPath('file', file.path));
         print('a7a request+${request}');
@@ -78,6 +78,7 @@ class _RecordState extends State<Record> {
     }
   }
 
+
   Future<void> _handleSaveProject() async {
     try {
       await _controller.saveProject(
@@ -95,6 +96,22 @@ class _RecordState extends State<Record> {
       );
     }
   }
+Future<void> extractRequirements(String transcription) async {
+  var url = Uri.parse('http://192.168.1.11:8081/extract/');
+  var response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: json.encode({"transcription": transcription}),
+  );
+
+  if (response.statusCode == 200) {
+    // Handle the successful response here
+    print('Success: ${response.body}');
+  } else {
+    // Handle error here
+    print('Error: ${response.statusCode}');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
