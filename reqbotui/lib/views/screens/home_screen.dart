@@ -159,8 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _loadProjects()), // Reload projects after creating a new one
                     onViewFavorites: () =>
                         Navigator.pushNamed(context, '/FavoritesScreen'),
-                    onGoToMailPage: () =>
-                        Navigator.pushNamed(context, '/MailPage'),
+                    
                   ),
                 ],
               ),

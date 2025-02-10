@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class HomeActionButtons extends StatelessWidget {
   final VoidCallback onNewProject;
   final VoidCallback onViewFavorites;
-  final VoidCallback onGoToMailPage;
+  
 
   const HomeActionButtons({
     super.key,
     required this.onNewProject,
     required this.onViewFavorites,
-    required this.onGoToMailPage,
+ 
   });
 
   @override
@@ -44,10 +44,7 @@ class HomeActionButtons extends StatelessWidget {
               style: TextStyle(color: Color(0xFF3F51B5)),
             ),
           ),
-          ElevatedButton(
-            onPressed: onGoToMailPage,
-            child: const Text('Go to Mail Page'),
-          ),
+         
         ],
       ),
     );
