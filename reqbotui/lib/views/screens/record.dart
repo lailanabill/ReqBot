@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reqbot/controllers/record_controller.dart';
+import 'package:reqbot/views/screens/selectReqs.dart';
 import '../widgets/project_name_input_field.dart';
 import '../widgets/transcription_display.dart';
 import 'home_screen.dart';
@@ -51,24 +52,21 @@ class _RecordState extends State<Record> {
 
       if (result != null) {
         File file = File(result.files.single.path!);
-        print('a7a+ ${file}');
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('http://192.168.1.11:8081/whisper/'),
+          Uri.parse(
+              'https://lastisa-1016128810332.us-central1.run.app/whisper/'),
         );
         request.files.add(await http.MultipartFile.fromPath('file', file.path));
-        print('a7a request+${request}');
         var response = await request.send();
         if (response.statusCode == 200) {
-          print('ma ygebha ella rgalha ya gello , kaffo 3lyk + ${response}');
           var responseData = await response.stream.bytesToString();
           var transcription = jsonDecode(responseData)['transcription'];
 
           _updateTranscription(transcription);
         } else {
-          print('shits + ${response.statusCode}');
           throw Exception(
-              "Failed to upload audio. Status code: ${response.statusCode}");
+              "Failed to upload audio. Status code: ${await response.stream.bytesToString()} ${response.statusCode}");
         }
       }
     } catch (e) {
@@ -77,7 +75,6 @@ class _RecordState extends State<Record> {
       );
     }
   }
-
 
   Future<void> _handleSaveProject() async {
     try {
@@ -96,22 +93,23 @@ class _RecordState extends State<Record> {
       );
     }
   }
-Future<void> extractRequirements(String transcription) async {
-  var url = Uri.parse('http://192.168.1.11:8081/extract/');
-  var response = await http.post(
-    url,
-    headers: {"Content-Type": "application/json"},
-    body: json.encode({"transcription": transcription}),
-  );
 
-  if (response.statusCode == 200) {
-    // Handle the successful response here
-    print('Success: ${response.body}');
-  } else {
-    // Handle error here
-    print('Error: ${response.statusCode}');
+  Future<void> extractRequirements(String transcription) async {
+    var url = Uri.parse('http://192.168.1.11:8081/extract/');
+    var response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({"transcription": transcription}),
+    );
+
+    if (response.statusCode == 200) {
+      // Handle the successful response here
+      print('Success: ${response.body}');
+    } else {
+      // Handle error here
+      print('Error: ${response.statusCode}');
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +144,18 @@ Future<void> extractRequirements(String transcription) async {
               ElevatedButton(
                 onPressed: _handleSaveProject,
                 child: const Text('Save Project'),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SelectReqs(
+                      myreqs: _transcription,
+                    ),
+                  ),
+                ),
+                child: Text('next'),
               ),
             ],
           ),
