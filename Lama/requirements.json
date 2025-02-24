@@ -1,0 +1,43 @@
+{
+  "project_name": "Mobile App for User Login and Sign Up",
+  "functional_requirements": [
+    {
+      "id": "FR001",
+      "description": "login",
+      "priority": "High",
+      "actor": "User"
+    },
+    {
+      "id": "FR002",
+      "description": "signup",
+      "priority": "High",
+      "actor": "User"
+    },
+    {
+      "id": "FR003",
+      "description": "view dashboard",
+      "priority": "High",
+      "actor": "Admin"
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR001",
+      "category": "Security",
+      "description": "High security levels for mobile app",
+      "priority": "High"
+    }
+  ],
+  "actors": [
+    {
+      "name": "User",
+      "description": "Mobile app user",
+      "type": "Primary"
+    },
+    {
+      "name": "Admin",
+      "description": "System administrator",
+      "type": "Primary"
+    }
+  ]
+}
