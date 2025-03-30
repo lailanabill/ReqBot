@@ -6,10 +6,10 @@ class AuthHeader extends StatelessWidget {
   final double height;
 
   const AuthHeader({
-    Key? key,
+    super.key,
     required this.title,
     required this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

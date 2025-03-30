@@ -7,7 +7,7 @@ import 'package:reqbot/views/screens/structured_requirements.dart';
 class SelectReqs extends StatefulWidget {
   final String myreqs;
 
-  SelectReqs({required this.myreqs});
+  const SelectReqs({super.key, required this.myreqs});
 
   @override
   _SelectReqsState createState() => _SelectReqsState();

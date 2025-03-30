@@ -6,11 +6,11 @@ class AuthNavigation extends StatelessWidget {
   final VoidCallback onTap;
 
   const AuthNavigation({
-    Key? key,
+    super.key,
     required this.questionText,
     required this.actionText,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SignUpOption extends StatelessWidget {
-  const SignUpOption({Key? key}) : super(key: key);
+  const SignUpOption({super.key});
 
   @override
   Widget build(BuildContext context) {
