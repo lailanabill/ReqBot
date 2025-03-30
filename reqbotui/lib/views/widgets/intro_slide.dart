@@ -6,11 +6,11 @@ class IntroSlide extends StatelessWidget {
   final String imageAsset;
 
   const IntroSlide({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.imageAsset,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
