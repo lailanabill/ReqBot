@@ -121,3 +121,103 @@ EXAMPLE OUTPUT:
   "classes": [
     {{
       "name": "Student",
+      "attributes": [
+        {{
+          "name": "studentId",
+          "type": "String",
+          "visibility": "private"
+        }},
+        {{
+          "name": "name",
+          "type": "String",
+          "visibility": "private"
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "registerForCourse",
+          "parameters": [
+            {{
+              "name": "courseCode",
+              "type": "String"
+            }}
+          ],
+          "return_type": "Boolean",
+          "visibility": "public"
+        }}
+      ]
+    }},
+    {{
+      "name": "Course",
+      "attributes": [
+        {{
+          "name": "courseCode",
+          "type": "String",
+          "visibility": "private"
+        }},
+        {{
+          "name": "title",
+          "type": "String",
+          "visibility": "private"
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "checkPrerequisites",
+          "parameters": [
+            {{
+              "name": "student",
+              "type": "Student"
+            }}
+          ],
+          "return_type": "Boolean",
+          "visibility": "public"
+        }}
+      ]
+    }}
+  ],
+  "relationships": [
+    {{
+      "type": "association",
+      "from": "Student",
+      "to": "Course",
+      "multiplicity": "0..*",
+      "label": "registers for"
+    }}
+  ]
+}}
+
+Now, analyze the following system description and extract class diagram elements:
+
+System Description:
+{description}
+
+IMPORTANT:
+- Create a comprehensive class diagram representation
+- Include all significant classes with their attributes and methods
+- Identify and specify relationships between classes
+- Return ONLY a valid JSON object
+- Ensure thorough and meaningful class design"""
+
+        start_time = time.time()
+        
+        for attempt in range(self.max_retries):
+            try:
+                response = ollama.chat(
+                    model=self.model,
+                    messages=[{'role': 'user', 'content': prompt}],
+                    options={
+                        'temperature': self.temperature,
+                        'num_predict': 3500,
+                        'top_k': 20,
+                        'top_p': 0.9
+                    }
+                )
+                
+                raw_response = response['message']['content']
+                cleaned_response = self.clean_json_response(raw_response)
+                
+                if not cleaned_response:
+                    print(f"Attempt {attempt + 1}: Failed to clean JSON")
+                    continue
+                
