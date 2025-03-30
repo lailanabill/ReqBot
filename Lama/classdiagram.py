@@ -221,3 +221,149 @@ IMPORTANT:
                     print(f"Attempt {attempt + 1}: Failed to clean JSON")
                     continue
                 
+                class_diagram_json = json.loads(cleaned_response)
+                self.validate_json_structure(class_diagram_json)
+                
+                end_time = time.time()
+                print(f"Extraction completed in {end_time - start_time:.2f} seconds")
+                
+                return class_diagram_json
+            
+            except Exception as e:
+                print(f"Attempt {attempt + 1} failed: {e}")
+                time.sleep(2)
+        
+        return None
+
+    def generate_plantuml(self, json_data: Dict[str, Any]) -> str:
+        """
+        Generate PlantUML class diagram code with robust parameter handling
+        """
+        plantuml = [
+            "@startuml",
+            f"title {json_data.get('system_name', 'Class Diagram')} Class Diagram",
+            "skinparam classAttributeIconSize 0",
+            "skinparam monochrome true",
+            "skinparam class {",
+            "    BackgroundColor White",
+            "    BorderColor Black",
+            "    ArrowColor Black",
+            "}"
+        ]
+
+        # Generate classes
+        for cls in json_data.get('classes', []):
+            class_def = [f"class {cls['name']} {{"]
+            
+            # Add attributes
+            for attr in cls.get('attributes', []):
+                visibility = {"private": "-", "public": "+", "protected": "#"}.get(attr.get('visibility', 'private'), '-')
+                class_def.append(f"  {visibility} {attr.get('name', 'unnamed')}: {attr.get('type', 'Any')}")
+            
+            # Add methods
+            for method in cls.get('methods', []):
+                visibility = {"private": "-", "public": "+", "protected": "#"}.get(method.get('visibility', 'public'), '+')
+                
+                # Safely get parameters
+                safe_params = self.safe_get_parameters(method)
+                
+                # Format parameters
+                params_str = ', '.join([f"{p['name']}: {p['type']}" for p in safe_params])
+                
+                # Add method to class definition
+                class_def.append(f"  {visibility} {method.get('name', 'unnamed_method')}({params_str}): {method.get('return_type', 'void')}")
+            
+            class_def.append("}")
+            plantuml.extend(class_def)
+
+        # Generate relationships
+        for rel in json_data.get('relationships', []):
+            relation_type = rel.get('type', 'association')
+            line_styles = {
+                'inheritance': '▷',
+                'association': '-->',
+                'aggregation': 'o--',
+                'composition': '*--'
+            }
+            line_style = line_styles.get(relation_type, '-->')
+            
+            plantuml.append(f"{rel.get('from', 'UnknownClass')} {line_style} {rel.get('to', 'UnknownClass')} : {rel.get('label', '')}")
+
+        plantuml.append("@enduml")
+        return '\n'.join(plantuml)
+
+    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'class_diagram.png') -> bool:
+        """
+        Generate diagram using Kroki API
+        """
+        try:
+            kroki_url = "https://kroki.io/plantuml/png/"
+            
+            plantuml_encoded = base64.urlsafe_b64encode(
+                zlib.compress(plantuml_code.encode('utf-8'), 9)
+            ).decode('ascii')
+
+            response = requests.get(f"{kroki_url}{plantuml_encoded}")
+
+            if response.status_code == 200:
+                with open(output_file, 'wb') as f:
+                    f.write(response.content)
+                print(f"Diagram successfully generated and saved as {output_file}")
+                return True
+            else:
+                print(f"Failed to generate diagram. Status code: {response.status_code}")
+                return False
+
+        except Exception as e:
+            print(f"Error generating diagram: {e}")
+            return False
+
+def main():
+    # Initialize generator
+    generator = ClassDiagramGenerator(model='llama3')
+    
+    # System description as a meeting transcript
+    description = """
+Meeting Transcript: University Course Registration System Discussion
+
+Team Lead (Alex): Okay, team, today we're discussing the University Course Registration System we're building. It's meant to streamline how students register for courses at the university, so let's map out the key classes and their interactions.
+
+Developer (Sam): We'll need classes for Students, Courses, Faculty, and Registration.
+
+Team Lead (Alex): Exactly. Students will have attributes like student ID, name, and enrolled courses. They'll be able to register for courses, view their schedule, and check prerequisites.
+
+Analyst (Jordan): Courses should have details like course code, title, description, and capacity. Faculty members will manage courses, set prerequisites, and view student enrollments.
+
+Designer (Priya): We'll need a Registration class to handle the registration process, tracking which students are enrolled in which courses, managing waitlists, and handling course capacity.
+
+Team Lead (Alex): Great points. We should also consider how we'll handle academic records, prerequisites, and potential conflicts in course scheduling.
+    """
+    
+    # Extract class diagram elements
+    class_diagram_json = generator.extract_class_diagram_elements(description)
+    
+    if class_diagram_json:
+        # Save JSON
+        with open('class_diagram.json', 'w', encoding='utf-8') as f:
+            json.dump(class_diagram_json, f, indent=2, ensure_ascii=False)
+        
+        # Generate PlantUML
+        plantuml_code = generator.generate_plantuml(class_diagram_json)
+        
+        # Save PlantUML code
+        with open('class_diagram.puml', 'w', encoding='utf-8') as f:
+            f.write(plantuml_code)
+        
+        # Generate diagram using Kroki
+        generator.generate_diagram_with_kroki(plantuml_code, 'class_diagram.png')
+        
+        # Print results
+        print("Extracted Class Diagram Elements:")
+        print(json.dumps(class_diagram_json, indent=2, ensure_ascii=False))
+        print("\nPlantUML Diagram Code:")
+        print(plantuml_code)
+    else:
+        print("Failed to extract class diagram elements from description")
+
+if __name__ == "__main__":
+    main()
