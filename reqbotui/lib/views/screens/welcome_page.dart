@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_introduction/animated_introduction.dart';
 import 'package:reqbot/controllers/welcome_controller.dart';
-import '../widgets/intro_slide.dart';
 
 class WelcomePage extends StatelessWidget {
   final WelcomeController controller = WelcomeController();
