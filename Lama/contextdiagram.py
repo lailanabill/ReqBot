@@ -296,3 +296,296 @@ Output:
     }}
   ]
 }}
+
+EXAMPLE 4:
+Description: "A Hospital Management System handles patient records. Doctors update records, and patients view them. It uses an SMS Service for reminders."
+Output:
+{{
+  "system_name": "Hospital Management System",
+  "external_entities": [
+    {{
+      "id": "EE1",
+      "name": "Doctor",
+      "description": "Medical staff updating patient records"
+    }},
+    {{
+      "id": "EE2",
+      "name": "Patient",
+      "description": "Individuals accessing their records"
+    }},
+    {{
+      "id": "EE3",
+      "name": "SMS Service",
+      "description": "External service for sending reminders"
+    }}
+  ],
+  "data_flows": [
+    {{
+      "id": "DF1",
+      "from": "Doctor",
+      "to": "System",
+      "description": "Update Patient Records"
+    }},
+    {{
+      "id": "DF2",
+      "from": "System",
+      "to": "Doctor",
+      "description": "Send Update Confirmations"
+    }},
+    {{
+      "id": "DF3",
+      "from": "Patient",
+      "to": "System",
+      "description": "Request Record Access"
+    }},
+    {{
+      "id": "DF4",
+      "from": "System",
+      "to": "Patient",
+      "description": "Provide Patient Records"
+    }},
+    {{
+      "id": "DF5",
+      "from": "System",
+      "to": "SMS Service",
+      "description": "Send Reminder Requests"
+    }}
+  ]
+}}
+
+EXAMPLE 5:
+Description: "A Ride-Sharing App connects drivers with passengers. It uses a GPS Service for navigation and a Payment Processor for transactions."
+Output:
+{{
+  "system_name": "Ride-Sharing App",
+  "external_entities": [
+    {{
+      "id": "EE1",
+      "name": "Passenger",
+      "description": "Users requesting rides"
+    }},
+    {{
+      "id": "EE2",
+      "name": "Driver",
+      "description": "Individuals providing rides"
+    }},
+    {{
+      "id": "EE3",
+      "name": "GPS Service",
+      "description": "External navigation service"
+    }},
+    {{
+      "id": "EE4",
+      "name": "Payment Processor",
+      "description": "External payment service"
+    }}
+  ],
+  "data_flows": [
+    {{
+      "id": "DF1",
+      "from": "Passenger",
+      "to": "System",
+      "description": "Submit Ride Requests"
+    }},
+    {{
+      "id": "DF2",
+      "from": "System",
+      "to": "Passenger",
+      "description": "Send Ride Confirmations"
+    }},
+    {{
+      "id": "DF3",
+      "from": "System",
+      "to": "Driver",
+      "description": "Assign Ride Details"
+    }},
+    {{
+      "id": "DF4",
+      "from": "Driver",
+      "to": "System",
+      "description": "Provide Ride Updates"
+    }},
+    {{
+      "id": "DF5",
+      "from": "System",
+      "to": "GPS Service",
+      "description": "Request Location Data"
+    }},
+    {{
+      "id": "DF6",
+      "from": "GPS Service",
+      "to": "System",
+      "description": "Provide Location Data"
+    }},
+    {{
+      "id": "DF7",
+      "from": "System",
+      "to": "Payment Processor",
+      "description": "Send Payment Requests"
+    }},
+    {{
+      "id": "DF8",
+      "from": "Payment Processor",
+      "to": "System",
+      "description": "Return Payment Confirmations"
+    }}
+  ]
+}}
+
+EXAMPLE 6:
+Description: "A Smart Home System controls devices. Homeowners set preferences, and it connects to a Weather API for conditions."
+Output:
+{{
+  "system_name": "Smart Home System",
+  "external_entities": [
+    {{
+      "id": "EE1",
+      "name": "Homeowner",
+      "description": "Users controlling home devices"
+    }},
+    {{
+      "id": "EE2",
+      "name": "Weather API",
+      "description": "External service providing weather data"
+    }}
+  ],
+  "data_flows": [
+    {{
+      "id": "DF1",
+      "from": "Homeowner",
+      "to": "System",
+      "description": "Set Device Preferences"
+    }},
+    {{
+      "id": "DF2",
+      "from": "System",
+      "to": "Homeowner",
+      "description": "Provide Device Status"
+    }},
+    {{
+      "id": "DF3",
+      "from": "System",
+      "to": "Weather API",
+      "description": "Request Weather Data"
+    }},
+    {{
+      "id": "DF4",
+      "from": "Weather API",
+      "to": "System",
+      "description": "Provide Weather Data"
+    }}
+  ]
+}}
+
+EXAMPLE 7:
+Description: "A Customer Support System handles inquiries. Customers submit tickets, and agents resolve them. It integrates with a Chatbot Service."
+Output:
+{{
+  "system_name": "Customer Support System",
+  "external_entities": [
+    {{
+      "id": "EE1",
+      "name": "Customer",
+      "description": "Users submitting support tickets"
+    }},
+    {{
+      "id": "EE2",
+      "name": "Agent",
+      "description": "Staff resolving tickets"
+    }},
+    {{
+      "id": "EE3",
+      "name": "Chatbot Service",
+      "description": "External automated support service"
+    }}
+  ],
+  "data_flows": [
+    {{
+      "id": "DF1",
+      "from": "Customer",
+      "to": "System",
+      "description": "Submit Support Tickets"
+    }},
+    {{
+      "id": "DF2",
+      "from": "System",
+      "to": "Customer",
+      "description": "Send Ticket Updates"
+    }},
+    {{
+      "id": "DF3",
+      "from": "System",
+      "to": "Agent",
+      "description": "Assign Tickets"
+    }},
+    {{
+      "id": "DF4",
+      "from": "Agent",
+      "to": "System",
+      "description": "Provide Ticket Resolutions"
+    }},
+    {{
+      "id": "DF5",
+      "from": "System",
+      "to": "Chatbot Service",
+      "description": "Send Inquiry Handling Requests"
+    }},
+    {{
+      "id": "DF6",
+      "from": "Chatbot Service",
+      "to": "System",
+      "description": "Return Inquiry Responses"
+    }}
+  ]
+}}
+
+EXAMPLE 8:
+Description: "A Fitness Tracking App logs workouts. Users input data, and it syncs with a Health Cloud for storage and analysis."
+Output:
+{{
+  "system_name": "Fitness Tracking App",
+  "external_entities": [
+    {{
+      "id": "EE1",
+      "name": "User",
+      "description": "Individuals logging workouts"
+    }},
+    {{
+      "id": "EE2",
+      "name": "Health Cloud",
+      "description": "External service for data storage and analysis"
+    }}
+  ],
+  "data_flows": [
+    {{
+      "id": "DF1",
+      "from": "User",
+      "to": "System",
+      "description": "Log Workout Data"
+    }},
+    {{
+      "id": "DF2",
+      "from": "System",
+      "to": "User",
+      "description": "Provide Workout Summaries"
+    }},
+    {{
+      "id": "DF3",
+      "from": "System",
+      "to": "Health Cloud",
+      "description": "Sync Workout Data"
+    }},
+    {{
+      "id": "DF4",
+      "from": "Health Cloud",
+      "to": "System",
+      "description": "Return Analysis Results"
+    }}
+  ]
+}}
+
+Now, analyze the following system description and extract context diagram elements:
+
+
+if __name__ == "__main__":
+    main()
