@@ -586,6 +586,171 @@ Output:
 
 Now, analyze the following system description and extract context diagram elements:
 
+System Description:
+{description}
+
+IMPORTANT:
+- Create a diagram with the system as the only circle at the center and external entities as rectangles around it
+- Use clear, action-oriented labels for data flows (e.g., "Submit Registration Data", "Provide Information & Tools")
+- Represent each direction of data flow as a separate arrow (do NOT combine into bidirectional arrows)
+- Return ONLY a valid JSON object
+- Ensure comprehensive identification of entities and flows"""
+
+        start_time = time.time()
+        
+        for attempt in range(self.max_retries):
+            try:
+                response = ollama.chat(
+                    model=self.model,
+                    messages=[{'role': 'user', 'content': prompt}],
+                    options={
+                        'temperature': self.temperature,
+                        'num_predict': 3500,
+                        'top_k': 20,
+                        'top_p': 0.9
+                    }
+                )
+                
+                raw_response = response['message']['content']
+                cleaned_response = self.clean_json_response(raw_response)
+                
+                if not cleaned_response:
+                    print(f"Attempt {attempt + 1}: Failed to clean JSON")
+                    continue
+                
+                context_json = json.loads(cleaned_response)
+                self.validate_json_structure(context_json)
+                
+                end_time = time.time()
+                print(f"Extraction completed in {end_time - start_time:.2f} seconds")
+                
+                return context_json
+            
+            except Exception as e:
+                print(f"Attempt {attempt + 1} failed: {e}")
+                time.sleep(2)
+        
+        return None
+
+    def generate_plantuml(self, json_data: Dict[str, Any]) -> str:
+        """
+        Generate a PlantUML context diagram with the system as a circle
+        """
+        plantuml = [
+            "@startuml",
+            "skinparam monochrome true",
+            "skinparam class {",
+            "    BackgroundColor White",
+            "    BorderColor Black",
+            "    ArrowColor Black",
+            "    FontSize 12",
+            "}",
+            "skinparam circle {",
+            "    BackgroundColor White",
+            "    BorderColor Black",
+            "}",
+            "skinparam ArrowThickness 1",
+            "skinparam ArrowFontSize 10",
+            "",
+            f"circle \"{json_data['system_name']}\" as SysName",
+            ""
+        ]
+
+        # Add external entities as rectangles
+        entity_ids = {entity['name']: entity['id'] for entity in json_data['external_entities']}
+        for entity in json_data['external_entities']:
+            plantuml.append(f"rectangle \"{entity['name']}\" as {entity['id']}")
+
+        plantuml.append("")
+
+        # Add data flows as separate arrows
+        for flow in json_data['data_flows']:
+            if flow['from'] == "System":
+                source = "SysName"
+                target = entity_ids.get(flow['to'], flow['to'])
+            else:
+                source = entity_ids.get(flow['from'], flow['from'])
+                target = "SysName"
+            plantuml.append(f"{source} --> {target}: {flow['description']}")
+
+        plantuml.append("@enduml")
+        return '\n'.join(plantuml)
+
+    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'context_diagram.png') -> bool:
+        """
+        Generate diagram using Kroki API
+        """
+        try:
+            kroki_url = "https://kroki.io/plantuml/png/"
+            
+            plantuml_encoded = base64.urlsafe_b64encode(
+                zlib.compress(plantuml_code.encode('utf-8'), 9)
+            ).decode('ascii')
+
+            response = requests.get(f"{kroki_url}{plantuml_encoded}")
+
+            if response.status_code == 200:
+                with open(output_file, 'wb') as f:
+                    f.write(response.content)
+                print(f"Diagram successfully generated and saved as {output_file}")
+                return True
+            else:
+                print(f"Failed to generate diagram. Status code: {response.status_code}")
+                return False
+
+        except Exception as e:
+            print(f"Error generating diagram: {e}")
+            return False
+
+def main():
+    # Initialize generator
+    generator = ContextDiagramGenerator(model='llama3')
+    
+    # System description as a meeting transcript
+    description = """
+Meeting Transcript: University Course Registration System Discussion
+
+Team Lead (Alex): Okay, team, today we’re discussing the University Course Registration System we’re building. It’s meant to streamline how students register for courses at the university, so let’s map out the key interactions.
+
+Developer (Sam): Got it. What’s the main functionality of this system?
+
+Team Lead (Alex): The system handles the entire course registration process. Students can browse available courses, register for them, and view their schedules. Faculty members need to submit their course offerings—like the syllabus and schedule—and they also want to see who’s enrolled in their classes. Registrars are in charge of managing the course catalog and approving student registrations to make sure everything’s in order.
+
+Analyst (Jordan): So, students are registering and checking schedules, faculty are submitting course details and checking enrollments, and registrars are managing the catalog and approvals. Any external systems we need to connect to?
+
+Team Lead (Alex): Yes, there are a few. We need a Payment System to handle tuition fees when students register for courses. There’s also an Email Notification Service to send confirmations to students once their registration is approved. And we’ll connect to the Academic Records System to update student records with their registered courses.
+
+Designer (Priya): Sounds good! So, the system is interacting with students, faculty, registrars, and those external systems. I’ll make sure we capture all those flows clearly in the diagram.
+
+Team Lead (Alex): Exactly. Let’s get this documented so we can visualize how everything connects.
+    """
+    
+    # Extract context elements
+    context_json = generator.extract_context_elements(description)
+    
+    if context_json:
+        # Save JSON
+        with open('context_diagram.json', 'w', encoding='utf-8') as f:
+            json.dump(context_json, f, indent=2, ensure_ascii=False)
+        
+        # Generate PlantUML
+        plantuml_code = generator.generate_plantuml(context_json)
+        
+        # Save PlantUML code
+        with open('context_diagram.puml', 'w', encoding='utf-8') as f:
+            f.write(plantuml_code)
+        
+        # Generate diagram using Kroki
+        generator.generate_diagram_with_kroki(plantuml_code, 'context_diagram.png')
+        
+        # Print results
+        print("Extracted Context Elements:")
+        print(json.dumps(context_json, indent=2, ensure_ascii=False))
+        print("\nPlantUML Diagram Code:")
+        print(plantuml_code)
+    else:
+        print("Failed to extract context elements from description")
+
 
 if __name__ == "__main__":
     main()
