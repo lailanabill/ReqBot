@@ -13,7 +13,8 @@ ThemeData buildDarkTheme() {
       backgroundColor: kDarkColorScheme.primaryContainer,
       foregroundColor: kDarkColorScheme.onPrimaryContainer,
     ),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
+      // ✅ FIXED
       color: kDarkColorScheme.secondaryContainer,
       margin: const EdgeInsets.all(16),
     ),
