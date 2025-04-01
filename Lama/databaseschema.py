@@ -98,4 +98,103 @@ System Description:
                         'top_p': 0.9
                     }
                 )
-           
+                
+                raw_response = response['message']['content']
+                cleaned_response = self.clean_json_response(raw_response)
+                
+                if cleaned_response:
+                    return json.loads(cleaned_response)
+                
+            except Exception as e:
+                print(f"Attempt {attempt + 1} failed: {e}")
+                time.sleep(2)
+        
+        return None
+
+    def clean_json_response(self, response: str) -> Optional[str]:
+        def extract_json(text):
+            patterns = [
+                r'\{.*"system_name".*"classes".*\}',
+                r'```json(.*?)```',
+                r'\{.*\}'
+            ]
+            
+            for pattern in patterns:
+                try:
+                    match = re.search(pattern, text, re.DOTALL | re.MULTILINE)
+                    if match:
+                        json_str = match.group(1) if len(match.groups()) > 0 else match.group(0)
+                        return json_str.strip()
+                except Exception:
+                    continue
+            return None
+
+        try:
+            cleaned_json_str = extract_json(response)
+            if not cleaned_json_str:
+                return None
+
+            # Remove any non-JSON content
+            cleaned_json_str = re.sub(r'```.*?```', '', cleaned_json_str, flags=re.DOTALL)
+            cleaned_json_str = cleaned_json_str.strip()
+
+            # Validate JSON structure
+            parsed_json = json.loads(cleaned_json_str)
+            return json.dumps(parsed_json)
+
+        except Exception as e:
+            print(f"JSON cleaning error: {e}")
+            return None
+
+    def generate_plantuml(self, json_data: Dict[str, Any]) -> str:
+        """Generate PlantUML class diagram code"""
+        plantuml = [
+            "@startuml",
+            "skinparam class {",
+            "    BackgroundColor White",
+            "    BorderColor Black",
+            "    ArrowColor Black",
+            "}",
+            "skinparam classAttributeIconSize 0",
+            f"title {json_data.get('system_name', 'Database Schema')} Class Diagram"
+        ]
+
+        # Generate classes
+        for cls in json_data.get('classes', []):
+            class_def = [f"class {cls['name']} {{"]
+            
+            # Add description as note
+            if 'description' in cls:
+                class_def.extend([
+                    f".. {cls['description']} ..",
+                    ""
+                ])
+            
+            # Add attributes
+            for attr in cls.get('attributes', []):
+                visibility = "+" if attr.get('is_primary_key') else "-"
+                attr_str = f"{visibility} {attr.get('name')}: {attr.get('type')}"
+                
+                constraints = []
+                if attr.get('is_primary_key'):
+                    constraints.append("PK")
+                if not attr.get('is_nullable', True):
+                    constraints.append("NOT NULL")
+                
+                if constraints:
+                    attr_str += f" {{{', '.join(constraints)}}}"
+                
+                class_def.append(attr_str)
+            
+            # Add methods
+            class_def.append("")  # Empty line before methods
+            for method in cls.get('methods', []):
+                params = method.get('parameters', [])
+                params_str = ", ".join([f"{p['name']}: {p['type']}" for p in params])
+                method_str = f"+ {method['name']}({params_str}): {method.get('return_type', 'void')}"
+                class_def.append(method_str)
+            
+            class_def.append("}")
+            plantuml.extend(class_def)
+
+        # Generate relationships
