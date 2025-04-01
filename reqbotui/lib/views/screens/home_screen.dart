@@ -7,6 +7,7 @@ import '../widgets/animated_project_card.dart';
 import '../screens/projectDetailsScreen.dart';
 import '../screens/record.dart';
 import 'package:reqbot/services/auth/auth_services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final HomeController _controller = HomeController();
   final AuthServices _authServices = AuthServices();
+  final SupabaseClient _supabase = Supabase.instance.client;
+
   List<ProjectModel> _projects = [];
   ProjectModel? _lastRemovedProject;
   int? _lastRemovedProjectIndex;
@@ -29,10 +32,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadProjects() async {
-    final projects = await _controller.loadProjects();
-    setState(() {
-      _projects = projects;
-    });
+    try {
+      final response = await _supabase.from('projects').select();
+      setState(() {
+        _projects = response.map((p) => ProjectModel.fromMap(p)).toList();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error loading projects: $e")),
+      );
+    }
   }
 
   Future<void> _removeProject(int index) async {
@@ -63,12 +72,22 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
 
-    // Proceed with actual deletion in the backend only if the action isn't undone
+    // Proceed with actual deletion in Supabase only if the action isn't undone
     await Future.delayed(const Duration(seconds: 5), () async {
       if (_lastRemovedProject != null) {
-        await _controller.removeProject(_lastRemovedProject!.id);
-        _lastRemovedProject = null;
-        _lastRemovedProjectIndex = null;
+        try {
+          await _supabase
+              .from('projects')
+              .delete()
+              .eq('id', _lastRemovedProject!.id as Object);
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error deleting project: $e")),
+          );
+        } finally {
+          _lastRemovedProject = null;
+          _lastRemovedProjectIndex = null;
+        }
       }
     });
   }
@@ -139,6 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ProjectDetailsScreen(
+                                      projectId: project.id,
                                       projectName: project.name,
                                       transcription: project.transcription,
                                     ),
@@ -159,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         _loadProjects()), // Reload projects after creating a new one
                     onViewFavorites: () =>
                         Navigator.pushNamed(context, '/FavoritesScreen'),
-                    
                   ),
                 ],
               ),

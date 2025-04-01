@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reqbot/controllers/project_name_controller.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../widgets/project_name_input_field.dart';
 import '../widgets/save_button.dart';
 
@@ -12,18 +12,40 @@ class ProjectNameScreen extends StatefulWidget {
 
 class _ProjectNameScreenState extends State<ProjectNameScreen> {
   final TextEditingController _projectNameController = TextEditingController();
-  final ProjectNameController _controller = ProjectNameController();
+  final SupabaseClient _supabase = Supabase.instance.client;
 
   Future<void> _handleSaveProject() async {
+    final projectName = _projectNameController.text.trim();
+    if (projectName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Project name cannot be empty.')),
+      );
+      return;
+    }
+
     try {
-      await _controller.saveProject(_projectNameController.text);
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You must be logged in to save a project.')),
+        );
+        return;
+      }
+
+      await _supabase.from('projects').insert({
+        'user_id': user.id, // Linking project to the logged-in user
+        'name': projectName,
+        'transcription': '', // Empty transcription for now
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Project saved successfully.')),
       );
-      Navigator.pop(context);
+
+      Navigator.pop(context); // Close the screen after saving
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text('Error saving project: $e')),
       );
     }
   }
