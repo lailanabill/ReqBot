@@ -198,3 +198,90 @@ System Description:
             plantuml.extend(class_def)
 
         # Generate relationships
+        for rel in json_data.get('relationships', []):
+            if rel.get('type') == 'one_to_many':
+                arrow_style = "\"1\" *-- \"*\""
+            elif rel.get('type') == 'many_to_one':
+                arrow_style = "\"*\" --* \"1\""
+            elif rel.get('type') == 'one_to_one':
+                arrow_style = "\"1\" -- \"1\""
+            else:
+                arrow_style = "\"*\" -- \"*\""
+            
+            plantuml.append(
+                f"{rel.get('from_class')} {arrow_style} {rel.get('to_class')} : {rel.get('description', '')}"
+            )
+
+        plantuml.append("@enduml")
+        return '\n'.join(plantuml)
+
+    def generate_diagram(self, plantuml_code: str, output_file: str = 'database_class_diagram.png') -> bool:
+        """Generate diagram using Kroki"""
+        try:
+            kroki_url = self.url_generator.generate_kroki_url('plantuml', plantuml_code, 'png')
+            
+            if not kroki_url:
+                return False
+            
+            response = requests.get(kroki_url)
+            
+            if response.status_code == 200:
+                with open(output_file, 'wb') as f:
+                    f.write(response.content)
+                
+                with open('database_class_diagram.puml', 'w', encoding='utf-8') as f:
+                    f.write(plantuml_code)
+                
+                print(f"Class diagram saved as {output_file}")
+                return True
+            else:
+                print(f"Failed to generate diagram. Status code: {response.status_code}")
+                return False
+            
+        except Exception as e:
+            print(f"Error generating diagram: {e}")
+            return False
+
+def main():
+    # Initialize generator
+    generator = DatabaseClassDiagramGenerator(model='llama3')
+    
+    # System description
+    description = """
+    Meeting Transcript: University Course Registration System Discussion
+
+    Team Lead (Alex): We need to design a comprehensive database schema for our University Course Registration System.
+
+    Database Architect (Sam): We'll need tables for Students, Courses, Enrollments, and Faculty.
+
+    Team Lead (Alex): Great. Students should have unique identifiers, personal information, and enrollment history.
+
+    Analyst (Jordan): Courses need details like course code, title, department, and capacity. Faculty members will be assigned to teach specific courses.
+
+    Designer (Priya): We'll create an Enrollments table to manage the relationship between students and courses, and ensure faculty are linked to their assigned courses.
+
+    Team Lead (Alex): Exactly. We want to track which faculty members are teaching which courses, and how students are enrolled in those courses.
+    """
+    
+    # Generate class diagram
+    class_diagram_json = generator.extract_database_schema_elements(description)
+    
+    if class_diagram_json:
+        # Save JSON
+        with open('database_class_diagram.json', 'w', encoding='utf-8') as f:
+            json.dump(class_diagram_json, f, indent=2, ensure_ascii=False)
+        
+        # Generate and save diagram
+        plantuml_code = generator.generate_plantuml(class_diagram_json)
+        generator.generate_diagram(plantuml_code)
+        
+        # Print results
+        print("Generated Class Diagram Elements:")
+        print(json.dumps(class_diagram_json, indent=2, ensure_ascii=False))
+        print("\nPlantUML Class Diagram Code:")
+        print(plantuml_code)
+    else:
+        print("Failed to generate class diagram")
+
+if __name__ == "__main__":
+    main()
