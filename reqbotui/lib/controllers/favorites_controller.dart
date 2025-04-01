@@ -5,11 +5,14 @@ class FavoritesController {
 
   FavoritesController(this._favoritesProvider);
 
-  List<String> getFavoriteProjects() {
-    return _favoritesProvider.favoriteProjects.toList();
-  }
+  /// Returns a copy of favorite projects to prevent external modifications.
+  List<String> getFavoriteProjects() =>
+      List.unmodifiable(_favoritesProvider.favoriteProjects);
 
+  /// Toggles the favorite status of a project.
   void toggleFavorite(String projectName) {
-    _favoritesProvider.toggleFavorite(projectName);
+    if (projectName.isNotEmpty) {
+      _favoritesProvider.toggleFavorite(projectName);
+    }
   }
 }

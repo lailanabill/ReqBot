@@ -20,23 +20,33 @@ class SignInController {
   }
 
   Future<void> login(BuildContext context) async {
-    final email = emailController.text;
-    final password = passwordController.text;
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
     try {
       final response = await authServices.signInWithEmailPassword(email, password);
 
       if (response.session != null) {
+        if (!context.mounted) return; // Prevents navigation after widget disposal
         Navigator.pushReplacementNamed(context, '/HomeScreen');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login failed: No session found")),
-        );
+        _showSnackBar(context, "Login failed: No session found");
       }
     } catch (e) {
+      _showSnackBar(context, "Login Error: ${e.toString()}");
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login Error: $e")),
+        SnackBar(content: Text(message)),
       );
     }
+  }
+
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
   }
 }

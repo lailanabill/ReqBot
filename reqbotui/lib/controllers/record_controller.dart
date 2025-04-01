@@ -1,9 +1,10 @@
 import 'package:permission_handler/permission_handler.dart';
-import 'package:reqbot/database/database_helper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class RecordController {
   final stt.SpeechToText _speech = stt.SpeechToText();
+  final SupabaseClient _supabase = Supabase.instance.client;
   bool isListening = false;
   String transcription = '';
 
@@ -49,7 +50,10 @@ class RecordController {
       throw Exception('Please enter a project name and record audio.');
     }
     try {
-      await DBHelper.instance.insertProject(projectName, transcription);
+      await _supabase.from('projects').insert({
+        'name': projectName,
+        'transcription': transcription,
+      });
     } catch (e) {
       throw Exception('Error saving project: $e');
     }
