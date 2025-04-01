@@ -13,7 +13,8 @@ ThemeData buildLightTheme() {
       backgroundColor: kColorScheme.primaryContainer,
       foregroundColor: kColorScheme.onPrimaryContainer,
     ),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
+      // ✅ FIXED
       color: kColorScheme.secondaryContainer,
       margin: const EdgeInsets.all(16),
     ),
