@@ -52,3 +52,108 @@ class _RecordState extends State<Record> {
           .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
+
+  void _showTranscriptionDialog(String title) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('$title Transcription'),
+          content: Text(_transcription.isEmpty
+              ? 'No transcription available'
+              : _transcription),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Meetings & Audio Records'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                childAspectRatio: 1.4,
+                children: [
+                  _buildMeetingCard(
+                      'Project Kickoff', 'April 25, 2024', 'Pending'),
+                  _buildMeetingCard(
+                      'Design Review', 'April 20, 2024', 'Completed',
+                      showAudio: true),
+                  _buildMeetingCard(
+                      'Sprint Planning', 'April 15, 2024', 'In Progress'),
+                  _buildMeetingCard(
+                      'Retrospective', 'April 10, 2024', 'Completed'),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RequirementsMenuScreen()),
+                );
+              },
+              child: Text('Next'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMeetingCard(String title, String date, String status,
+      {bool showAudio = false}) {
+    return GestureDetector(
+      onTap: () => _showTranscriptionDialog(title),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              SizedBox(height: 5),
+              Text(date, style: TextStyle(color: Colors.grey, fontSize: 12)),
+              SizedBox(height: 10),
+              if (showAudio)
+                Row(
+                  children: [
+                    Icon(Icons.play_arrow, color: Colors.blue, size: 20),
+                    Expanded(child: LinearProgressIndicator()),
+                    Icon(Icons.stop, color: Colors.red, size: 20),
+                  ],
+                ),
+              Spacer(),
+              ElevatedButton(
+                onPressed: _handleUploadAudio,
+                child: Text('Upload'),
+                style: ElevatedButton.styleFrom(
+                  textStyle: TextStyle(fontSize: 12),
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
