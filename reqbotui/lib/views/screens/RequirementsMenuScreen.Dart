@@ -43,6 +43,35 @@ class RequirementsMenuScreen extends StatelessWidget {
             ),
             const Divider(),
 
-         
+            // Diagrams Button
+            ListTile(
+              title: const Text('Diagrams'),
+              leading: const Icon(Icons.account_tree, color: Color.fromARGB(255, 187, 151, 236)),
+              onTap: () {
+                // Navigate to the Diagrams Menu
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DiagramsMenu()),
+                );
+              },
+            ),
+            const Divider(),
+
+            // Draft SRS Button (Disabled for now)
+            ListTile(
+              title: const Text('Draft SRS'),
+              leading: const Icon(Icons.article_outlined, color: Color.fromARGB(255, 187, 151, 236)),
+              onTap: () {
+                // Uncomment and add the correct screen when available
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => DraftSrsScreen()),
+                // );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
