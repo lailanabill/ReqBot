@@ -51,3 +51,33 @@ class DiagramsMenu extends StatelessWidget {
       },
     );
   }
+
+  Widget _buildDiagramCard(BuildContext context, int index) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DiagramPage(diagramName: diagrams[index]['name']),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(diagrams[index]['icon'], size: 50, color: Colors.blue),
+            SizedBox(height: 10),
+            Text(
+              diagrams[index]['name'],
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
