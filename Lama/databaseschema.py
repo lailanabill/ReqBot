@@ -48,3 +48,54 @@ JSON STRUCTURE TEMPLATE:
       "description": "Represents a student in the system",
       "attributes": [
         {{
+          "name": "studentId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "registerForCourse",
+          "parameters": [
+            {{
+              "name": "courseId",
+              "type": "String"
+            }}
+          ],
+          "return_type": "boolean"
+        }}
+      ]
+    }}
+  ],
+  "relationships": [
+    {{
+      "type": "one_to_many",
+      "from_class": "Student",
+      "to_class": "Course",
+      "description": "Student enrolls in multiple courses"
+    }}
+  ]
+}}
+
+System Description:
+{description}"""
+
+        for attempt in range(self.max_retries):
+            try:
+                response = ollama.chat(
+                    model=self.model,
+                    messages=[{'role': 'user', 'content': prompt}],
+                    options={
+                        'temperature': self.temperature,
+                        'num_predict': 4000,
+                        'top_k': 20,
+                        'top_p': 0.9
+                    }
+                )
+           
