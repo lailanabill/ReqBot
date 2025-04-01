@@ -22,5 +22,13 @@ class DiagramPage extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-           
+            onPressed: () {
+              // Handle edit action
+            },
+            child: Text("Edit Diagram", style: TextStyle(fontSize: 18, color: Colors.white)),
+          ),
+        ),
+      ),
+    );
+  }
 }
