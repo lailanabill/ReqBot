@@ -116,7 +116,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF3F51B5), Color(0xFFF6F7FB)],
+                colors: [
+                  Color.fromARGB(255, 187, 151, 236), // Your chosen purple
+                  Color(0xFFF6F7FB) // Lighter shade for smooth transition
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
