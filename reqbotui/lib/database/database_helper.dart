@@ -1,62 +1,47 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DBHelper {
-  static final DBHelper instance = DBHelper._init();
-  static Database? _database;
+  static final SupabaseClient _supabase = Supabase.instance.client;
 
-  DBHelper._init();
-
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDB('projects.db');
-    return _database!;
+  /// Insert a project into Supabase
+  Future<void> insertProject(String name, String transcription) async {
+    try {
+      await _supabase.from('projects').insert({
+        'name': name,
+        'transcription': transcription,
+      });
+    } catch (e) {
+      throw Exception('Error inserting project: $e');
+    }
   }
 
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
+  /// Delete a project from Supabase by ID
+  Future<void> deleteProject(int id) async {
+    try {
+      await _supabase.from('projects').delete().match({'id': id});
+    } catch (e) {
+      throw Exception('Error deleting project: $e');
+    }
   }
 
-  Future<void> _createDB(Database db, int version) async {
-    await db.execute('''
-    CREATE TABLE IF NOT EXISTS projects (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      transcription TEXT NOT NULL
-    )
-  ''');
-  }
-
-  Future<int> insertProject(String name, String transcription) async {
-    final db = await database;
-    return await db
-        .insert('projects', {'name': name, 'transcription': transcription});
-  }
-
-  Future<int> deleteProject(int id) async {
-    final db = await database;
-    return await db.delete(
-      'projects',
-      where: 'id = ?', // Match by id
-      whereArgs: [id],
-    );
-  }
-
+  /// Get all projects from Supabase
   Future<List<Map<String, dynamic>>> getProjects() async {
-    final db = await database;
-    return await db.query('projects');
+    try {
+      final response = await _supabase.from('projects').select();
+      return response;
+    } catch (e) {
+      throw Exception('Error fetching projects: $e');
+    }
   }
 
+  /// Get a single project by ID from Supabase
   Future<Map<String, dynamic>> getProjectById(int id) async {
-    final db = await database;
-    final result = await db.query('projects', where: 'id = ?', whereArgs: [id]);
-    return result.first;
+    try {
+      final response =
+          await _supabase.from('projects').select().eq('id', id).single();
+      return response;
+    } catch (e) {
+      throw Exception('Error fetching project by ID: $e');
+    }
   }
 }
