@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import whisper
 from transformers import pipeline
 
-summarizer = pipeline("summarization",model="facebook/bart-large-cnn")  
+# summarizer = pipeline("summarization",model="facebook/bart-large-cnn")  
 model = whisper.load_model("large")
 
 
@@ -36,13 +36,13 @@ async def transcribe_audio(file: UploadFile = File(...)):
         
     
         os.remove(temp_file_path)
-        ARTICLE=result["text"]
-        length=int(len(ARTICLE)*0.25)
-        fnl = summarizer(ARTICLE, max_length=length, min_length=5, do_sample=False)
+        # ARTICLE=result["text"]
+        # length=int(len(ARTICLE)*0.25)
+        # fnl = summarizer(ARTICLE, max_length=length, min_length=5, do_sample=False)
         return JSONResponse(content={
-            "transcription": fnl[0]["summary_text"], 
-            "running":"large",   
-            "length":"4500"
+            "transcription": result["text"]
+            # "running":"large",   
+            # "length":"4500"
         })
     
     except Exception as e:
