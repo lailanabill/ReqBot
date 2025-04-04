@@ -65,7 +65,133 @@ rectangle "Library Management System" {
   void initState() {
     super.initState();
     _loadDiagram();
+     if (_useCases.isNotEmpty) {
+    _selectedUseCase = _useCases[0];
   }
+  if (_actors.isNotEmpty) {
+    _selectedActorForUseCaseRemoval = _actors[0];
+  }
+
+  }
+  List<String> _findActorsConnectedToUseCase(String useCase) {
+  List<String> connectedActors = [];
+  
+  // Split the PlantUML code into lines
+  List<String> lines = _plantUmlCode.split('\n');
+  
+  // Look for relationships between actors and this use case
+  for (String line in lines) {
+    // Check for pattern: Actor --> UseCase
+    for (String actor in _actors) {
+      if (line.contains('$actor --> $useCase')) {
+        connectedActors.add(actor);
+        break;
+      }
+    }
+  }
+  
+  return connectedActors;
+}
+void _removeUseCase() {
+    List<String> lines = _plantUmlCode.split('\n');
+    List<String> updatedLines = [];
+  if (_selectedUseCase.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Please select a use case to remove')),
+    );
+    return;
+  }
+  
+  // Get the description for the selected use case
+  Map<String, String> descriptions = _extractUseCaseDescriptions();
+  String useCaseDescription = descriptions[_selectedUseCase] ?? _selectedUseCase;
+  
+  if (_removeEntireUseCase) {
+    // Remove the use case entirely
+    
+    // Split the PlantUML code into lines for easier processing
+  
+    
+    // 1. Remove the use case declaration
+    for (String line in lines) {
+      if (!line.contains('usecase') || !line.contains('as $_selectedUseCase')) {
+        updatedLines.add(line);
+      }
+    }
+    
+    // 2. Remove all relationships involving this use case
+    List<String> finalLines = [];
+    for (String line in updatedLines) {
+      // Skip lines containing relationships with this use case
+      if (!line.contains('$_selectedUseCase -->') && 
+          !line.contains('--> $_selectedUseCase') &&
+          !line.contains('$_selectedUseCase ..>') &&
+          !line.contains('..> $_selectedUseCase')) {
+        finalLines.add(line);
+      }
+    }
+    
+    // 3. Remove any notes related to this use case
+    List<String> withoutNotes = [];
+    for (String line in finalLines) {
+      if (!line.contains('note right of $_selectedUseCase') &&
+          !line.contains('note left of $_selectedUseCase') &&
+          !line.contains('note top of $_selectedUseCase') &&
+          !line.contains('note bottom of $_selectedUseCase')) {
+        withoutNotes.add(line);
+      }
+    }
+    
+    // Update the state
+    setState(() {
+      _plantUmlCode = withoutNotes.join('\n');
+      
+      // Update the use cases list
+      _useCases.remove(_selectedUseCase);
+      
+      // Reset selection
+      if (_useCases.isNotEmpty) {
+        _selectedUseCase = _useCases[0];
+      } else {
+        _selectedUseCase = '';
+      }
+    });
+    
+    // Show confirmation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Use case "$useCaseDescription" has been removed entirely')),
+    );
+  } else {
+    // Remove the use case only from the specified actor
+    if (_selectedActorForUseCaseRemoval.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select an actor')),
+      );
+      return;
+    }
+    
+    // Keep all lines but remove the specific relationship
+    for (String line in lines) {
+      // Skip the line that contains the relationship between the actor and the use case
+      if (!line.contains('$_selectedActorForUseCaseRemoval --> $_selectedUseCase')) {
+        updatedLines.add(line);
+      }
+    }
+    
+    // Update the state
+    setState(() {
+      _plantUmlCode = updatedLines.join('\n');
+    });
+    
+    // Show confirmation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Use case "$useCaseDescription" has been removed from actor "$_selectedActorForUseCaseRemoval"')),
+    );
+  }
+  
+  // Reload the diagram with the updated code
+  _loadDiagram();
+}
 
   @override
   void dispose() {
@@ -320,6 +446,9 @@ rectangle "Library Management System" {
       SnackBar(content: Text('Actor "$newActorName" has been added')),
     );
   }
+  String _selectedUseCase = ''; // For storing the selected use case to remove
+bool _removeEntireUseCase = true; // Whether to remove the use case entirely or just from an actor
+String _selectedActorForUseCaseRemoval = ''; // Actor to remove the use case from
 
 // Function to add a new use case to the temporary list
   void _addNewUseCase() {
@@ -835,6 +964,148 @@ Widget build(BuildContext context) {
                 ),
               ],
             ),
+            ExpansionTile(
+  tilePadding: EdgeInsets.symmetric(horizontal: 8),
+  title: Text('Remove Use Case'),
+  children: [
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Use case selection dropdown
+          DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Use Case to Remove',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+            value: _useCases.contains(_selectedUseCase) ? _selectedUseCase : (_useCases.isNotEmpty ? _useCases[0] : null),
+            items: _useCases.map((useCase) {
+              // Get descriptions using your existing method
+              Map<String, String> descriptions = _extractUseCaseDescriptions();
+              return DropdownMenuItem<String>(
+                value: useCase,
+                child: Text('${descriptions[useCase] ?? useCase}', 
+                     style: TextStyle(fontSize: 13)),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _selectedUseCase = value;
+                });
+              }
+            },
+          ),
+          SizedBox(height: 12),
+          
+          // Radio buttons for removal type
+          Text(
+            'Removal Type:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          RadioListTile<bool>(
+            title: Text('Remove entirely', style: TextStyle(fontSize: 13)),
+            value: true,
+            groupValue: _removeEntireUseCase,
+            dense: true,
+            onChanged: (value) {
+              setState(() {
+                _removeEntireUseCase = value!;
+              });
+            },
+          ),
+          RadioListTile<bool>(
+            title: Text('Remove from specific actor', style: TextStyle(fontSize: 13)),
+            value: false,
+            groupValue: _removeEntireUseCase,
+            dense: true,
+            onChanged: (value) {
+              setState(() {
+                _removeEntireUseCase = value!;
+              });
+            },
+          ),
+          
+          // Actor selection (only visible when removing from specific actor)
+          if (!_removeEntireUseCase) ...[
+  SizedBox(height: 8),
+  Builder(
+    builder: (context) {
+      // Get actors connected to this use case
+      List<String> connectedActors = _findActorsConnectedToUseCase(_selectedUseCase);
+      
+      // If no actors are connected, show a message
+      if (connectedActors.isEmpty) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'No actors are connected to this use case.',
+            style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+          ),
+        );
+      }
+      
+      // Initialize the selected actor if needed
+      if (!connectedActors.contains(_selectedActorForUseCaseRemoval)) {
+        _selectedActorForUseCaseRemoval = connectedActors[0];
+      }
+      
+      return DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: 'Select Actor',
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        ),
+        value: connectedActors.contains(_selectedActorForUseCaseRemoval) ? 
+               _selectedActorForUseCaseRemoval : connectedActors[0],
+        items: connectedActors.map((actor) {
+          return DropdownMenuItem<String>(
+            value: actor,
+            child: Text(actor, style: TextStyle(fontSize: 13)),
+          );
+        }).toList(),
+        onChanged: (value) {
+          if (value != null) {
+            setState(() {
+              _selectedActorForUseCaseRemoval = value;
+            });
+          }
+        },
+      );
+    },
+  ),
+],
+          
+          SizedBox(height: 12),
+          
+          // Warning text
+          Text(
+            _removeEntireUseCase ? 
+              'Warning: This will remove the use case and all its connections from the diagram.' :
+              'Warning: This will remove the connection between the selected actor and use case.',
+            style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic, fontSize: 12),
+          ),
+          SizedBox(height: 8),
+          
+          // Remove button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+              onPressed: _removeUseCase,
+              child: Text('Remove Use Case'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
           ],
         ),
       ),
