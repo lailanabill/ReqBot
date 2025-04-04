@@ -58,6 +58,7 @@ rectangle "Library Management System" {
   // List of actors extracted from the PlantUML code
   List<String> _actors = ['Librarian', 'Member', 'Admin'];
   String _selectedActor = 'Librarian'; // Default selected actor
+  String _actorToRemove = 'Librarian'; // Default actor to remove
   final TextEditingController _newNameController = TextEditingController();
   
   @override
@@ -163,11 +164,72 @@ rectangle "Library Management System" {
       }
       
       _selectedActor = newName;
+      _actorToRemove = _actors.isNotEmpty ? _actors[0] : '';
       _newNameController.clear();
     });
     
     // Reload the diagram with the updated code
     _loadDiagram();
+  }
+  
+  // Function to remove an actor from the PlantUML code
+  void _removeActor() {
+    if (_actors.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cannot remove the last actor from the diagram')),
+      );
+      return;
+    }
+    
+    final String actorToRemove = _actorToRemove;
+    
+    // Split the PlantUML code into lines for easier processing
+    List<String> lines = _plantUmlCode.split('\n');
+    List<String> updatedLines = [];
+    
+    // 1. Remove the actor declaration line
+    for (String line in lines) {
+      if (!line.contains('actor "$actorToRemove" as $actorToRemove')) {
+        updatedLines.add(line);
+      }
+    }
+    
+    // 2. Remove any relationships involving this actor
+    String updatedCode = updatedLines.join('\n');
+    
+    // Remove relationships where the actor is the source
+    final RegExp actorSourceRegex = RegExp(
+      '$actorToRemove\\s+-->\\s+\\w+',
+      caseSensitive: true,
+    );
+    updatedCode = updatedCode.replaceAll(actorSourceRegex, '');
+    
+    // Clean up any empty lines created by the removal
+    updatedCode = updatedCode.replaceAll(RegExp(r'\n\s*\n'), '\n\n');
+    
+    // Update the state
+    setState(() {
+      _plantUmlCode = updatedCode;
+      
+      // Update the actors list
+      _actors.remove(actorToRemove);
+      
+      // Update selected actors if needed
+      if (_selectedActor == actorToRemove && _actors.isNotEmpty) {
+        _selectedActor = _actors[0];
+      }
+      if (_actorToRemove == actorToRemove && _actors.isNotEmpty) {
+        _actorToRemove = _actors[0];
+      }
+    });
+    
+    // Reload the diagram with the updated code
+    _loadDiagram();
+    
+    // Show confirmation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Actor "$actorToRemove" has been removed')),
+    );
   }
 
   @override
@@ -305,7 +367,7 @@ rectangle "Library Management System" {
                           labelText: 'Select Actor',
                           border: OutlineInputBorder(),
                         ),
-                        value: _selectedActor,
+                        value: _actors.contains(_selectedActor) ? _selectedActor : (_actors.isNotEmpty ? _actors[0] : null),
                         items: _actors.map((actor) {
                           return DropdownMenuItem<String>(
                             value: actor,
@@ -343,6 +405,63 @@ rectangle "Library Management System" {
                           ),
                           onPressed: _renameActor,
                           child: Text('Apply Rename'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            
+            // Remove Actor Tool
+            ExpansionTile(
+              title: Text('Remove Actor'),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Actor selection dropdown
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: 'Select Actor to Remove',
+                          border: OutlineInputBorder(),
+                        ),
+                        value: _actors.contains(_actorToRemove) ? _actorToRemove : (_actors.isNotEmpty ? _actors[0] : null),
+                        items: _actors.map((actor) {
+                          return DropdownMenuItem<String>(
+                            value: actor,
+                            child: Text(actor),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _actorToRemove = value;
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      
+                      // Warning text
+                      Text(
+                        'Warning: This will remove the actor and all its connections from the diagram.',
+                        style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic),
+                      ),
+                      SizedBox(height: 16),
+                      
+                      // Remove button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: _removeActor,
+                          child: Text('Remove Actor'),
                         ),
                       ),
                     ],
