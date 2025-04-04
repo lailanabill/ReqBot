@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'UseCaseValidation.dart'; // Import the new validation page
+import 'class_diagram_editor.dart';
+import 'UseCaseValidation.dart'; // Assuming this exists elsewhere
 
 class DiagramPage extends StatelessWidget {
   final String diagramName;
-  
+
   const DiagramPage({Key? key, required this.diagramName}) : super(key: key);
 
   @override
@@ -11,7 +12,7 @@ class DiagramPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(diagramName)),
       body: Center(
-        child: Text('Showing $diagramName', style: TextStyle(fontSize: 20)),
+        child: Text('Showing $diagramName', style: const TextStyle(fontSize: 20)),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -20,26 +21,36 @@ class DiagramPage extends StatelessWidget {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color.fromARGB(255, 187, 151, 236),
-              padding: EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () {
-              // Navigate to the appropriate validation page based on diagram type
-              if (diagramName == 'Use Case Diagram') {
+              // Navigate to the appropriate editor based on diagram type
+              if (diagramName == 'Class Diagram') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UseCaseValidation(),
+                    builder: (context) => const ClassDiagramEditor(),
+                  ),
+                );
+              } else if (diagramName == 'Use Case Diagram') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UseCaseValidation(),
                   ),
                 );
               } else {
-                // For other diagram types, you can add more conditions later
+                // For other diagram types, show a placeholder message
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Validation for $diagramName not implemented yet')),
+                  SnackBar(content: Text('Editor for $diagramName not implemented yet')),
                 );
               }
             },
-            child: Text("Edit Diagram", style: TextStyle(fontSize: 18, color: Colors.white)),
+            child: const Text(
+              "Edit Diagram",
+              style: TextStyle(fontSize: 18, color: Colors.white),
+            ),
           ),
         ),
       ),

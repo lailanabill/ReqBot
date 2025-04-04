@@ -13,7 +13,7 @@ class DiagramsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Select a Diagram')),
+      appBar: AppBar(title: const Text('Select a Diagram')),
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 600) {
@@ -28,8 +28,8 @@ class DiagramsMenu extends StatelessWidget {
 
   Widget _buildWideLayout(BuildContext context) {
     return GridView.builder(
-      padding: EdgeInsets.all(16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
@@ -44,7 +44,7 @@ class DiagramsMenu extends StatelessWidget {
 
   Widget _buildNarrowLayout(BuildContext context) {
     return ListView.builder(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       itemCount: diagrams.length,
       itemBuilder: (context, index) {
         return _buildDiagramCard(context, index);
@@ -69,11 +69,11 @@ class DiagramsMenu extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(diagrams[index]['icon'], size: 50, color: Colors.blue),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               diagrams[index]['name'],
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
