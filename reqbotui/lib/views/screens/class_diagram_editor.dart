@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:archive/archive.dart';
-import 'package:reqbot/views/widgets/editor_tools.dart';
 import 'package:flutter/services.dart';
+import 'package:reqbot/views/widgets/Classdiagram/editor_tools.dart'; // Adjust path as needed
 
 class ClassDiagramEditor extends StatefulWidget {
   const ClassDiagramEditor({super.key});
@@ -69,74 +69,77 @@ User "1" --> "0..*" Order : places
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             const Text(
               'Edit Your Class Diagram',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             const Text(
               'Modify classes, attributes, methods, and relationships in your UML class diagram.',
               style: TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
+            // Diagram Section (Upper)
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: InteractiveViewer(
-                        boundaryMargin: const EdgeInsets.all(20),
-                        minScale: 0.5,
-                        maxScale: 3.0,
-                        child: Image.network(
-                          _getDiagramUrl(),
-                          fit: BoxFit.contain,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(child: CircularProgressIndicator());
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            print('Image load error: $error');
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.broken_image, size: 64, color: Colors.grey),
-                                const SizedBox(height: 16),
-                                Text('Failed to load image: $error'),
-                                const SizedBox(height: 16),
-                                ElevatedButton(
-                                  onPressed: _updateDiagram,
-                                  child: const Text('Retry'),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+              flex: 2, // Takes more space at the top
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: InteractiveViewer(
+                  boundaryMargin: const EdgeInsets.all(20),
+                  minScale: 0.5,
+                  maxScale: 3.0,
+                  child: Image.network(
+                    _getDiagramUrl(),
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      print('Image load error: $error');
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          Text('Failed to load image: $error'),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _updateDiagram,
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      );
+                    },
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: EditorTools(
-                        plantumlCode: plantumlCode,
-                        plantumlController: _plantumlController,
-                        onUpdate: (newCode) {
-                          print('Updating PlantUML code: $newCode');
-                          setState(() {
-                            _previousPlantumlCode = plantumlCode;
-                            plantumlCode = newCode;
-                            _plantumlController.text = plantumlCode;
-                          });
-                          _updateDiagram();
-                        },
-                        onCopy: _copyCode,
-                        onRevert: _revertToLastVersion,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Editor Tools Section (Lower)
+            Expanded(
+              flex: 1, // Takes less space below
+              child: SingleChildScrollView(
+                child: EditorTools(
+                  plantumlCode: plantumlCode,
+                  plantumlController: _plantumlController,
+                  onUpdate: (newCode) {
+                    print('Updating PlantUML code: $newCode');
+                    setState(() {
+                      _previousPlantumlCode = plantumlCode;
+                      plantumlCode = newCode;
+                      _plantumlController.text = plantumlCode;
+                    });
+                    _updateDiagram();
+                  },
+                  onCopy: _copyCode,
+                  onRevert: _revertToLastVersion,
+                ),
               ),
             ),
           ],
