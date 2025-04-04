@@ -25,7 +25,7 @@ class WelcomePage extends StatelessWidget {
             imageAsset: 'assets/images/onboard_two.png',
           ),
         ],
-        onSkip: () => controller.navigateToSignUp(context),
+        onSkip: () => controller.navigateToSignIn(context),
         onDone: () => controller.navigateToSignIn(context),
         indicatorType: IndicatorType.circle,
       ),

@@ -30,9 +30,6 @@ async def split_sentences(data: InputText):
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 
-# @app.get("/")
-# async def read_root():
-#     return {"Hello": "World"}   
 
 import os
 import uvicorn
