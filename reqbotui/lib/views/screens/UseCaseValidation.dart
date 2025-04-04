@@ -60,6 +60,9 @@ rectangle "Library Management System" {
   String _selectedActor = 'Librarian'; // Default selected actor
   String _actorToRemove = 'Librarian'; // Default actor to remove
   final TextEditingController _newNameController = TextEditingController();
+  String _useCaseToRename = '';
+
+final TextEditingController _newUseCaseNameController2 = TextEditingController();
 
   @override
   void initState() {
@@ -73,6 +76,7 @@ rectangle "Library Management System" {
   }
 
   }
+  
   List<String> _findActorsConnectedToUseCase(String useCase) {
   List<String> connectedActors = [];
   
@@ -197,6 +201,9 @@ void _removeUseCase() {
   void dispose() {
     _newNameController.dispose();
     _newActorNameController.dispose();
+      _newUseCaseNameController.dispose();
+  _newUseCaseNameController2.dispose();
+
     _newUseCaseNameController.dispose();
     super.dispose();
   }
@@ -263,7 +270,49 @@ void _removeUseCase() {
   
   return descriptions;
 }
-
+void _renameUseCase() {
+  if (_newUseCaseNameController2.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Please enter a new name for the use case')),
+    );
+    return;
+  }
+  
+  final String oldId = _useCaseToRename;
+  final String newName = _newUseCaseNameController2.text;
+  
+  // Get the current description for display in confirmation
+  Map<String, String> descriptions = _extractUseCaseDescriptions();
+  String oldDescription = descriptions[oldId] ?? oldId;
+  
+  // Update the PlantUML code
+  // We need to update the use case declaration but keep the ID the same
+  
+  // Find and replace the use case declaration
+  final RegExp useCaseDeclarationRegex = RegExp(
+    'usecase\\s+"[^"]+"\\s+as\\s+$oldId',
+    caseSensitive: true,
+  );
+  
+  String updatedCode = _plantUmlCode.replaceAll(
+    useCaseDeclarationRegex, 
+    'usecase "$newName" as $oldId'
+  );
+  
+  // Update the state
+  setState(() {
+    _plantUmlCode = updatedCode;
+    _newUseCaseNameController2.clear();
+  });
+  
+  // Reload the diagram
+  _loadDiagram();
+  
+  // Show confirmation
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Use case "$oldDescription" has been renamed to "$newName"')),
+  );
+}
   // Function to rename an actor in the PlantUML code
   void _renameActor() {
     if (_newNameController.text.isEmpty) {
@@ -329,6 +378,8 @@ void _removeUseCase() {
   final Set<String> _selectedExistingUseCases = <String>{};
   final TextEditingController _newUseCaseNameController =
       TextEditingController();
+      final Set<String> _actorsForNewUseCase = <String>{};
+
   final List<String> _newUseCases = [];
 // Function to add a new actor to the PlantUML code
   void _addNewActor() {
@@ -451,7 +502,7 @@ bool _removeEntireUseCase = true; // Whether to remove the use case entirely or 
 String _selectedActorForUseCaseRemoval = ''; // Actor to remove the use case from
 
 // Function to add a new use case to the temporary list
-  void _addNewUseCase() {
+  void _addNewUseCaseToTheActor() {
     if (_newUseCaseNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please enter a name for the new use case')),
@@ -475,6 +526,93 @@ String _selectedActorForUseCaseRemoval = ''; // Actor to remove the use case fro
       _newUseCaseNameController.clear();
     });
   }
+  void _addNewUseCase() {
+  if (_newUseCaseNameController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Please enter a name for the new use case')),
+    );
+    return;
+  }
+  
+  final String newUseCaseName = _newUseCaseNameController.text;
+  
+  // Generate a new ID for the use case (e.g., UC007, UC008, etc.)
+  String newUseCaseId = 'UC';
+  int maxId = 0;
+  
+  // Find the highest existing use case ID number
+  for (String useCase in _useCases) {
+    if (useCase.startsWith('UC')) {
+      try {
+        int idNumber = int.parse(useCase.substring(2));
+        if (idNumber > maxId) {
+          maxId = idNumber;
+        }
+      } catch (e) {
+        // Skip if not a number
+      }
+    }
+  }
+  
+  // Create new ID with the next number, padded to 3 digits
+  newUseCaseId += (maxId + 1).toString().padLeft(3, '0');
+  
+  // Split the PlantUML code into lines for easier processing
+  List<String> lines = _plantUmlCode.split('\n');
+  
+  // Find where use cases are defined
+  int useCaseIndex = -1;
+  for (int i = 0; i < lines.length; i++) {
+    if (lines[i].trim().startsWith('usecase ')) {
+      useCaseIndex = i;
+    }
+  }
+  
+  // Add the new use case after the last use case
+  if (useCaseIndex >= 0) {
+    lines.insert(useCaseIndex + 1, '    usecase "$newUseCaseName" as $newUseCaseId');
+  } else {
+    // If no use cases found, add it after the rectangle opening
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].contains('rectangle "Library Management System" {')) {
+        lines.insert(i + 1, '    usecase "$newUseCaseName" as $newUseCaseId');
+        break;
+      }
+    }
+  }
+  
+  // Find where to add relationships (before the closing brace of the rectangle)
+  int closingBraceIndex = -1;
+  for (int i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].trim() == '}') {
+      closingBraceIndex = i;
+      break;
+    }
+  }
+  
+  // Add relationships for selected actors
+  if (_actorsForNewUseCase.isNotEmpty && closingBraceIndex > 0) {
+    for (String actor in _actorsForNewUseCase) {
+      lines.insert(closingBraceIndex, '    $actor --> $newUseCaseId');
+    }
+  }
+  
+  // Update the state
+  setState(() {
+    _plantUmlCode = lines.join('\n');
+    _useCases.add(newUseCaseId);
+    _newUseCaseNameController.clear();
+    _actorsForNewUseCase.clear();
+  });
+  
+  // Reload the diagram
+  _loadDiagram();
+  
+  // Show confirmation
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Use case "$newUseCaseName" has been added')),
+  );
+}
 
   // Function to remove an actor from the PlantUML code
   void _removeActor() {
@@ -899,7 +1037,7 @@ Widget build(BuildContext context) {
                           ),
                           SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: _addNewUseCase,
+                            onPressed: _addNewUseCaseToTheActor,
                             child: Text('Add'),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
@@ -1099,6 +1237,144 @@ Widget build(BuildContext context) {
               ),
               onPressed: _removeUseCase,
               child: Text('Remove Use Case'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
+ExpansionTile(
+  tilePadding: EdgeInsets.symmetric(horizontal: 8),
+  title: Text('Add New Use Case'),
+  children: [
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // New use case name field
+          TextField(
+            controller: _newUseCaseNameController,
+            decoration: InputDecoration(
+              labelText: 'New Use Case Name',
+              hintText: 'Enter name for the new use case',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+          SizedBox(height: 16),
+          
+          // Actor selection section
+          Text(
+            'Connect to actors:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          SizedBox(height: 8),
+          
+          // Wrap the checkboxes in a container with fixed height and scrolling
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: ListView(
+              children: _actors.map((actor) {
+                return CheckboxListTile(
+                  dense: true,
+                  title: Text(actor, style: TextStyle(fontSize: 13)),
+                  value: _actorsForNewUseCase.contains(actor),
+                  onChanged: (bool? value) {
+                    setState(() {
+                      if (value == true) {
+                        _actorsForNewUseCase.add(actor);
+                      } else {
+                        _actorsForNewUseCase.remove(actor);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          SizedBox(height: 16),
+          
+          // Add button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+              onPressed: _addNewUseCase,
+              child: Text('Add Use Case'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
+ExpansionTile(
+  tilePadding: EdgeInsets.symmetric(horizontal: 8),
+  title: Text('Rename Use Case'),
+  children: [
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Use case selection dropdown
+          DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Use Case',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+            value: _useCases.contains(_useCaseToRename) ? _useCaseToRename : (_useCases.isNotEmpty ? _useCases[0] : null),
+            items: _useCases.map((useCase) {
+              // Get descriptions using your existing method
+              Map<String, String> descriptions = _extractUseCaseDescriptions();
+              return DropdownMenuItem<String>(
+                value: useCase,
+                child: Text('${descriptions[useCase] ?? useCase}', 
+                     style: TextStyle(fontSize: 13)),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _useCaseToRename = value;
+                });
+              }
+            },
+          ),
+          SizedBox(height: 16),
+          
+          // New name text field
+          TextField(
+            controller: _newUseCaseNameController2,
+            decoration: InputDecoration(
+              labelText: 'New Use Case Name',
+              hintText: 'Enter new name for the use case',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+          SizedBox(height: 16),
+          
+          // Apply button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+              onPressed: _renameUseCase,
+              child: Text('Apply Rename'),
             ),
           ),
         ],
