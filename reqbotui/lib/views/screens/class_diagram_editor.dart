@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:archive/archive.dart'; // For zlib compression
-import 'editor_tools.dart';
+import 'package:archive/archive.dart';
+import 'package:reqbot/views/widgets/editor_tools.dart';
 import 'package:flutter/services.dart';
 
 class ClassDiagramEditor extends StatefulWidget {
@@ -83,7 +83,6 @@ User "1" --> "0..*" Order : places
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Left side: Diagram preview (scrollable)
                   Expanded(
                     child: SingleChildScrollView(
                       child: InteractiveViewer(
@@ -118,13 +117,13 @@ User "1" --> "0..*" Order : places
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // Right side: Editor tools (scrollable)
                   Expanded(
                     child: SingleChildScrollView(
                       child: EditorTools(
                         plantumlCode: plantumlCode,
                         plantumlController: _plantumlController,
                         onUpdate: (newCode) {
+                          print('Updating PlantUML code: $newCode');
                           setState(() {
                             _previousPlantumlCode = plantumlCode;
                             plantumlCode = newCode;
@@ -168,6 +167,7 @@ User "1" --> "0..*" Order : places
 
   void _revertToLastVersion() {
     if (_previousPlantumlCode != null) {
+      print('Reverting to previous code: $_previousPlantumlCode');
       setState(() {
         plantumlCode = _previousPlantumlCode!;
         _plantumlController.text = plantumlCode;

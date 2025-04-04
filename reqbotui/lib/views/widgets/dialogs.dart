@@ -28,14 +28,6 @@ class ClassManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.blue),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.blueAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _addClassDialog(context),
             child: const Text('Add Class'),
@@ -48,14 +40,6 @@ class ClassManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.blue),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.blueAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _renameClassDialog(context),
             child: const Text('Rename Class'),
@@ -68,14 +52,6 @@ class ClassManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.red),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.redAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _deleteClassDialog(context),
             child: const Text('Delete Class'),
@@ -86,8 +62,7 @@ class ClassManagement extends StatelessWidget {
   }
 
   void _addClassDialog(BuildContext context) {
-    String className = '';
-    String classType = 'class'; // Default to regular class
+    String classType = 'class';
     String? errorMessage;
 
     showDialog(
@@ -104,13 +79,13 @@ class ClassManagement extends StatelessWidget {
                     TextField(
                       controller: classNameController,
                       onChanged: (value) {
-                        className = value.trim();
-                        if (className.isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(className)) {
-                          errorMessage = 'Class name must be a valid identifier (letters, numbers, underscores only)';
-                        } else {
-                          errorMessage = null;
-                        }
-                        setState(() {});
+                        setState(() {
+                          if (value.trim().isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(value.trim())) {
+                            errorMessage = 'Class name must be a valid identifier (letters, numbers, underscores only)';
+                          } else {
+                            errorMessage = null;
+                          }
+                        });
                       },
                       decoration: const InputDecoration(
                         labelText: 'Class Name',
@@ -148,13 +123,14 @@ class ClassManagement extends StatelessWidget {
               ),
               actions: [
                 TextButton(
-                  onPressed: errorMessage != null || className.isEmpty
+                  onPressed: classNameController.text.trim().isEmpty || errorMessage != null
                       ? null
                       : () {
+                          print('Adding class: ${classNameController.text.trim()}');
                           Navigator.pop(context);
                           onUpdate(plantumlCode.replaceFirst(
                             '@enduml',
-                            '$classType $className {\n}\n@enduml',
+                            '$classType ${classNameController.text.trim()} {\n}\n@enduml',
                           ));
                           classNameController.clear();
                         },
@@ -199,7 +175,7 @@ class ClassManagement extends StatelessWidget {
                       onChanged: (value) {
                         newName = value.trim();
                         if (newName.isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(newName)) {
-                          errorMessage = 'New class name must be a valid identifier (letters, numbers, underscores only)';
+                          errorMessage = 'New class name must be a valid identifier';
                         } else {
                           errorMessage = null;
                         }
@@ -226,25 +202,28 @@ class ClassManagement extends StatelessWidget {
                   onPressed: oldName.isEmpty || newName.isEmpty || errorMessage != null
                       ? null
                       : () {
+                          print('Renaming class from $oldName to $newName');
                           Navigator.pop(context);
-                          // Match class, abstract class, or interface
                           final classRegex = RegExp(
                             r'(class|abstract class|interface)\s+' + RegExp.escape(oldName) + r'\s*\{[^}]*\}',
                             multiLine: true,
                           );
                           final match = classRegex.firstMatch(plantumlCode);
                           if (match != null) {
-                            final classType = match.group(1); // e.g., "class", "abstract class", "interface"
+                            final classType = match.group(1);
                             String newCode = plantumlCode.replaceFirst(
                               classRegex,
                               '$classType $newName {\n${match.group(0)!.split('{')[1]}',
                             );
-                            // Update relationships
                             newCode = newCode.replaceAll(
                               RegExp(r'\b' + RegExp.escape(oldName) + r'\b(?=.*-->.*)'),
                               newName,
                             );
                             onUpdate(newCode);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Class "$oldName" not found')),
+                            );
                           }
                         },
                   child: const Text('Rename'),
@@ -263,44 +242,56 @@ class ClassManagement extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete Class'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) => className = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Class Name',
-                    border: OutlineInputBorder(),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Delete Class'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        className = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Class Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: className.isEmpty
+                      ? null
+                      : () {
+                          print('Deleting class: $className');
+                          Navigator.pop(context);
+                          final classRegex = RegExp(
+                            r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{[^}]*\}',
+                            multiLine: true,
+                          );
+                          String newCode = plantumlCode.replaceAll(classRegex, '');
+                          newCode = newCode.replaceAll(
+                            RegExp(r'.*\b' + RegExp.escape(className) + r'\b.*\n(?=.*(-->|..>|--|>|<|--\|>|\*-->|o-->))'),
+                            '',
+                          );
+                          if (newCode != plantumlCode) {
+                            onUpdate(newCode);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Class "$className" not found')),
+                            );
+                          }
+                        },
+                  child: const Text('Delete'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: className.isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      // Match class, abstract class, or interface
-                      final classRegex = RegExp(
-                        r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{[^}]*\}',
-                        multiLine: true,
-                      );
-                      String newCode = plantumlCode.replaceAll(classRegex, '');
-                      // Remove relationships involving this class
-                      newCode = newCode.replaceAll(
-                        RegExp(r'.*\b' + RegExp.escape(className) + r'\b.*\n(?=.*(-->|..>|--|>|<|--\|>|\*-->|o-->))'),
-                        '',
-                      );
-                      onUpdate(newCode);
-                    },
-              child: const Text('Delete'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -334,14 +325,6 @@ class AttributeManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.blue),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.blueAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _addAttributeDialog(context),
             child: const Text('Add Attribute'),
@@ -354,14 +337,6 @@ class AttributeManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.blue),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.blueAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _editAttributeDialog(context),
             child: const Text('Edit Attribute'),
@@ -373,55 +348,90 @@ class AttributeManagement extends StatelessWidget {
 
   void _addAttributeDialog(BuildContext context) {
     String className = '';
+    String? errorMessage;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Attribute'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) => className = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Class Name',
-                    border: OutlineInputBorder(),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Add Attribute'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        className = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Class Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: attributeController,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value.trim().isEmpty) {
+                            errorMessage = 'Attribute cannot be empty';
+                          } else {
+                            errorMessage = null;
+                          }
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Attribute',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    if (errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: attributeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Attribute',
-                    border: OutlineInputBorder(),
-                  ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: className.isEmpty || attributeController.text.trim().isEmpty || errorMessage != null
+                      ? null
+                      : () {
+                          print('Adding attribute to $className: ${attributeController.text.trim()}');
+                          Navigator.pop(context);
+                          final attribute = attributeController.text.trim();
+                          final classRegex = RegExp(
+                            r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{\s*([^\}]*?)\s*\}',
+                            multiLine: true,
+                          );
+                          final match = classRegex.firstMatch(plantumlCode);
+                          if (match != null) {
+                            final classType = match.group(1);
+                            final existingContent = match.group(2) ?? '';
+                            final newContent = existingContent.isEmpty ? attribute : '$existingContent\n  $attribute';
+                            onUpdate(plantumlCode.replaceFirst(
+                              classRegex,
+                              '$classType $className {\n  $newContent\n}',
+                            ));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Class "$className" not found')),
+                            );
+                          }
+                          attributeController.clear();
+                        },
+                  child: const Text('Add'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: className.isEmpty || attributeController.text.trim().isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      final attribute = attributeController.text.trim();
-                      // Match class, abstract class, or interface
-                      final classRegex = RegExp(
-                        r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{',
-                        multiLine: true,
-                      );
-                      onUpdate(plantumlCode.replaceFirst(
-                        classRegex,
-                        '\$1 $className {\n  $attribute',
-                      ));
-                      attributeController.clear();
-                    },
-              child: const Text('Add'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -431,63 +441,100 @@ class AttributeManagement extends StatelessWidget {
     String className = '';
     String oldAttribute = '';
     String newAttribute = '';
+    String? errorMessage;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Attribute'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) => className = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Class Name',
-                    border: OutlineInputBorder(),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit Attribute'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        className = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Class Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (value) {
+                        oldAttribute = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Old Attribute',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (value) {
+                        newAttribute = value.trim();
+                        if (newAttribute.isEmpty) {
+                          errorMessage = 'New attribute cannot be empty';
+                        } else {
+                          errorMessage = null;
+                        }
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'New Attribute',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    if (errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  onChanged: (value) => oldAttribute = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Old Attribute',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  onChanged: (value) => newAttribute = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'New Attribute',
-                    border: OutlineInputBorder(),
-                  ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: className.isEmpty || oldAttribute.isEmpty || newAttribute.isEmpty || errorMessage != null
+                      ? null
+                      : () {
+                          print('Editing attribute in $className: $oldAttribute -> $newAttribute');
+                          Navigator.pop(context);
+                          final classRegex = RegExp(
+                            r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{[^}]*\}',
+                            multiLine: true,
+                          );
+                          final match = classRegex.firstMatch(plantumlCode);
+                          if (match != null) {
+                            String classDef = match.group(0)!;
+                            if (classDef.contains(oldAttribute)) {
+                              classDef = classDef.replaceAll(oldAttribute, newAttribute);
+                              onUpdate(plantumlCode.replaceFirst(classRegex, classDef));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Attribute "$oldAttribute" not found in "$className"')),
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Class "$className" not found')),
+                            );
+                          }
+                        },
+                  child: const Text('Edit'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: className.isEmpty || oldAttribute.isEmpty || newAttribute.isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      // Match class, abstract class, or interface
-                      final classRegex = RegExp(
-                        r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{[^}]*\}',
-                        multiLine: true,
-                      );
-                      final match = classRegex.firstMatch(plantumlCode);
-                      if (match != null) {
-                        String classDef = match.group(0)!;
-                        classDef = classDef.replaceAll(oldAttribute, newAttribute);
-                        onUpdate(plantumlCode.replaceFirst(classRegex, classDef));
-                      }
-                    },
-              child: const Text('Edit'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -521,14 +568,6 @@ class MethodManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.blue),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.blueAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _addMethodDialog(context),
             child: const Text('Add Method'),
@@ -541,14 +580,6 @@ class MethodManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.blue),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.blueAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _editMethodDialog(context),
             child: const Text('Edit Method'),
@@ -561,14 +592,6 @@ class MethodManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.red),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.redAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _deleteMethodDialog(context),
             child: const Text('Delete Method'),
@@ -580,55 +603,90 @@ class MethodManagement extends StatelessWidget {
 
   void _addMethodDialog(BuildContext context) {
     String className = '';
+    String? errorMessage;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Method'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) => className = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Class Name',
-                    border: OutlineInputBorder(),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Add Method'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        className = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Class Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: methodController,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value.trim().isEmpty) {
+                            errorMessage = 'Method cannot be empty';
+                          } else {
+                            errorMessage = null;
+                          }
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Method',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    if (errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: methodController,
-                  decoration: const InputDecoration(
-                    labelText: 'Method',
-                    border: OutlineInputBorder(),
-                  ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: className.isEmpty || methodController.text.trim().isEmpty || errorMessage != null
+                      ? null
+                      : () {
+                          print('Adding method to $className: ${methodController.text.trim()}');
+                          Navigator.pop(context);
+                          final method = methodController.text.trim();
+                          final classRegex = RegExp(
+                            r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{\s*([^\}]*?)\s*\}',
+                            multiLine: true,
+                          );
+                          final match = classRegex.firstMatch(plantumlCode);
+                          if (match != null) {
+                            final classType = match.group(1);
+                            final existingContent = match.group(2) ?? '';
+                            final newContent = existingContent.isEmpty ? method : '$existingContent\n  $method';
+                            onUpdate(plantumlCode.replaceFirst(
+                              classRegex,
+                              '$classType $className {\n  $newContent\n}',
+                            ));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Class "$className" not found')),
+                            );
+                          }
+                          methodController.clear();
+                        },
+                  child: const Text('Add'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: className.isEmpty || methodController.text.trim().isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      final method = methodController.text.trim();
-                      // Match class, abstract class, or interface
-                      final classRegex = RegExp(
-                        r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{',
-                        multiLine: true,
-                      );
-                      onUpdate(plantumlCode.replaceFirst(
-                        classRegex,
-                        '\$1 $className {\n  $method',
-                      ));
-                      methodController.clear();
-                    },
-              child: const Text('Add'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -638,120 +696,185 @@ class MethodManagement extends StatelessWidget {
     String className = '';
     String oldMethod = '';
     String newMethod = '';
+    String? errorMessage;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Method'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) => className = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Class Name',
-                    border: OutlineInputBorder(),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit Method'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        className = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Class Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (value) {
+                        oldMethod = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Old Method',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (value) {
+                        newMethod = value.trim();
+                        if (newMethod.isEmpty) {
+                          errorMessage = 'New method cannot be empty';
+                        } else {
+                          errorMessage = null;
+                        }
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'New Method',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    if (errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  onChanged: (value) => oldMethod = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Old Method',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  onChanged: (value) => newMethod = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'New Method',
-                    border: OutlineInputBorder(),
-                  ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: className.isEmpty || oldMethod.isEmpty || newMethod.isEmpty || errorMessage != null
+                      ? null
+                      : () {
+                          print('Editing method in $className: $oldMethod -> $newMethod');
+                          Navigator.pop(context);
+                          final classRegex = RegExp(
+                            r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{[^}]*\}',
+                            multiLine: true,
+                          );
+                          final match = classRegex.firstMatch(plantumlCode);
+                          if (match != null) {
+                            String classDef = match.group(0)!;
+                            if (classDef.contains(oldMethod)) {
+                              classDef = classDef.replaceAll(oldMethod, newMethod);
+                              onUpdate(plantumlCode.replaceFirst(classRegex, classDef));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Method "$oldMethod" not found in "$className"')),
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Class "$className" not found')),
+                            );
+                          }
+                        },
+                  child: const Text('Edit'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: className.isEmpty || oldMethod.isEmpty || newMethod.isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      // Match class, abstract class, or interface
-                      final classRegex = RegExp(
-                        r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{[^}]*\}',
-                        multiLine: true,
-                      );
-                      final match = classRegex.firstMatch(plantumlCode);
-                      if (match != null) {
-                        String classDef = match.group(0)!;
-                        classDef = classDef.replaceAll(oldMethod, newMethod);
-                        onUpdate(plantumlCode.replaceFirst(classRegex, classDef));
-                      }
-                    },
-              child: const Text('Edit'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
 
-  void _deleteMethodDialog(BuildContext context) {
+ void _deleteMethodDialog(BuildContext context) {
     String className = '';
     String methodName = '';
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete Method'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) => className = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Class Name',
-                    border: OutlineInputBorder(),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Delete Method'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        className = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Class Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (value) {
+                        methodName = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Method Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  onChanged: (value) => methodName = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Method Name',
-                    border: OutlineInputBorder(),
-                  ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: className.isEmpty || methodName.isEmpty
+                      ? null
+                      : () {
+                          print('Attempting to delete method "$methodName" from "$className"');
+                          Navigator.pop(context);
+                          final classRegex = RegExp(
+                            r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{\s*([^\}]*?)\s*\}',
+                            multiLine: true,
+                          );
+                          final match = classRegex.firstMatch(plantumlCode);
+                          if (match != null) {
+                            String classDef = match.group(0)!;
+                            final classType = match.group(1)!;
+                            final classContent = match.group(2) ?? '';
+                            // Split content into lines and filter out the method
+                            final lines = classContent.split('\n').map((line) => line.trim()).toList();
+                            final updatedLines = lines.where((line) => line != methodName).join('\n  ');
+                            if (lines.length != updatedLines.split('\n').length) {
+                              final newClassDef = updatedLines.isEmpty
+                                  ? '$classType $className {}'
+                                  : '$classType $className {\n  $updatedLines\n}';
+                              print('New class definition: $newClassDef');
+                              onUpdate(plantumlCode.replaceFirst(classRegex, newClassDef));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Method "$methodName" not found in "$className"')),
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Class "$className" not found')),
+                            );
+                          }
+                        },
+                  child: const Text('Delete'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: className.isEmpty || methodName.isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      // Match class, abstract class, or interface
-                      final classRegex = RegExp(
-                        r'(class|abstract class|interface)\s+' + RegExp.escape(className) + r'\s*\{[^}]*\}',
-                        multiLine: true,
-                      );
-                      final match = classRegex.firstMatch(plantumlCode);
-                      if (match != null) {
-                        String classDef = match.group(0)!;
-                        classDef = classDef.replaceAll(RegExp('  ' + RegExp.escape(methodName) + r'\n'), '');
-                        onUpdate(plantumlCode.replaceFirst(classRegex, classDef));
-                      }
-                    },
-              child: const Text('Delete'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -764,7 +887,6 @@ class RelationshipManagement extends StatelessWidget {
 
   RelationshipManagement({required this.plantumlCode, required this.onUpdate});
 
-  // Map of relationship types to their PlantUML syntax
   final Map<String, String> relationshipTypes = {
     'Inheritance (extends)': '--|>',
     'Inheritance (implements)': '<|--',
@@ -787,14 +909,6 @@ class RelationshipManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.green),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.greenAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _addRelationshipDialog(context),
             child: const Text('Add Relationship'),
@@ -807,14 +921,6 @@ class RelationshipManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.blue),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.blueAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _editRelationshipDialog(context),
             child: const Text('Edit Relationship'),
@@ -827,14 +933,6 @@ class RelationshipManagement extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.red),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) {
-                    return Colors.redAccent;
-                  }
-                  return null;
-                },
-              ),
             ),
             onPressed: () => _removeRelationshipDialog(context),
             child: const Text('Remove Relationship'),
@@ -847,7 +945,7 @@ class RelationshipManagement extends StatelessWidget {
   void _addRelationshipDialog(BuildContext context) {
     String fromClass = '';
     String toClass = '';
-    String relationshipType = 'Association'; // Default to Association
+    String relationshipType = 'Association';
     String multiplicityFrom = '';
     String multiplicityTo = '';
     String label = '';
@@ -856,7 +954,7 @@ class RelationshipManagement extends StatelessWidget {
       context: context,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (context, setState) {
             return AlertDialog(
               title: const Text('Add Relationship'),
               content: SingleChildScrollView(
@@ -866,7 +964,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         fromClass = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'From Class',
@@ -877,7 +975,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         toClass = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'To Class',
@@ -898,7 +996,7 @@ class RelationshipManagement extends StatelessWidget {
                         );
                       }).toList(),
                       onChanged: (value) {
-                        setDialogState(() {
+                        setState(() {
                           relationshipType = value!;
                         });
                       },
@@ -907,7 +1005,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         multiplicityFrom = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'Multiplicity (From) e.g., "1"',
@@ -918,7 +1016,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         multiplicityTo = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'Multiplicity (To) e.g., "0..*"',
@@ -929,7 +1027,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         label = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'Label (optional)',
@@ -944,6 +1042,7 @@ class RelationshipManagement extends StatelessWidget {
                   onPressed: fromClass.isEmpty || toClass.isEmpty
                       ? null
                       : () {
+                          print('Adding relationship: $fromClass -> $toClass ($relationshipType)');
                           Navigator.pop(context);
                           String relationshipSyntax = relationshipTypes[relationshipType]!;
                           String relationshipLine = '';
@@ -990,7 +1089,7 @@ class RelationshipManagement extends StatelessWidget {
       context: context,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (context, setState) {
             return AlertDialog(
               title: const Text('Edit Relationship'),
               content: SingleChildScrollView(
@@ -1000,7 +1099,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         fromClass = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'From Class',
@@ -1011,7 +1110,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         toClass = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'To Class',
@@ -1032,7 +1131,7 @@ class RelationshipManagement extends StatelessWidget {
                         );
                       }).toList(),
                       onChanged: (value) {
-                        setDialogState(() {
+                        setState(() {
                           oldRelationshipType = value!;
                         });
                       },
@@ -1041,7 +1140,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         oldMultiplicityFrom = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'Old Multiplicity (From) e.g., "1"',
@@ -1052,7 +1151,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         oldMultiplicityTo = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'Old Multiplicity (To) e.g., "0..*"',
@@ -1063,7 +1162,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         oldLabel = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'Old Label (optional)',
@@ -1084,7 +1183,7 @@ class RelationshipManagement extends StatelessWidget {
                         );
                       }).toList(),
                       onChanged: (value) {
-                        setDialogState(() {
+                        setState(() {
                           newRelationshipType = value!;
                         });
                       },
@@ -1093,7 +1192,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         newMultiplicityFrom = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'New Multiplicity (From) e.g., "1"',
@@ -1104,7 +1203,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         newMultiplicityTo = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'New Multiplicity (To) e.g., "0..*"',
@@ -1115,7 +1214,7 @@ class RelationshipManagement extends StatelessWidget {
                     TextField(
                       onChanged: (value) {
                         newLabel = value.trim();
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       decoration: const InputDecoration(
                         labelText: 'New Label (optional)',
@@ -1130,6 +1229,7 @@ class RelationshipManagement extends StatelessWidget {
                   onPressed: fromClass.isEmpty || toClass.isEmpty
                       ? null
                       : () {
+                          print('Editing relationship: $fromClass -> $toClass');
                           Navigator.pop(context);
                           String oldRelationshipSyntax = relationshipTypes[oldRelationshipType]!;
                           String oldRelationshipLine = '';
@@ -1161,10 +1261,17 @@ class RelationshipManagement extends StatelessWidget {
                             newRelationshipLine += ' : $newLabel';
                           }
 
-                          onUpdate(plantumlCode.replaceAll(
+                          String newCode = plantumlCode.replaceAll(
                             '$fromClass $oldRelationshipLine $toClass',
                             '$fromClass $newRelationshipLine $toClass',
-                          ));
+                          );
+                          if (newCode != plantumlCode) {
+                            onUpdate(newCode);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Relationship not found')),
+                            );
+                          }
                         },
                   child: const Text('Edit'),
                 ),
@@ -1183,51 +1290,68 @@ class RelationshipManagement extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Remove Relationship'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) => fromClass = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'From Class',
-                    border: OutlineInputBorder(),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Remove Relationship'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        fromClass = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'From Class',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (value) {
+                        toClass = value.trim();
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'To Class',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  onChanged: (value) => toClass = value.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'To Class',
-                    border: OutlineInputBorder(),
-                  ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: fromClass.isEmpty || toClass.isEmpty
+                      ? null
+                      : () {
+                          print('Removing relationship: $fromClass -> $toClass');
+                          Navigator.pop(context);
+                          String newCode = plantumlCode.replaceAll(
+                            RegExp(
+                              r'.*\b' +
+                                  RegExp.escape(fromClass) +
+                                  r'\b.*(-->|..>|--|>|<|--\|>|\*-->|o-->).*\b' +
+                                  RegExp.escape(toClass) +
+                                  r'\b.*\n',
+                            ),
+                            '',
+                          );
+                          if (newCode != plantumlCode) {
+                            onUpdate(newCode);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Relationship not found')),
+                            );
+                          }
+                        },
+                  child: const Text('Remove'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: fromClass.isEmpty || toClass.isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      // Match any relationship type
-                      onUpdate(plantumlCode.replaceAll(
-                        RegExp(
-                          r'.*\b' +
-                              RegExp.escape(fromClass) +
-                              r'\b.*(-->|..>|--|>|<|--\|>|\*-->|o-->).*\b' +
-                              RegExp.escape(toClass) +
-                              r'\b.*\n',
-                        ),
-                        '',
-                      ));
-                    },
-              child: const Text('Remove'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
