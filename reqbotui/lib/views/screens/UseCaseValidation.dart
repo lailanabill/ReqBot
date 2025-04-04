@@ -59,8 +59,13 @@ rectangle "Library Management System" {
   List<String> _actors = ['Librarian', 'Member', 'Admin'];
   String _selectedActor = 'Librarian'; // Default selected actor
   String _actorToRemove = 'Librarian'; // Default actor to remove
+  String _sourceUseCase = '';
+String _targetUseCase = '';
+String _relationshipType = 'include'; 
   final TextEditingController _newNameController = TextEditingController();
   String _useCaseToRename = '';
+  List<Map<String, dynamic>> _existingRelationships = [];
+int _selectedRelationshipIndex = -1;
 
 final TextEditingController _newUseCaseNameController2 = TextEditingController();
 
@@ -68,6 +73,8 @@ final TextEditingController _newUseCaseNameController2 = TextEditingController()
   void initState() {
     super.initState();
     _loadDiagram();
+    _extractExistingRelationships();
+
      if (_useCases.isNotEmpty) {
     _selectedUseCase = _useCases[0];
   }
@@ -76,7 +83,67 @@ final TextEditingController _newUseCaseNameController2 = TextEditingController()
   }
 
   }
+  void _addRelationship() {
+  if (_sourceUseCase == _targetUseCase) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Source and target use cases cannot be the same')),
+    );
+    return;
+  }
   
+  // Get descriptions for display in confirmation
+  Map<String, String> descriptions = _extractUseCaseDescriptions();
+  String sourceDescription = descriptions[_sourceUseCase] ?? _sourceUseCase;
+  String targetDescription = descriptions[_targetUseCase] ?? _targetUseCase;
+  
+  // Split the PlantUML code into lines for easier processing
+  List<String> lines = _plantUmlCode.split('\n');
+  
+  // Check if the relationship already exists
+  bool relationshipExists = false;
+  for (String line in lines) {
+    if (line.contains('$_sourceUseCase ..> $_targetUseCase') && 
+        line.contains('<<$_relationshipType>>')) {
+      relationshipExists = true;
+      break;
+    }
+  }
+  
+  if (relationshipExists) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('This relationship already exists')),
+    );
+    return;
+  }
+  
+  // Find where to add the relationship (before the closing brace of the rectangle)
+  int closingBraceIndex = -1;
+  for (int i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].trim() == '}') {
+      closingBraceIndex = i;
+      break;
+    }
+  }
+  
+  // Add the relationship
+  if (closingBraceIndex > 0) {
+    lines.insert(closingBraceIndex, '    $_sourceUseCase ..> $_targetUseCase : <<$_relationshipType>>');
+  }
+  
+  // Update the state
+  setState(() {
+    _plantUmlCode = lines.join('\n');
+  });
+  
+  // Reload the diagram
+  _loadDiagram();
+  
+  // Show confirmation
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Added $_relationshipType relationship from "$sourceDescription" to "$targetDescription"')),
+  );
+}
+
   List<String> _findActorsConnectedToUseCase(String useCase) {
   List<String> connectedActors = [];
   
@@ -96,6 +163,54 @@ final TextEditingController _newUseCaseNameController2 = TextEditingController()
   
   return connectedActors;
 }
+void _extractExistingRelationships() {
+  _existingRelationships = [];
+  
+  // Split the PlantUML code into lines
+  List<String> lines = _plantUmlCode.split('\n');
+  
+  // Regular expressions to match include and extend relationships
+  RegExp includeRegex = RegExp(r'(\w+)\s+\.\.>\s+(\w+)\s*:\s*<<include>>');
+  RegExp extendRegex = RegExp(r'(\w+)\s+\.\.>\s+(\w+)\s*:\s*<<extend>>');
+  
+  // Extract relationships
+  for (String line in lines) {
+    // Check for include relationships
+    Match? includeMatch = includeRegex.firstMatch(line);
+    if (includeMatch != null && includeMatch.groupCount >= 2) {
+      String source = includeMatch.group(1)!;
+      String target = includeMatch.group(2)!;
+      _existingRelationships.add({
+        'source': source,
+        'target': target,
+        'type': 'include',
+        'line': line
+      });
+      continue;
+    }
+    
+    // Check for extend relationships
+    Match? extendMatch = extendRegex.firstMatch(line);
+    if (extendMatch != null && extendMatch.groupCount >= 2) {
+      String source = extendMatch.group(1)!;
+      String target = extendMatch.group(2)!;
+      _existingRelationships.add({
+        'source': source,
+        'target': target,
+        'type': 'extend',
+        'line': line
+      });
+    }
+  }
+  
+  // Update selected index if needed
+  if (_existingRelationships.isNotEmpty && _selectedRelationshipIndex < 0) {
+    _selectedRelationshipIndex = 0;
+  } else if (_selectedRelationshipIndex >= _existingRelationships.length) {
+    _selectedRelationshipIndex = _existingRelationships.isEmpty ? -1 : 0;
+  }
+}
+
 void _removeUseCase() {
     List<String> lines = _plantUmlCode.split('\n');
     List<String> updatedLines = [];
@@ -224,31 +339,84 @@ void _removeUseCase() {
   }
 
   Future<void> _loadDiagram() async {
+  setState(() {
+    _isLoading = true;
+    _errorMessage = null;
+  });
+
+  try {
+    // Encode the PlantUML code for Kroki
+    final String encodedDiagram = encodePlantUMLForKroki(_plantUmlCode);
+    
+    // Create the Kroki API URL with the encoded diagram
+    final String url = 'https://kroki.io/plantuml/png/$encodedDiagram';
+    
+    // Set the image URL
     setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+      _imageUrl = url;
+      _isLoading = false;
     });
-
-    try {
-      // Encode the PlantUML code for Kroki
-      final String encodedDiagram = encodePlantUMLForKroki(_plantUmlCode);
-
-      // Create the Kroki API URL with the encoded diagram
-      final String url = 'https://kroki.io/plantuml/png/$encodedDiagram';
-
-      // Set the image URL
-      setState(() {
-        _imageUrl = url;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print('Exception: $e');
-      setState(() {
-        _errorMessage = 'Error encoding diagram: $e';
-        _isLoading = false;
-      });
+    
+    // Extract relationships after loading
+    _extractExistingRelationships();
+    
+    // Clear the actors cache since we've updated the diagram
+    
+  } catch (e) {
+    print('Exception: $e');
+    setState(() {
+      _errorMessage = 'Error encoding diagram: $e';
+      _isLoading = false;
+    });
+  }
+}
+  void _removeRelationship() {
+  if (_selectedRelationshipIndex < 0 || _selectedRelationshipIndex >= _existingRelationships.length) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Please select a relationship to remove')),
+    );
+    return;
+  }
+  
+  Map<String, dynamic> relationship = _existingRelationships[_selectedRelationshipIndex];
+  String source = relationship['source'];
+  String target = relationship['target'];
+  String type = relationship['type'];
+  String line = relationship['line'];
+  
+  // Get descriptions for display in confirmation
+  Map<String, String> descriptions = _extractUseCaseDescriptions();
+  String sourceDescription = descriptions[source] ?? source;
+  String targetDescription = descriptions[target] ?? target;
+  
+  // Split the PlantUML code into lines
+  List<String> lines = _plantUmlCode.split('\n');
+  List<String> updatedLines = [];
+  
+  // Remove the relationship line
+  for (String currentLine in lines) {
+    if (currentLine.trim() != line.trim()) {
+      updatedLines.add(currentLine);
     }
   }
+  
+  // Update the state
+  setState(() {
+    _plantUmlCode = updatedLines.join('\n');
+    
+    // Re-extract relationships
+    _extractExistingRelationships();
+  });
+  
+  // Reload the diagram
+  _loadDiagram();
+  
+  // Show confirmation
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Removed $type relationship from "$sourceDescription" to "$targetDescription"')),
+  );
+}
+
   Map<String, String> _extractUseCaseDescriptions() {
   Map<String, String> descriptions = {};
   
@@ -1375,6 +1543,212 @@ ExpansionTile(
               ),
               onPressed: _renameUseCase,
               child: Text('Apply Rename'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),ExpansionTile(
+  tilePadding: EdgeInsets.symmetric(horizontal: 8),
+  title: Text('Add Relationship'),
+  children: [
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Relationship type selection
+          Text(
+            'Relationship Type:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: RadioListTile<String>(
+                  title: Text('Include', style: TextStyle(fontSize: 13)),
+                  value: 'include',
+                  groupValue: _relationshipType,
+                  dense: true,
+                  onChanged: (value) {
+                    setState(() {
+                      _relationshipType = value!;
+                    });
+                  },
+                ),
+              ),
+              Expanded(
+                child: RadioListTile<String>(
+                  title: Text('Extend', style: TextStyle(fontSize: 13)),
+                  value: 'extend',
+                  groupValue: _relationshipType,
+                  dense: true,
+                  onChanged: (value) {
+                    setState(() {
+                      _relationshipType = value!;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          
+          // Source use case selection
+          Text(
+            'Source Use Case:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          SizedBox(height: 4),
+          DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Source',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+            value: _useCases.contains(_sourceUseCase) ? _sourceUseCase : (_useCases.isNotEmpty ? _useCases[0] : null),
+            items: _useCases.map((useCase) {
+              Map<String, String> descriptions = _extractUseCaseDescriptions();
+              return DropdownMenuItem<String>(
+                value: useCase,
+                child: Text('${descriptions[useCase] ?? useCase}', 
+                     style: TextStyle(fontSize: 13)),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _sourceUseCase = value;
+                });
+              }
+            },
+          ),
+          SizedBox(height: 12),
+          
+          // Target use case selection
+          Text(
+            'Target Use Case:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          SizedBox(height: 4),
+          DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Target',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+            value: _useCases.contains(_targetUseCase) ? _targetUseCase : (_useCases.isNotEmpty ? _useCases[0] : null),
+            items: _useCases.map((useCase) {
+              Map<String, String> descriptions = _extractUseCaseDescriptions();
+              return DropdownMenuItem<String>(
+                value: useCase,
+                child: Text('${descriptions[useCase] ?? useCase}', 
+                     style: TextStyle(fontSize: 13)),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _targetUseCase = value;
+                });
+              }
+            },
+          ),
+          SizedBox(height: 16),
+          
+          // Add relationship button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+              onPressed: _addRelationship,
+              child: Text('Add Relationship'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
+ExpansionTile(
+  tilePadding: EdgeInsets.symmetric(horizontal: 8),
+  title: Text('Remove Relationship'),
+  children: [
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select Relationship to Remove:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          SizedBox(height: 8),
+          
+          // Show message if no relationships exist
+          if (_existingRelationships.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'No include/extend relationships found in the diagram.',
+                style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+              ),
+            )
+          else
+            // List of existing relationships
+            Container(
+              height: 150,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: ListView.builder(
+                itemCount: _existingRelationships.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> relationship = _existingRelationships[index];
+                  String source = relationship['source'];
+                  String target = relationship['target'];
+                  String type = relationship['type'];
+                  
+                  // Get descriptions
+                  Map<String, String> descriptions = _extractUseCaseDescriptions();
+                  String sourceDesc = descriptions[source] ?? source;
+                  String targetDesc = descriptions[target] ?? target;
+                  
+                  return RadioListTile<int>(
+                    title: Text(
+                      '$sourceDesc ${type == 'include' ? '→ includes →' : '→ extends →'} $targetDesc',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    value: index,
+                    groupValue: _selectedRelationshipIndex,
+                    dense: true,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedRelationshipIndex = value!;
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+          
+          SizedBox(height: 16),
+          
+          // Remove button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+              onPressed: _existingRelationships.isEmpty ? null : _removeRelationship,
+              child: Text('Remove Relationship'),
             ),
           ),
         ],
