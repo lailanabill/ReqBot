@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'UseCaseValidation.dart'; // Import the new validation page
 
 class DiagramPage extends StatelessWidget {
   final String diagramName;
@@ -18,12 +19,25 @@ class DiagramPage extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 187, 151, 236), // Custom button color
+              backgroundColor: const Color.fromARGB(255, 187, 151, 236),
               padding: EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () {
-              // Handle edit action
+              // Navigate to the appropriate validation page based on diagram type
+              if (diagramName == 'Use Case Diagram') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UseCaseValidation(),
+                  ),
+                );
+              } else {
+                // For other diagram types, you can add more conditions later
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Validation for $diagramName not implemented yet')),
+                );
+              }
             },
             child: Text("Edit Diagram", style: TextStyle(fontSize: 18, color: Colors.white)),
           ),
