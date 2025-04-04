@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reqbot/views/screens/database_schema';
 import 'class_diagram_editor.dart';
 import 'UseCaseValidation.dart'; // Assuming this exists elsewhere
 
@@ -38,6 +39,12 @@ class DiagramPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const UseCaseValidation(),
+                  ),
+                );} else if (diagramName == 'Database Schema') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DatabaseSchemaEditor(),
                   ),
                 );
               } else {
