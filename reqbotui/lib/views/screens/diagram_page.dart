@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reqbot/views/screens/context_diagram_editor_screen.dart';
 import 'package:reqbot/views/screens/database_schema';
 import 'package:reqbot/views/screens/sequence_diagram_screen.dart';
 import 'class_diagram_editor.dart'; // Assuming this exists
@@ -56,6 +57,13 @@ class DiagramPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const SequenceDiagramScreen(),
+                  ),
+                );
+              } else if (diagramName == 'Context Diagram') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContextDiagramEditorScreen(),
                   ),
                 );
               } else {
