@@ -291,10 +291,11 @@ System --> User: Display Data
     return Column(
       children: [
         Expanded(
+          flex: 5, // Increased from 3 to 5 to give more space to the image
           child: _buildDiagramContent(),
         ),
         Expanded(
-          flex: 2,
+          flex: 2, // Keep the tools section as is
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
@@ -332,7 +333,9 @@ System --> User: Display Data
           maxScale: 3.0,
           child: Image.network(
             _imageUrl!,
-            fit: BoxFit.contain,
+            fit: BoxFit.contain, // Keeps the aspect ratio intact
+            width: double.infinity, // Ensures it takes full available width
+            height: double.infinity, // Ensures it takes full available height
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
               return const Center(child: CircularProgressIndicator());
