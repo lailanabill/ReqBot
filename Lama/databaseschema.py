@@ -229,7 +229,7 @@ System Description:
                 with open(output_file, 'wb') as f:
                     f.write(response.content)
                 
-                with open('database_class_diagram.puml', 'w', encoding='utf-8') as f:
+                with open('database_diagram.puml', 'w', encoding='utf-8') as f:
                     f.write(plantuml_code)
                 
                 print(f"Class diagram saved as {output_file}")
