@@ -1,0 +1,39 @@
+@startuml
+title University Course Registration System Class Diagram
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+class Student {
+  - studentId: String
+  - name: String
+  - enrolledCourses: List<Course>
+  + registerForCourse(courseCode: String): Boolean
+  + viewSchedule(): void
+  + checkPrerequisites(courseCode: String): Boolean
+}
+class Course {
+  - courseCode: String
+  - title: String
+  - description: String
+  - capacity: Integer
+  + setPrerequisites(prerequisites: List<Course>): void
+  + viewStudentEnrollments(): void
+}
+class Faculty {
+  - facultyId: String
+  - name: String
+  + manageCourses(): void
+  + viewStudentEnrollments(): void
+}
+class Registration {
+  - waitlist: List<Course>
+  + registerStudent(student: Student, courseCode: String): Boolean
+  + manageWaitlist(): void
+}
+Student --> Course : registers for
+Registration o-- Course : enrolled in
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+skinparam classAttributeIconSize 0
+title University Course Registration Database Class Diagram
+class Student {
+.. Represents a student in the system ..
+
++ studentId: String {PK, NOT NULL}
+- name: String {NOT NULL}
+- email: String {NOT NULL}
+- enrollmentHistory: List<CourseEnrollment>
+
++ registerForCourse(courseId: String): boolean
++ getEnrollmentHistory(): List<CourseEnrollment>
+}
+class Course {
+.. Represents a course in the system ..
+
++ courseId: String {PK, NOT NULL}
+- title: String {NOT NULL}
+- department: String {NOT NULL}
+- capacity: Integer
+
++ getStudentsEnrolled(): List<Student>
+}
+class Faculty {
+.. Represents a faculty member in the system ..
+
++ facultyId: String {PK, NOT NULL}
+- name: String {NOT NULL}
+- department: String {NOT NULL}
+
++ getAssignedCourses(): List<Course>
+}
+class Enrollment {
+.. Represents an enrollment between a student and course ..
+
++ enrollmentId: String {PK, NOT NULL}
+- studentId: String {NOT NULL}
+- courseId: String {NOT NULL}
+
++ getStudent(): Student
++ getCourse(): Course
+}
+Student "1" *-- "*" Enrollment : A student can enroll in multiple courses
+Course "*" --* "1" Faculty : A course is taught by one faculty member
+@enduml

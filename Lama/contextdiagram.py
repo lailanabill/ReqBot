@@ -69,7 +69,7 @@ class ContextDiagramGenerator:
         plantuml.append("@enduml")
         return '\n'.join(plantuml)
 
-    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'context_diagram.png') -> bool:
+    def generate_diagram_with_kroki(self, plantuml_code: str,  output_file: str = 'reqbotui/assets/images/context_diagram.png') -> bool:
         try:
             kroki_url = "https://kroki.io/plantuml/png/"
             plantuml_encoded = base64.urlsafe_b64encode(

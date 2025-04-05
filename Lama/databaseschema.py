@@ -215,7 +215,7 @@ System Description:
         plantuml.append("@enduml")
         return '\n'.join(plantuml)
 
-    def generate_diagram(self, plantuml_code: str, output_file: str = 'database_class_diagram.png') -> bool:
+    def generate_diagram(self, plantuml_code: str,  output_file: str = 'reqbotui/assets/images/database_diagram.png') -> bool:
         """Generate diagram using Kroki"""
         try:
             kroki_url = self.url_generator.generate_kroki_url('plantuml', plantuml_code, 'png')

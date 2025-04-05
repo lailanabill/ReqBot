@@ -292,7 +292,7 @@ IMPORTANT:
         plantuml.append("@enduml")
         return '\n'.join(plantuml)
 
-    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'class_diagram.png') -> bool:
+    def generate_diagram_with_kroki(self, plantuml_code: str,  output_file: str = 'reqbotui/assets/images/class_diagram.png') -> bool:
         """
         Generate diagram using Kroki API
         """
@@ -355,7 +355,7 @@ Team Lead (Alex): Great points. We should also consider how we'll handle academi
             f.write(plantuml_code)
         
         # Generate diagram using Kroki
-        generator.generate_diagram_with_kroki(plantuml_code, 'class_diagram.png')
+        generator.generate_diagram_with_kroki(plantuml_code)
         
         # Print results
         print("Extracted Class Diagram Elements:")

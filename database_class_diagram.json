@@ -1,0 +1,160 @@
+{
+  "system_name": "University Course Registration Database",
+  "classes": [
+    {
+      "name": "Student",
+      "description": "Represents a student in the system",
+      "attributes": [
+        {
+          "name": "studentId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "is_nullable": false
+        },
+        {
+          "name": "enrollmentHistory",
+          "type": "List<CourseEnrollment>",
+          "is_nullable": true
+        }
+      ],
+      "methods": [
+        {
+          "name": "registerForCourse",
+          "parameters": [
+            {
+              "name": "courseId",
+              "type": "String"
+            }
+          ],
+          "return_type": "boolean"
+        },
+        {
+          "name": "getEnrollmentHistory",
+          "parameters": [],
+          "return_type": "List<CourseEnrollment>"
+        }
+      ]
+    },
+    {
+      "name": "Course",
+      "description": "Represents a course in the system",
+      "attributes": [
+        {
+          "name": "courseId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        },
+        {
+          "name": "title",
+          "type": "String",
+          "is_nullable": false
+        },
+        {
+          "name": "department",
+          "type": "String",
+          "is_nullable": false
+        },
+        {
+          "name": "capacity",
+          "type": "Integer",
+          "is_nullable": true
+        }
+      ],
+      "methods": [
+        {
+          "name": "getStudentsEnrolled",
+          "parameters": [],
+          "return_type": "List<Student>"
+        }
+      ]
+    },
+    {
+      "name": "Faculty",
+      "description": "Represents a faculty member in the system",
+      "attributes": [
+        {
+          "name": "facultyId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        },
+        {
+          "name": "department",
+          "type": "String",
+          "is_nullable": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "getAssignedCourses",
+          "parameters": [],
+          "return_type": "List<Course>"
+        }
+      ]
+    },
+    {
+      "name": "Enrollment",
+      "description": "Represents an enrollment between a student and course",
+      "attributes": [
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        },
+        {
+          "name": "studentId",
+          "type": "String",
+          "is_nullable": false
+        },
+        {
+          "name": "courseId",
+          "type": "String",
+          "is_nullable": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "getStudent",
+          "parameters": [],
+          "return_type": "Student"
+        },
+        {
+          "name": "getCourse",
+          "parameters": [],
+          "return_type": "Course"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "one_to_many",
+      "from_class": "Student",
+      "to_class": "Enrollment",
+      "description": "A student can enroll in multiple courses"
+    },
+    {
+      "type": "many_to_one",
+      "from_class": "Course",
+      "to_class": "Faculty",
+      "description": "A course is taught by one faculty member"
+    }
+  ]
+}

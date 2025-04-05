@@ -7,16 +7,34 @@ import 'UseCaseValidation.dart'; // Assuming this exists
 
 class DiagramPage extends StatelessWidget {
   final String diagramName;
+  final String dgrnam;
 
-  const DiagramPage({Key? key, required this.diagramName}) : super(key: key);
+  const DiagramPage({Key? key, required this.diagramName, required this.dgrnam})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(title: Text(diagramName)),
       body: Center(
-        child:
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
             Text('Showing $diagramName', style: const TextStyle(fontSize: 20)),
+            SizedBox(
+              height: 20,
+            ),
+            Image.asset(
+              'assets/images/${dgrnam}_diagram.png',
+              width: screenWidth * 0.8,
+              height: screenHeight * 0.6,
+              fit: BoxFit.cover,
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),

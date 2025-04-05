@@ -1,0 +1,124 @@
+{
+  "project_name": "Software Development Lifecycle Management System",
+  "functional_requirements": [
+    {
+      "id": "FR001",
+      "description": "Conduct Stakeholder Analysis",
+      "priority": "High",
+      "actor": [
+        "Product Manager"
+      ]
+    },
+    {
+      "id": "FR002",
+      "description": "Gather Requirements",
+      "priority": "High",
+      "actor": [
+        "Product Manager"
+      ],
+      "includes": [
+        {
+          "use_case_id": "FR003",
+          "description": "Perform Risk Assessment"
+        }
+      ]
+    },
+    {
+      "id": "FR004",
+      "description": "Develop Feature",
+      "priority": "High",
+      "actor": [
+        "Developer"
+      ],
+      "includes": [
+        {
+          "use_case_id": "FR005",
+          "description": "Conduct Code Review"
+        }
+      ]
+    },
+    {
+      "id": "FR006",
+      "description": "Test and Quality Assurance",
+      "priority": "High",
+      "actor": [
+        "Tester"
+      ],
+      "includes": [
+        {
+          "use_case_id": "FR007",
+          "description": "Generate Test Cases"
+        }
+      ]
+    },
+    {
+      "id": "FR008",
+      "description": "Deploy Feature",
+      "priority": "High",
+      "actor": [
+        "DevOps Engineer"
+      ],
+      "includes": [
+        {
+          "use_case_id": "FR009",
+          "description": "Configure Environment"
+        }
+      ]
+    },
+    {
+      "id": "FR010",
+      "description": "Manage Project",
+      "priority": "High",
+      "actor": [
+        "Scrum Master"
+      ],
+      "includes": [
+        {
+          "use_case_id": "FR011",
+          "description": "Plan Sprint"
+        }
+      ]
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR001",
+      "category": "Security",
+      "description": "Robust Access Control and Audit Logging",
+      "priority": "Critical"
+    },
+    {
+      "id": "NFR002",
+      "category": "Performance",
+      "description": "Real-time Collaboration Capabilities",
+      "priority": "High"
+    }
+  ],
+  "actors": [
+    {
+      "name": "Product Manager",
+      "description": "Initiates and guides requirement gathering",
+      "type": "Primary"
+    },
+    {
+      "name": "Developer",
+      "description": "Executes feature development",
+      "type": "Primary"
+    },
+    {
+      "name": "Tester",
+      "description": "Performs comprehensive quality assurance",
+      "type": "Primary"
+    },
+    {
+      "name": "DevOps Engineer",
+      "description": "Manages deployment pipelines",
+      "type": "Primary"
+    },
+    {
+      "name": "Scrum Master",
+      "description": "Facilitates project management",
+      "type": "Primary"
+    }
+  ]
+}

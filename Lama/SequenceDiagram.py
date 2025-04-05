@@ -339,7 +339,7 @@ IMPORTANT:
 
         return '\n'.join(plantuml)
 
-    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'diagram.png') -> bool:
+    def generate_diagram_with_kroki(self, plantuml_code: str,  output_file: str = 'reqbotui/assets/images/seq_diagram.png') -> bool:
         """
         Generate diagram using Kroki API
         """
@@ -521,7 +521,7 @@ IMPORTANT:
             print(f"Error generating interactive HTML: {e}")
             return False
 
-    def analyze_and_generate_diagrams(self, transcript: str, output_prefix: str = 'sequence_diagram') -> bool:
+    def analyze_and_generate_diagrams(self, transcript: str, output_file: str = 'reqbotui/assets/images/seq_diagram.png') -> bool:
         """
         Complete workflow to analyze transcript and generate all diagram formats
         """
@@ -581,7 +581,7 @@ def main():
     """
 
     # Use the complete workflow method
-    success = generator.analyze_and_generate_diagrams(transcript, 'smart_home_sequence')
+    success = generator.analyze_and_generate_diagrams(transcript)
     
     if success:
         print("All diagram generation completed successfully!")

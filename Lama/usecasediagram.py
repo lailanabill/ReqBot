@@ -420,7 +420,7 @@ IMPORTANT:
     
      return '\n'.join(plantuml)
 
-    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'diagram.png') -> bool:
+    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'reqbotui/assets/images/use_case_diagram.png') -> bool:
         """
         Generate diagram using Kroki API
         """
@@ -520,7 +520,7 @@ def main():
             f.write(plantuml_code)
         
         # Generate diagram using Kroki
-        converter.generate_diagram_with_kroki(plantuml_code, 'use_case_diagram.png')
+        converter.generate_diagram_with_kroki(plantuml_code)
         
         # Print results
         print("Extracted Requirements:")

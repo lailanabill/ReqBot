@@ -3,11 +3,23 @@ import 'diagram_page.dart';
 
 class DiagramsMenu extends StatelessWidget {
   final List<Map<String, dynamic>> diagrams = [
-    {'name': 'Use Case Diagram', 'icon': Icons.account_tree},
-    {'name': 'Sequence Diagram', 'icon': Icons.timeline},
-    {'name': 'Database Schema', 'icon': Icons.storage},
-    {'name': 'Class Diagram', 'icon': Icons.class_},
-    {'name': 'Context Diagram', 'icon': Icons.blur_circular},
+    {
+      'name': 'Use Case Diagram',
+      'diagramName': 'use_case',
+      'icon': Icons.account_tree
+    },
+    {'name': 'Sequence Diagram', 'diagramName': 'seq', 'icon': Icons.timeline},
+    {
+      'name': 'Database Schema',
+      'diagramName': 'database',
+      'icon': Icons.storage
+    },
+    {'name': 'Class Diagram', 'diagramName': 'class', 'icon': Icons.class_},
+    {
+      'name': 'Context Diagram',
+      'diagramName': 'context',
+      'icon': Icons.blur_circular
+    },
   ];
 
   @override
@@ -58,7 +70,9 @@ class DiagramsMenu extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DiagramPage(diagramName: diagrams[index]['name']),
+            builder: (context) => DiagramPage(
+                diagramName: diagrams[index]['name'],
+                dgrnam: diagrams[index]['diagramName']),
           ),
         );
       },

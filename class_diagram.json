@@ -1,0 +1,177 @@
+{
+  "system_name": "University Course Registration System",
+  "classes": [
+    {
+      "name": "Student",
+      "attributes": [
+        {
+          "name": "studentId",
+          "type": "String",
+          "visibility": "private"
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "visibility": "private"
+        },
+        {
+          "name": "enrolledCourses",
+          "type": "List<Course>",
+          "visibility": "private"
+        }
+      ],
+      "methods": [
+        {
+          "name": "registerForCourse",
+          "parameters": [
+            {
+              "name": "courseCode",
+              "type": "String"
+            }
+          ],
+          "return_type": "Boolean",
+          "visibility": "public"
+        },
+        {
+          "name": "viewSchedule",
+          "parameters": [],
+          "return_type": "void",
+          "visibility": "public"
+        },
+        {
+          "name": "checkPrerequisites",
+          "parameters": [
+            {
+              "name": "courseCode",
+              "type": "String"
+            }
+          ],
+          "return_type": "Boolean",
+          "visibility": "public"
+        }
+      ]
+    },
+    {
+      "name": "Course",
+      "attributes": [
+        {
+          "name": "courseCode",
+          "type": "String",
+          "visibility": "private"
+        },
+        {
+          "name": "title",
+          "type": "String",
+          "visibility": "private"
+        },
+        {
+          "name": "description",
+          "type": "String",
+          "visibility": "private"
+        },
+        {
+          "name": "capacity",
+          "type": "Integer",
+          "visibility": "private"
+        }
+      ],
+      "methods": [
+        {
+          "name": "setPrerequisites",
+          "parameters": [
+            {
+              "name": "prerequisites",
+              "type": "List<Course>"
+            }
+          ],
+          "return_type": "void",
+          "visibility": "public"
+        },
+        {
+          "name": "viewStudentEnrollments",
+          "parameters": [],
+          "return_type": "void",
+          "visibility": "public"
+        }
+      ]
+    },
+    {
+      "name": "Faculty",
+      "attributes": [
+        {
+          "name": "facultyId",
+          "type": "String",
+          "visibility": "private"
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "visibility": "private"
+        }
+      ],
+      "methods": [
+        {
+          "name": "manageCourses",
+          "parameters": [],
+          "return_type": "void",
+          "visibility": "public"
+        },
+        {
+          "name": "viewStudentEnrollments",
+          "parameters": [],
+          "return_type": "void",
+          "visibility": "public"
+        }
+      ]
+    },
+    {
+      "name": "Registration",
+      "attributes": [
+        {
+          "name": "waitlist",
+          "type": "List<Course>",
+          "visibility": "private"
+        }
+      ],
+      "methods": [
+        {
+          "name": "registerStudent",
+          "parameters": [
+            {
+              "name": "student",
+              "type": "Student"
+            },
+            {
+              "name": "courseCode",
+              "type": "String"
+            }
+          ],
+          "return_type": "Boolean",
+          "visibility": "public"
+        },
+        {
+          "name": "manageWaitlist",
+          "parameters": [],
+          "return_type": "void",
+          "visibility": "public"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "association",
+      "from": "Student",
+      "to": "Course",
+      "multiplicity": "0..*",
+      "label": "registers for"
+    },
+    {
+      "type": "aggregation",
+      "from": "Registration",
+      "to": "Course",
+      "multiplicity": "1..*",
+      "label": "enrolled in"
+    }
+  ]
+}
