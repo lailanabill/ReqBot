@@ -1,0 +1,59 @@
+@startuml
+entity "Users" {
+  *id : INT <<PK>>
+  --
+  name : VARCHAR(100)
+  email : VARCHAR(100)
+  is_active : BOOLEAN
+}
+
+entity "Tasks" {
+  *task_id : INT <<PK>>
+  --
+  title : VARCHAR(255)
+  description : TEXT
+  deadline : DATETIME
+  priority : VARCHAR(20)
+  status : VARCHAR(20)
+  created_by : INT <<FK>>
+}
+
+entity "Task_Assignees" {
+  *id : INT <<PK>>
+  --
+  task_id : INT <<FK>>
+  user_id : INT <<FK>>
+}
+
+entity "Notifications" {
+  *notification_id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  content : TEXT
+  is_read : BOOLEAN
+  timestamp : DATETIME
+}
+
+entity "Preferences" {
+  *id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  push_enabled : BOOLEAN
+  daily_summary : BOOLEAN
+  dark_mode : BOOLEAN
+}
+
+entity "Language_Settings" {
+  *id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  language_code : VARCHAR(10)
+}
+
+Users ||--o{ Tasks : creates
+Users ||--o{ Task_Assignees : assigned
+Tasks ||--o{ Task_Assignees
+Users ||--o{ Notifications : receives
+Users ||--|| Preferences : has
+Users ||--|| Language_Settings : uses
+@enduml
