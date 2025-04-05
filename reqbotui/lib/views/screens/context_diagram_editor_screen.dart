@@ -32,18 +32,34 @@ class ContextDiagramEditorScreen extends StatefulWidget {
 class _ContextDiagramEditorScreenState extends State<ContextDiagramEditorScreen> {
   String plantumlCode = '''
 @startuml
+@startuml
 left to right direction
 skinparam monochrome true
-actor "Customer" as customer
-rectangle "Online Shopping System" as sys
-rectangle "Payment Gateway" as payment
-rectangle "Shipping Service" as shipping
-customer --> sys : "Places Order"
-sys --> customer : "Sends Confirmation"
-sys --> payment : "Requests Payment"
-payment --> sys : "Sends Approval"
-sys --> shipping : "Requests Delivery"
-shipping --> sys : "Sends Status"
+
+actor "User" as user
+actor "Admin" as admin
+actor "QA Tester" as qa
+actor "UX Designer" as ux
+rectangle "Task Management System" as sys
+rectangle "Notification Service" as notify
+rectangle "Authentication Service" as auth
+rectangle "Frontend UI" as frontend
+
+user --> sys : "Creates/Edits Tasks"
+sys --> user : "Sends Notifications"
+admin --> sys : "Manages Users"
+qa --> sys : "Reports Issues"
+ux --> sys : "Provides UI Feedback"
+
+sys --> notify : "Triggers Notification"
+notify --> sys : "Sends Delivery Status"
+
+sys --> auth : "Validates User"
+auth --> sys : "Returns Access Info"
+
+user --> frontend : "Uses Interface"
+frontend --> sys : "Calls APIs"
+
 @enduml
 ''';
 

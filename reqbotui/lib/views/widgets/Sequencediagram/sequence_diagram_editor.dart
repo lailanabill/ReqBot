@@ -17,20 +17,22 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
 
   String _plantUmlCode = '''@startuml
 actor "User" as User
-participant "System" as System
+participant "Task Management System" as System
 participant "Database" as Database
+participant "Notification Service" as Notify
 
-loop Check Login
-  User -> System: Enter Credentials
-  System -> Database: Verify User
-  Database --> System: Return Status
-  System --> User: Login Status
-end
+User -> System: Create Task
+System -> Database: Insert Task Data
+Database --> System: Task Created
 
-User -> System: Request Data
-System -> Database: Fetch Data
-Database --> System: Return Data
-System --> User: Display Data
+User -> System: Assign Task to User(s)
+System -> Database: Update Task Assignees
+Database --> System: Assignment Confirmed
+
+System -> Notify: Trigger Assignment Notification
+Notify --> System: Notification Sent
+
+System --> User: Task Assigned & Notified
 
 @enduml''';
 

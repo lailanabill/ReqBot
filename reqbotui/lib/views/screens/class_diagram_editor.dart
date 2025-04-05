@@ -22,19 +22,51 @@ skinparam class {
 }
 
 class User {
-  -String id
+  -String userId
   -String name
+  -Boolean isActive
   +getName(): String
   +setName(name: String): void
+  +isDeactivated(): Boolean
 }
 
-class Order {
-  -String orderId
-  -DateTime date
-  +createOrder(): void
+class Task {
+  -String taskId
+  -String title
+  -String description
+  -DateTime deadline
+  -Priority priority
+  -Status status
+  +assignUser(user: User): void
+  +editTask(): void
+  +deleteTask(): void
 }
 
-User "1" --> "0..*" Order : places
+class Notification {
+  -String notificationId
+  -String content
+  -Boolean isRead
+  -DateTime timestamp
+  +markAsRead(): void
+}
+
+class Preferences {
+  -Boolean pushEnabled
+  -Boolean dailySummary
+  -Boolean darkMode
+  +updatePreferences(): void
+}
+
+class LanguageSetting {
+  -String languageCode
+  +apply(): void
+}
+
+User "1" --> "0..*" Task : creates
+Task "1" --> "0..*" User : assigned to
+User "1" --> "0..*" Notification : receives
+User "1" --> "1" Preferences : has
+User "1" --> "1" LanguageSetting : uses
 @enduml
 ''';
 

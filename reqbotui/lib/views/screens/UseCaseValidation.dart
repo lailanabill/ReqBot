@@ -18,7 +18,7 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
   // Store the PlantUML code as a class variable so we can modify it
   String _plantUmlCode = '''@startuml
 left to right direction
-title Library Management System - Use Case Diagram
+title Task Management System - Use Case Diagram
 
 skinparam usecase {
     BackgroundColor LightBlue
@@ -27,31 +27,46 @@ skinparam usecase {
     ActorBorderColor Navy
 }
 
-actor "Librarian" as Librarian
-actor "Member" as Member
+actor "User" as User
 actor "Admin" as Admin
 
-rectangle "Library Management System" {
-    usecase "Search Books" as UC001
-    usecase "Borrow Book" as UC002
-    usecase "Return Book" as UC003
-    usecase "Manage Books" as UC004
-    usecase "Register Member" as UC005
-    usecase "Generate Reports" as UC006
+rectangle "Task Management System" {
+    usecase "Create Task" as UC001
+    usecase "Assign Task" as UC002
+    usecase "Edit Task" as UC003
+    usecase "Delete Task" as UC004
+    usecase "View Task List" as UC005
+    usecase "Filter Tasks" as UC006
+    usecase "Receive Notifications" as UC007
+    usecase "Set Notification Preferences" as UC008
+    usecase "View Archived Notifications" as UC009
+    usecase "Enable Dark Mode" as UC010
+    usecase "Set Language Preferences" as UC011
+    usecase "See Confirmation Prompt" as UC012
+    usecase "Prevent Assignment to Deactivated Users" as UC013
+    usecase "Deactivate User" as UC014
 
-    UC002 ..> UC001 : <<include>>
-    UC003 ..> UC001 : <<include>>
-    note right of UC002 : Searching is required before borrowing
-    note right of UC003 : Searching is required before returning
+    UC004 ..> UC012 : <<include>>
+    UC002 ..> UC013 : <<extend>>
 
-    Member --> UC001
-    Member --> UC002
-    Member --> UC003
-    Librarian --> UC004
-    Librarian --> UC005
-    Librarian --> UC006
-    Admin --> UC004
-    Admin --> UC006
+    note right of UC004 : Confirmation required before deletion
+    note right of UC002 : Cannot assign to deactivated users
+
+    User --> UC001
+    User --> UC002
+    User --> UC003
+    User --> UC004
+    User --> UC005
+    User --> UC006
+    User --> UC007
+    User --> UC008
+    User --> UC009
+    User --> UC010
+    User --> UC011
+    User --> UC012
+
+    Admin --> UC013
+    Admin --> UC014
 }
 @enduml''';
 
