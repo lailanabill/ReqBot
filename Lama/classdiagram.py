@@ -344,14 +344,14 @@ Team Lead (Alex): Great points. We should also consider how we'll handle academi
     
     if class_diagram_json:
         # Save JSON
-        with open('class_diagram.json', 'w', encoding='utf-8') as f:
+        with open('reqbotui/assets/jsons/class_diagram.json', 'w', encoding='utf-8') as f:
             json.dump(class_diagram_json, f, indent=2, ensure_ascii=False)
         
         # Generate PlantUML
         plantuml_code = generator.generate_plantuml(class_diagram_json)
         
         # Save PlantUML code
-        with open('class_diagram.puml', 'w', encoding='utf-8') as f:
+        with open('reqbotui/assets/umls/class_diagram.puml', 'w', encoding='utf-8') as f:
             f.write(plantuml_code)
         
         # Generate diagram using Kroki

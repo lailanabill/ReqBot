@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:reqbot/controllers/record_controller.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'dart:io';
@@ -16,6 +17,7 @@ class Record extends StatefulWidget {
 }
 
 class _RecordState extends State<Record> {
+  String xxx = '';
   final RecordController _controller = RecordController();
   String _transcription = '';
   bool _isListening = false;
@@ -53,6 +55,44 @@ class _RecordState extends State<Record> {
     }
   }
 
+  // Future<void> scam() async {
+  //   final user = Supabase.instance.client.auth.currentUser;
+  //   final userId = user!.id;
+  //   final analyid = await Supabase.instance.client
+  //       .from('users')
+  //       .select("analyzer_id")
+  //       .eq('id', userId)
+  //       .single();
+
+  //   final classdia = File(
+  //       'reqbotui/assets/umls/class_diagram.puml'); // path to your UML file
+  //   final contdia = File(
+  //       'reqbotui/assets/umls/context_diagram.puml'); // path to your UML file
+  //   final seqdia = File(
+  //       'reqbotui/assets/umls/sequence_diagram.puml'); // path to your UML file
+  //   final ucdia = File(
+  //       'reqbotui/assets/umls/use_case_diagram.puml'); // path to your UML file
+  //   final dbdia = File(
+  //       'reqbotui/assets/umls/database_diagram.puml'); // path to your UML file
+  //   final analyzerId = analyid['analyzer_id'];
+  //   final String umlclass = await classdia.readAsString();
+  //   final String umlcontext = await contdia.readAsString();
+  //   final String umlseq = await seqdia.readAsString();
+  //   final String umlusecase = await ucdia.readAsString();
+  //   final String umldatabase = await dbdia.readAsString();
+
+  //   final response = await Supabase.instance.client.from('diagrams').insert({
+  //     "class_uml": umlclass,
+  //     "context_uml": umlcontext,
+  //     "seq_uml": umlseq,
+  //     "usecase": umlusecase,
+  //     "database_uml": umldatabase,
+  //     "analyzer_id": analyzerId
+  //   }).select();
+
+  //   print('RES YA GELLO ${response}');
+  // }
+
   Future<void> scam() async {
     final user = Supabase.instance.client.auth.currentUser;
     final userId = user!.id;
@@ -61,34 +101,19 @@ class _RecordState extends State<Record> {
         .select("analyzer_id")
         .eq('id', userId)
         .single();
-
-    final classdia = File(
-        'reqbotui/assets/umls/class_diagram.puml'); // path to your UML file
-    final contdia = File(
-        'reqbotui/assets/umls/context_diagram.puml'); // path to your UML file
-    final seqdia = File(
-        'reqbotui/assets/umls/sequence_diagram.puml'); // path to your UML file
-    final ucdia = File(
-        'reqbotui/assets/umls/use_case_diagram.puml'); // path to your UML file
-    final dbdia = File(
-        'reqbotui/assets/umls/database_diagram.puml'); // path to your UML file
     final analyzerId = analyid['analyzer_id'];
-    final String umlclass = await classdia.readAsString();
-    final String umlcontext = await contdia.readAsString();
-    final String umlseq = await seqdia.readAsString();
-    final String umlusecase = await ucdia.readAsString();
-    final String umldatabase = await dbdia.readAsString();
 
-    final response = await Supabase.instance.client.from('diagrams').insert({
-      "class_uml": umlclass,
-      "context_uml": umlcontext,
-      "seq_uml": umlseq,
-      "usecase": umlusecase,
-      "database_uml": umldatabase,
-      "analyzer_id": analyzerId
-    }).select();
+    // final classdia = File(
+    //     'reqbotui/assets/umls/class_diagram.puml'); // path to your UML file
 
-    print('RES YA GELLO ${response}');
+    // final String umlclass = await classdia.readAsString();
+    final classdia = await rootBundle.loadString('umls/class_diagram.puml');
+    print('Analyzer ID: $analyzerId ');
+    print('Class UML: $classdia');
+    xxx = classdia;
+    final response = await Supabase.instance.client
+        .from('diagrams')
+        .insert({"class_uml": classdia, "project_id": analyzerId}).select();
   }
 
   void _showTranscriptionDialog(String title) {
@@ -153,7 +178,7 @@ class _RecordState extends State<Record> {
             ElevatedButton(
               onPressed: () async {
                 scam();
-                print('here');
+                print('here alooo RES YA');
               },
               child: Text('nothinggggg'),
             ),

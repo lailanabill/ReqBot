@@ -85,6 +85,11 @@ flutter:
     - assets/images/use_case_diagram.png
     - assets/images/database_diagram.png
     - assets/images/seq_diagram.png
+    - assets/umls/class_diagram.puml
+    - assets/umls/context_diagram.puml
+    - assets/umls/sequence_diagram.puml
+    - assets/umls/use_case_diagram.puml
+    - assets/umls/database_diagram.puml
     - .env
 
 

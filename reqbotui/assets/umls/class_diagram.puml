@@ -1,54 +1,38 @@
 @startuml
+title University Course Registration System Class Diagram
+skinparam classAttributeIconSize 0
+skinparam monochrome true
 skinparam class {
-  BackgroundColor PaleGreen
-  BorderColor DarkGreen
-  ArrowColor DarkGray
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
 }
-
-class User {
-  -String userId
-  -String name
-  -Boolean isActive
-  +getName(): String
-  +setName(name: String): void
-  +isDeactivated(): Boolean
+class Student {
+  - studentId: String
+  - name: String
+  - enrolledCourses: List<Course>
+  + registerForCourse(courseCode: String): Boolean
+  + viewSchedule(): List<Course>
+  + checkPrerequisites(courseCode: String): Boolean
 }
-
-class Task {
-  -String taskId
-  -String title
-  -String description
-  -DateTime deadline
-  -Priority priority
-  -Status status
-  +assignUser(user: User): void
-  +editTask(): void
-  +deleteTask(): void
+class Course {
+  - courseCode: String
+  - title: String
+  - description: String
+  - capacity: Integer
+  + setPrerequisites(prerequisites: List<Course>): Void
+  + viewStudentEnrollments(): Map<String, List<Student>>
 }
-
-class Notification {
-  -String notificationId
-  -String content
-  -Boolean isRead
-  -DateTime timestamp
-  +markAsRead(): void
+class Faculty {
+  - facultyId: String
+  - name: String
+  + manageCourses(): Void
 }
-
-class Preferences {
-  -Boolean pushEnabled
-  -Boolean dailySummary
-  -Boolean darkMode
-  +updatePreferences(): void
+class Registration {
+  - waitlist: List<Course>
+  + registerStudent(student: Student, courseCode: String): Boolean
+  + manageCapacity(): Void
 }
-
-class LanguageSetting {
-  -String languageCode
-  +apply(): void
-}
-
-User "1" --> "0..*" Task : creates
-Task "1" --> "0..*" User : assigned to
-User "1" --> "0..*" Notification : receives
-User "1" --> "1" Preferences : has
-User "1" --> "1" LanguageSetting : uses
+Student --> Course : registers for
+Registration o-- Course : enrolls students in
 @enduml

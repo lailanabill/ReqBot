@@ -35,7 +35,7 @@
         {
           "name": "viewSchedule",
           "parameters": [],
-          "return_type": "void",
+          "return_type": "List<Course>",
           "visibility": "public"
         },
         {
@@ -84,13 +84,13 @@
               "type": "List<Course>"
             }
           ],
-          "return_type": "void",
+          "return_type": "Void",
           "visibility": "public"
         },
         {
           "name": "viewStudentEnrollments",
           "parameters": [],
-          "return_type": "void",
+          "return_type": "Map<String, List<Student>>",
           "visibility": "public"
         }
       ]
@@ -113,13 +113,7 @@
         {
           "name": "manageCourses",
           "parameters": [],
-          "return_type": "void",
-          "visibility": "public"
-        },
-        {
-          "name": "viewStudentEnrollments",
-          "parameters": [],
-          "return_type": "void",
+          "return_type": "Void",
           "visibility": "public"
         }
       ]
@@ -150,9 +144,9 @@
           "visibility": "public"
         },
         {
-          "name": "manageWaitlist",
+          "name": "manageCapacity",
           "parameters": [],
-          "return_type": "void",
+          "return_type": "Void",
           "visibility": "public"
         }
       ]
@@ -171,7 +165,7 @@
       "from": "Registration",
       "to": "Course",
       "multiplicity": "1..*",
-      "label": "enrolled in"
+      "label": "enrolls students in"
     }
   ]
 }
