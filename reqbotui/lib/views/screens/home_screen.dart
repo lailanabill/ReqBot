@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:reqbot/controllers/home_controller.dart';
 import 'package:reqbot/models/project_model.dart';
+import 'package:reqbot/views/screens/ProjectToDB.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_action_buttons.dart';
 import '../widgets/animated_project_card.dart';
@@ -19,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final HomeController _controller = HomeController();
+  // final HomeController _controller = HomeController();
 
   final AuthServices _authServices = AuthServices();
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -34,54 +33,24 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadProjects();
   }
 
-  Future<void> scam() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    final userId = user!.id;
-    final analyid = await Supabase.instance.client
-        .from('users')
-        .select("analyzer_id")
-        .eq('id', userId)
-        .single();
-
-    final classdia = File(
-        'reqbotui/assets/umls/class_diagram.puml'); // path to your UML file
-    final contdia = File(
-        'reqbotui/assets/umls/context_diagram.puml'); // path to your UML file
-    final seqdia = File(
-        'reqbotui/assets/umls/sequence_diagram.puml'); // path to your UML file
-    final ucdia = File(
-        'reqbotui/assets/umls/use_case_diagram.puml'); // path to your UML file
-    final dbdia = File(
-        'reqbotui/assets/umls/database_diagram.puml'); // path to your UML file
-    final analyzerId = analyid['analyzer_id'];
-    final String umlclass = await classdia.readAsString();
-    final String umlcontext = await contdia.readAsString();
-    final String umlseq = await seqdia.readAsString();
-    final String umlusecase = await ucdia.readAsString();
-    final String umldatabase = await dbdia.readAsString();
-
-    final response = await Supabase.instance.client.from('diagrams').insert({
-      "class_uml": umlclass,
-      "context_uml": umlcontext,
-      "seq_uml": umlseq,
-      "usecase": umlusecase,
-      "database_uml": umldatabase,
-      "analyzer_id": analyzerId
-    }).select();
-
-    print('RES YA GELLO ${response}');
-  }
-
   Future<void> _loadProjects() async {
     try {
-      final response = await _supabase.from('projects').select();
+      final user = Supabase.instance.client.auth.currentUser;
+      final userId = user!.id;
+      final analyid = await Supabase.instance.client
+          .from('users')
+          .select("analyzer_id")
+          .eq('id', userId)
+          .single();
+      final response =
+          await _supabase.from('projects').select().eq('analyzer_id', analyid);
       setState(() {
         _projects = response.map((p) => ProjectModel.fromMap(p)).toList();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error loading projects: $e")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text("Error loading projects: $e")),
+      // );
     }
   }
 
@@ -213,11 +182,23 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                   ),
                   const SizedBox(height: 16),
+                  // we will re route here to an new intermidiate screen  in order to make use of data base
+                  // HomeActionButtons(
+                  //   onNewProject: () => Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => const ProjectToDB(),
+                  //     ),
+                  //   ).then((_) =>
+                  //       _loadProjects()), // Reload projects after creating a new one
+                  //   onViewFavorites: () =>
+                  //       Navigator.pushNamed(context, '/FavoritesScreen'),
+                  // ),
                   HomeActionButtons(
                     onNewProject: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const Record(),
+                        builder: (context) => const ProjectToDB(),
                       ),
                     ).then((_) =>
                         _loadProjects()), // Reload projects after creating a new one

@@ -1,3 +1,6 @@
+import 'dart:html' as html;
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart'; // For content type
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:reqbot/controllers/record_controller.dart';
@@ -20,100 +23,74 @@ class _RecordState extends State<Record> {
   String xxx = '';
   final RecordController _controller = RecordController();
   String _transcription = '';
-  bool _isListening = false;
 
-  void _updateTranscription(String transcription) {
+  // bool _isListening = false;
+
+  void _updateTranscription(List<dynamic> transcription) {
     setState(() {
-      _transcription = transcription;
+      _transcription = transcription
+          .map((item) => "${item['speaker']}: ${item['text']}")
+          .join("\n");
     });
   }
 
   Future<void> _handleUploadAudio() async {
-    try {
-      FilePickerResult? result =
-          await FilePicker.platform.pickFiles(type: FileType.audio);
-      if (result != null) {
-        File file = File(result.files.single.path!);
-        var request = http.MultipartRequest(
-            'POST',
-            Uri.parse(
-                'https://lastisa-1016128810332.us-central1.run.app/whisper/'));
-        request.files.add(await http.MultipartFile.fromPath('file', file.path));
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          var responseData = await response.stream.bytesToString();
-          var transcription = jsonDecode(responseData)['transcription'];
-          _updateTranscription(transcription);
-        } else {
-          throw Exception(
-              "Failed to upload audio. Status code: ${response.statusCode}");
-        }
+    // //mobile updload function
+    // try {
+    //   FilePickerResult? result =
+    //       await FilePicker.platform.pickFiles(type: FileType.audio);
+    //   if (result != null) {
+    //     File file = File(result.files.single.path!);
+    //     var request = http.MultipartRequest(
+    //         'POST', Uri.parse('http://192.168.1.4:8080/whisper/'));
+    //     request.files.add(await http.MultipartFile.fromPath('file', file.path));
+    //     var response = await request.send();
+    //     if (response.statusCode == 200) {
+    //       var responseData = await response.stream.bytesToString();
+    //       var transcription = jsonDecode(responseData)['transcription'];
+    //       _updateTranscription(transcription);
+    //     } else {
+    //       throw Exception(
+    //           "Failed to upload audio. Status code: ${response.statusCode}");
+    //     }
+    //   }
+    // } catch (e) {
+    //   ScaffoldMessenger.of(context)
+    //       .showSnackBar(SnackBar(content: Text(e.toString())));
+    // }
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'audio/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final file = uploadInput.files?.first;
+      if (file != null) {
+        final reader = html.FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onLoadEnd.listen((e) async {
+          final bytes = reader.result as List<int>;
+
+          var uri = Uri.parse('http://192.168.1.4:8080/whisper/');
+          var request = http.MultipartRequest('POST', uri);
+          request.files.add(http.MultipartFile.fromBytes(
+            'file',
+            bytes,
+            filename: file.name,
+            contentType: MediaType('audio', 'wav'),
+          ));
+
+          var response = await request.send();
+          var responseData = await http.Response.fromStream(response);
+          if (responseData.statusCode == 200) {
+            var transcription = jsonDecode(responseData.body)['transcription'];
+            _updateTranscription(transcription);
+            print("TRANS: + " + transcription[0]);
+          } else {
+            print("Upload failed: ${responseData.statusCode}");
+          }
+        });
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
-    }
-  }
-
-  // Future<void> scam() async {
-  //   final user = Supabase.instance.client.auth.currentUser;
-  //   final userId = user!.id;
-  //   final analyid = await Supabase.instance.client
-  //       .from('users')
-  //       .select("analyzer_id")
-  //       .eq('id', userId)
-  //       .single();
-
-  //   final classdia = File(
-  //       'reqbotui/assets/umls/class_diagram.puml'); // path to your UML file
-  //   final contdia = File(
-  //       'reqbotui/assets/umls/context_diagram.puml'); // path to your UML file
-  //   final seqdia = File(
-  //       'reqbotui/assets/umls/sequence_diagram.puml'); // path to your UML file
-  //   final ucdia = File(
-  //       'reqbotui/assets/umls/use_case_diagram.puml'); // path to your UML file
-  //   final dbdia = File(
-  //       'reqbotui/assets/umls/database_diagram.puml'); // path to your UML file
-  //   final analyzerId = analyid['analyzer_id'];
-  //   final String umlclass = await classdia.readAsString();
-  //   final String umlcontext = await contdia.readAsString();
-  //   final String umlseq = await seqdia.readAsString();
-  //   final String umlusecase = await ucdia.readAsString();
-  //   final String umldatabase = await dbdia.readAsString();
-
-  //   final response = await Supabase.instance.client.from('diagrams').insert({
-  //     "class_uml": umlclass,
-  //     "context_uml": umlcontext,
-  //     "seq_uml": umlseq,
-  //     "usecase": umlusecase,
-  //     "database_uml": umldatabase,
-  //     "analyzer_id": analyzerId
-  //   }).select();
-
-  //   print('RES YA GELLO ${response}');
-  // }
-
-  Future<void> scam() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    final userId = user!.id;
-    final analyid = await Supabase.instance.client
-        .from('users')
-        .select("analyzer_id")
-        .eq('id', userId)
-        .single();
-    final analyzerId = analyid['analyzer_id'];
-
-    // final classdia = File(
-    //     'reqbotui/assets/umls/class_diagram.puml'); // path to your UML file
-
-    // final String umlclass = await classdia.readAsString();
-    final classdia = await rootBundle.loadString('umls/class_diagram.puml');
-    print('Analyzer ID: $analyzerId ');
-    print('Class UML: $classdia');
-    xxx = classdia;
-    final response = await Supabase.instance.client
-        .from('diagrams')
-        .insert({"class_uml": classdia, "project_id": analyzerId}).select();
+    });
   }
 
   void _showTranscriptionDialog(String title) {
@@ -174,13 +151,6 @@ class _RecordState extends State<Record> {
                 );
               },
               child: Text('Next'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                scam();
-                print('here alooo RES YA');
-              },
-              child: Text('nothinggggg'),
             ),
           ],
         ),
