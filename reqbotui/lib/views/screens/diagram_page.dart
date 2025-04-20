@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reqbot/views/screens/context_diagram_editor_screen.dart';
-import 'package:reqbot/views/screens/database_schema';
+import 'package:reqbot/views/screens/database_schema_editor.dart';
 import 'package:reqbot/views/screens/sequence_diagram_screen.dart';
 import 'class_diagram_editor.dart'; // Assuming this exists
 import 'UseCaseValidation.dart'; // Assuming this exists
