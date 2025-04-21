@@ -1,117 +1,20 @@
-from fastapi import FastAPI, UploadFile, File, Request
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-import whisper
-from transformers import pipeline
-from dotenv import load_dotenv
-load_dotenv()
-
-
-
-
-
-
-import os
+from fastapi.middleware.cors import CORSMiddleware
 import subprocess
-from typing import Optional, List, Dict, Any
-import time
-# import psutil
-# import GPUtil
-# from pytube import YouTube
-import matplotlib.pyplot as plt
-import whisperx
-import whisper
-from whisperx import load_align_model, align
-from whisperx.diarize import DiarizationPipeline, assign_word_speakers
-import torch
-import gc
-torch.backends.cuda.matmul.allow_tf32 = False
-torch.backends.cudnn.allow_tf32 = False
-model_name = 'large-v2'
-device = "cuda"
-hf_token = os.getenv("HF_TOKEN")
-compute_type = "float16"  # "int8_float16" or "int8"
-batch_size = 8
-
-
-
-
-
-
-
-# summarizer = pipeline("summarization",model="facebook/bart-large-cnn")  
-# model = whisper.load_model("large")
-
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["POST","GET"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
-def clean_gpu_memory():
-    torch.cuda.empty_cache()
-    gc.collect()
 
-
-clean_gpu_memory()
-
-@app.post("/whisper/")
-async def transcribe_audio(file: UploadFile = File(...)):
-    try:
-        audio_file = f"temp_{file.filename}"
-        with open(audio_file, "wb") as temp_file:
-            temp_file.write(await file.read())
-        _real_torch_load = torch.load
-        def patched_load(*args, **kwargs):
-            kwargs['weights_only'] = False  # force it to False!
-            return _real_torch_load(*args, **kwargs)
-        torch.load = patched_load  # 💥
-        model = whisperx.load_model(model_name, device ,compute_type=compute_type)
-        result = model.transcribe(audio_file,batch_size=batch_size, task="translate")
-        clean_gpu_memory();del model
-        segments = result["segments"]
-        model_a, metadata = load_align_model(language_code='en', device=device)
-        result_aligned = align(segments, model_a, metadata, audio_file, device)
-        clean_gpu_memory();del model_a, metadata
-        diarization_pipeline = DiarizationPipeline(use_auth_token=hf_token,device=device)
-        diarization_result = diarization_pipeline(audio_file)
-        clean_gpu_memory();del diarization_pipeline
-        temp= assign_word_speakers(diarization_result, result_aligned)
-        result_segments = temp['segments'],
-        # word_seg = temp['word_segments']
-        MeetMins: List[Dict[str, Any]] = []
-        for result_segment in result_segments[0]:
-            MeetMins.append(
-                {
-                    # "start": result_segment["start"],
-                    # "end": result_segment["end"],
-                    "text": result_segment["text"],
-                    "speaker": result_segment["speaker"],
-                }
-            )
-
-
-
-
-        return JSONResponse(content={
-            "transcription": MeetMins
-            # "running":"large",   
-            # "length":"4500"
-        })
-    
-    except Exception as e:
-        return JSONResponse(
-            content={"error": str(e)}, 
-            status_code=500
-        )
 
 @app.post("/summarize/")
 async def summarize_meeting(request: Request):
-    clean_gpu_memory()
     try:
         data = await request.json()
         meeting_text = data.get("text", "")
@@ -156,11 +59,9 @@ Meeting Transcript:
             stderr=subprocess.PIPE
         )
         output = response.stdout.decode()
-        clean_gpu_memory()
         return JSONResponse(content={
             "summary": output,
         })
-    
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
     
@@ -221,16 +122,82 @@ async def extract_requirements(request: Request):
             check=True,
         )
         output = response.stdout.decode()
-        clean_gpu_memory()
         return JSONResponse(content={
-            "reqs":output
+            "sum":output
         })
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+    
+# @app.post("/reqs/")
+# async def extract_requirements(request: Request):
+
+#     try:
+#         data = await request.json()
+#         meeting_text = data.get("text", "")
+
+#         if not meeting_text:
+#             return JSONResponse(content={"error": "No meeting text provided"}, status_code=400)
+#         prompt = (
+#                 # "extract from the following software meeting the functional and non functional requirements. :\n\n" + meeting_text
+#                 f""""
+#                 You are a senior software requirements analyst.
+
+#                 You will be given a meeting transcription related to a software project. Your task is to extract all the requirements that are discussed either explicitly or implicitly during the meeting.
+#                 Functional Requirements describe what the system should do — features, behaviors, actions, APIs, user interactions.
+
+#                 Non-Functional Requirements describe how the system should perform — performance, reliability, scalability, usability, security, maintainability, etc.
+
+#                 You may infer requirements that are implied by the conversation, not just the ones directly stated.
+
+#                 Use clear, concise phrasing.
+#                  Output Format:
+#                 Functional Requirements:
+#                 1) "..."
+
+#                 2 )"..."
+
+#                 Non-Functional Requirements:
+#                 1) "..."
+
+#                 2 )"..."
+
+#                 Additional Instructions:
+
+#                 Only output requirements — do not include speaker names or summaries.
+#                 Rephrase into requirement-style or interpretations.
+#                 If a requirement covers both functional and non-functional aspects, list it in both sections.
+                
+#                 Meeting Transcript: {meeting_text}
+#     """
+#             )
+
+#         # response = ollama.chat(model="llama3", messages=[{"role": "user", "content": prompt} ], temperature=0)
+#         # return response
+#         response = subprocess.run(
+#             ["ollama", "run", "llama3", "temperature", "0", "top_p", "1", "top_k", "1", "seed","42"],
+#             input=prompt.encode(),
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#             check=True,
+#         )
+#         output = response.stdout.decode()
+#         return JSONResponse(content={
+#             "requirements": output,
+#         })
+#     except Exception as e:
+#         return JSONResponse(content={"error": str(e)}, status_code=500)
+    
+
+
+
+
 
 
 import os
 import uvicorn
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 11435))
     uvicorn.run(app, host="0.0.0.0", port=port) 
+
+
+
