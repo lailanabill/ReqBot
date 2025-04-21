@@ -3,7 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart'; // For content type
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:reqbot/controllers/record_controller.dart';
+import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -20,9 +22,10 @@ class Record extends StatefulWidget {
 }
 
 class _RecordState extends State<Record> {
-  String xxx = '';
-  final RecordController _controller = RecordController();
+  // final RecordController _controller = RecordController();
   String _transcription = '';
+  String req_sumURI = "http://192.168.1.4:8080/reqsneww/";
+  String sumURI = "http://192.168.1.4:8080/summarize/";
 
   // bool _isListening = false;
 
@@ -31,6 +34,7 @@ class _RecordState extends State<Record> {
       _transcription = transcription
           .map((item) => "${item['speaker']}: ${item['text']}")
           .join("\n");
+      context.read<DataProvider>().setTranscript(_transcription);
     });
   }
 
@@ -84,13 +88,58 @@ class _RecordState extends State<Record> {
           if (responseData.statusCode == 200) {
             var transcription = jsonDecode(responseData.body)['transcription'];
             _updateTranscription(transcription);
-            print("TRANS: + " + transcription[0]);
+            _getTransciptSummary(context.read()<DataProvider>().transcript);
           } else {
             print("Upload failed: ${responseData.statusCode}");
           }
         });
       }
     });
+  }
+
+  Future<void> _getTransciptSummary(String WhisperTranscript) async {
+    var SumURI = Uri.parse(sumURI);
+
+    final body = jsonEncode({
+      "text": WhisperTranscript,
+    });
+    try {
+      var SumRequest = await http.post(SumURI, body: body);
+      if (SumRequest.statusCode == 200) {
+        final responseData = jsonDecode(SumRequest.body);
+        print("Summary: ${responseData['summary']}");
+        context.read<DataProvider>().setSummary(responseData['summary']);
+        _getRrequirements(WhisperTranscript, responseData['summary']);
+      } else {
+        print("Server error: ${SumRequest.statusCode}");
+        print("Error body: ${SumRequest.body}");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<void> _getRrequirements(
+      String WhisperTranscript, String SummaryText) async {
+    var ReqSumURI = Uri.parse(req_sumURI);
+
+    final body = jsonEncode({
+      "summ": SummaryText,
+      "orig": WhisperTranscript,
+    });
+    try {
+      var ReqSumRequest = await http.post(ReqSumURI, body: body);
+      if (ReqSumRequest.statusCode == 200) {
+        final responseData = jsonDecode(ReqSumRequest.body);
+        print("Requirements: ${responseData['reqs']}");
+        context.read<DataProvider>().setRequirements(responseData['reqs']);
+      } else {
+        print("Server error: ${ReqSumRequest.statusCode}");
+        print("Error body: ${ReqSumRequest.body}");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   void _showTranscriptionDialog(String title) {
@@ -144,13 +193,31 @@ class _RecordState extends State<Record> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => RequirementsMenuScreen()),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => RequirementsMenuScreen()),
+                // );
+                _getTransciptSummary(_transcription);
               },
               child: Text('Next'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => RequirementsMenuScreen()),
+                // );
+                final sumprov = context.read<DataProvider>().summary;
+                final transprov = context.read<DataProvider>().transcript;
+                final reqprov = context.read<DataProvider>().requirements;
+                // _getTransciptSummary(_transcription);
+                print("provv  Summary: $sumprov");
+                print("provv  Transcript: $transprov");
+                print("provv  Requirements: $reqprov");
+              },
+              child: Text('Printer'),
             ),
           ],
         ),
