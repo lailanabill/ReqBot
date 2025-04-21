@@ -2,9 +2,9 @@ import ollama
 import json
 import re
 import time
-import requests  # Added for Kroki API
-import base64    # Added for Kroki API
-import zlib      # Added for Kroki API
+import requests
+import base64
+import zlib
 from typing import Dict, Any, Optional
 
 class ContextDiagramGenerator:
@@ -58,9 +58,9 @@ class ContextDiagramGenerator:
 
     def extract_context_elements(self, description: str) -> Optional[Dict[str, Any]]:
         """
-        Extract context diagram elements with clear, action-oriented labels
+        Extract context diagram elements with clear, noun-based labels
         """
-        prompt = f"""You are an expert Systems Analyst tasked with identifying elements for a Context Diagram in the style of a single central system (as a circle) surrounded by external entities (as rectangles), with separate arrows for each direction of data flow and clear, action-oriented labels.
+        prompt = f"""You are an expert Systems Analyst tasked with identifying elements for a Context Diagram in the style of a single central system (as a circle) surrounded by external entities (as rectangles), with separate arrows for each direction of data flow and clear, noun-based labels.
 
 GUIDELINES FOR CONTEXT DIAGRAM EXTRACTION:
 1. System Identification:
@@ -74,7 +74,7 @@ GUIDELINES FOR CONTEXT DIAGRAM EXTRACTION:
 3. Data Flow Guidelines:
    - Identify data flows between external entities and the system
    - Specify direction of data flow (to/from system)
-   - Use clear, action-oriented labels for data flows that describe what the flow does (e.g., "Submit Registration Data" instead of "Registration", "Provide Information & Tools" instead of "Information & Tools")
+   - Use clear, noun-based labels for data flows that describe the data being exchanged (e.g., "Registration Data" instead of "Submit Registration Data", "Information & Tools" instead of "Provide Information & Tools")
    - Represent each direction of data flow as a separate arrow (e.g., "A to System" and "System to A" should be two separate flows)
    - Ensure all significant data exchanges are captured
 
@@ -93,12 +93,12 @@ OUTPUT FORMAT:
       "id": "DF1",
       "from": "Source",
       "to": "Target",
-      "description": "Clear, action-oriented data flow description"
+      "description": "Clear, noun-based data flow description"
     }}
   ]
 }}
 
-Here are 8 examples to guide you, emphasizing a single central circle, external rectangles, and clear, action-oriented labels:
+Here are 8 examples to guide you, emphasizing a single central circle, external rectangles, and clear, noun-based labels:
 
 EXAMPLE 1 (Inspired by the Online Community System diagram):
 Description: "An Online Community System where Community Users register and access information and tools, Staff Writers provide content, Advertisers pay for ad slots, and Accountants receive financial reports."
@@ -132,49 +132,49 @@ Output:
       "id": "DF1",
       "from": "Community Users",
       "to": "System",
-      "description": "Submit Registration Data"
+      "description": "Registration Data"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "Community Users",
-      "description": "Provide Information & Tools"
+      "description": "Information & Tools"
     }},
     {{
       "id": "DF3",
       "from": "Staff Writers",
       "to": "System",
-      "description": "Submit Content"
+      "description": "Content"
     }},
     {{
       "id": "DF4",
       "from": "System",
       "to": "Staff Writers",
-      "description": "Send Compensation Details"
+      "description": "Compensation Details"
     }},
     {{
       "id": "DF5",
       "from": "Advertisers",
       "to": "System",
-      "description": "Make Payments for Ads"
+      "description": "Ad Payments"
     }},
     {{
       "id": "DF6",
       "from": "System",
       "to": "Advertisers",
-      "description": "Allocate Ad Slots"
+      "description": "Ad Slots"
     }},
     {{
       "id": "DF7",
       "from": "System",
       "to": "Accountants",
-      "description": "Send Financial Reports"
+      "description": "Financial Reports"
     }},
     {{
       "id": "DF8",
       "from": "Accountants",
       "to": "System",
-      "description": "Provide Financial Data"
+      "description": "Financial Data"
     }}
   ]
 }}
@@ -206,31 +206,31 @@ Output:
       "id": "DF1",
       "from": "Patron",
       "to": "System",
-      "description": "Submit Borrow Requests"
+      "description": "Borrow Requests"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "Patron",
-      "description": "Send Borrow Confirmations"
+      "description": "Borrow Confirmations"
     }},
     {{
       "id": "DF3",
       "from": "Librarian",
       "to": "System",
-      "description": "Update Inventory Data"
+      "description": "Inventory Data"
     }},
     {{
       "id": "DF4",
       "from": "System",
       "to": "Librarian",
-      "description": "Provide Inventory Reports"
+      "description": "Inventory Reports"
     }},
     {{
       "id": "DF5",
       "from": "System",
       "to": "Email Service",
-      "description": "Send Notification Requests"
+      "description": "Notification Requests"
     }}
   ]
 }}
@@ -262,37 +262,37 @@ Output:
       "id": "DF1",
       "from": "Customer",
       "to": "System",
-      "description": "Place Orders"
+      "description": "Orders"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "Customer",
-      "description": "Send Order Confirmations"
+      "description": "Order Confirmations"
     }},
     {{
       "id": "DF3",
       "from": "System",
       "to": "Supplier",
-      "description": "Send Fulfillment Requests"
+      "description": "Fulfillment Requests"
     }},
     {{
       "id": "DF4",
       "from": "Supplier",
       "to": "System",
-      "description": "Provide Fulfillment Updates"
+      "description": "Fulfillment Updates"
     }},
     {{
       "id": "DF5",
       "from": "System",
       "to": "Payment Gateway",
-      "description": "Send Payment Requests"
+      "description": "Payment Requests"
     }},
     {{
       "id": "DF6",
       "from": "Payment Gateway",
       "to": "System",
-      "description": "Return Payment Confirmations"
+      "description": "Payment Confirmations"
     }}
   ]
 }}
@@ -324,31 +324,31 @@ Output:
       "id": "DF1",
       "from": "Doctor",
       "to": "System",
-      "description": "Update Patient Records"
+      "description": "Patient Records"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "Doctor",
-      "description": "Send Update Confirmations"
+      "description": "Update Confirmations"
     }},
     {{
       "id": "DF3",
       "from": "Patient",
       "to": "System",
-      "description": "Request Record Access"
+      "description": "Record Access Requests"
     }},
     {{
       "id": "DF4",
       "from": "System",
       "to": "Patient",
-      "description": "Provide Patient Records"
+      "description": "Patient Records"
     }},
     {{
       "id": "DF5",
       "from": "System",
       "to": "SMS Service",
-      "description": "Send Reminder Requests"
+      "description": "Reminder Requests"
     }}
   ]
 }}
@@ -385,49 +385,49 @@ Output:
       "id": "DF1",
       "from": "Passenger",
       "to": "System",
-      "description": "Submit Ride Requests"
+      "description": "Ride Requests"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "Passenger",
-      "description": "Send Ride Confirmations"
+      "description": "Ride Confirmations"
     }},
     {{
       "id": "DF3",
       "from": "System",
       "to": "Driver",
-      "description": "Assign Ride Details"
+      "description": "Ride Details"
     }},
     {{
       "id": "DF4",
       "from": "Driver",
       "to": "System",
-      "description": "Provide Ride Updates"
+      "description": "Ride Updates"
     }},
     {{
       "id": "DF5",
       "from": "System",
       "to": "GPS Service",
-      "description": "Request Location Data"
+      "description": "Location Data Requests"
     }},
     {{
       "id": "DF6",
       "from": "GPS Service",
       "to": "System",
-      "description": "Provide Location Data"
+      "description": "Location Data"
     }},
     {{
       "id": "DF7",
       "from": "System",
       "to": "Payment Processor",
-      "description": "Send Payment Requests"
+      "description": "Payment Requests"
     }},
     {{
       "id": "DF8",
       "from": "Payment Processor",
       "to": "System",
-      "description": "Return Payment Confirmations"
+      "description": "Payment Confirmations"
     }}
   ]
 }}
@@ -454,25 +454,25 @@ Output:
       "id": "DF1",
       "from": "Homeowner",
       "to": "System",
-      "description": "Set Device Preferences"
+      "description": "Device Preferences"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "Homeowner",
-      "description": "Provide Device Status"
+      "description": "Device Status"
     }},
     {{
       "id": "DF3",
       "from": "System",
       "to": "Weather API",
-      "description": "Request Weather Data"
+      "description": "Weather Data Requests"
     }},
     {{
       "id": "DF4",
       "from": "Weather API",
       "to": "System",
-      "description": "Provide Weather Data"
+      "description": "Weather Data"
     }}
   ]
 }}
@@ -504,37 +504,38 @@ Output:
       "id": "DF1",
       "from": "Customer",
       "to": "System",
-      "description": "Submit Support Tickets"
+      "description": "Support Tickets"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "Customer",
-      "description": "Send Ticket Updates"
+      "description": "Ticket Updates"
     }},
     {{
       "id": "DF3",
       "from": "System",
       "to": "Agent",
-      "description": "Assign Tickets"
+      "description": plugs
+Tickets"
     }},
     {{
       "id": "DF4",
       "from": "Agent",
       "to": "System",
-      "description": "Provide Ticket Resolutions"
+      "description": "Ticket Resolutions"
     }},
     {{
       "id": "DF5",
       "from": "System",
       "to": "Chatbot Service",
-      "description": "Send Inquiry Handling Requests"
+      "description": "Inquiry Handling Requests"
     }},
     {{
       "id": "DF6",
       "from": "Chatbot Service",
       "to": "System",
-      "description": "Return Inquiry Responses"
+      "description": "Inquiry Responses"
     }}
   ]
 }}
@@ -561,25 +562,25 @@ Output:
       "id": "DF1",
       "from": "User",
       "to": "System",
-      "description": "Log Workout Data"
+      "description": "Workout Data"
     }},
     {{
       "id": "DF2",
       "from": "System",
       "to": "User",
-      "description": "Provide Workout Summaries"
+      "description": "Workout Summaries"
     }},
     {{
       "id": "DF3",
       "from": "System",
       "to": "Health Cloud",
-      "description": "Sync Workout Data"
+      "description": "Workout Data Sync"
     }},
     {{
       "id": "DF4",
       "from": "Health Cloud",
       "to": "System",
-      "description": "Return Analysis Results"
+      "description": "Analysis Results"
     }}
   ]
 }}
@@ -591,7 +592,7 @@ System Description:
 
 IMPORTANT:
 - Create a diagram with the system as the only circle at the center and external entities as rectangles around it
-- Use clear, action-oriented labels for data flows (e.g., "Submit Registration Data", "Provide Information & Tools")
+- Use clear, noun-based labels for data flows (e.g., "Registration Data", "Information & Tools")
 - Represent each direction of data flow as a separate arrow (do NOT combine into bidirectional arrows)
 - Return ONLY a valid JSON object
 - Ensure comprehensive identification of entities and flows"""
