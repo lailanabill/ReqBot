@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:reqbot/controllers/home_controller.dart';
 import 'package:reqbot/models/project_model.dart';
+import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/views/screens/ProjectToDB.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_action_buttons.dart';
@@ -42,15 +44,19 @@ class _HomeScreenState extends State<HomeScreen> {
           .select("analyzer_id")
           .eq('id', userId)
           .single();
-      final response =
-          await _supabase.from('projects').select().eq('analyzer_id', analyid);
+
+      final clientid = analyid['analyzer_id'];
+      final response = await _supabase
+          .from('projects')
+          .select()
+          .eq('analyzer_id', clientid) as List;
       setState(() {
         _projects = response.map((p) => ProjectModel.fromMap(p)).toList();
       });
     } catch (e) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text("Error loading projects: $e")),
-      // );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error loading projects: $e")),
+      );
     }
   }
 
