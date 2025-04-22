@@ -9,7 +9,7 @@ import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:http/http.dart' as http;
+
 import 'dart:convert';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,8 +24,9 @@ class Record extends StatefulWidget {
 class _RecordState extends State<Record> {
   // final RecordController _controller = RecordController();
   String _transcription = '';
-  String req_sumURI = "http://192.168.1.4:8080/reqsneww/";
-  String sumURI = "http://192.168.1.4:8080/summarize/";
+  String req_sumURI = "http://192.168.1.3:8080/reqsneww/";
+  String sumURI = "http://192.168.1.3:8080/summarize/";
+  String diagramsURI = "http://192.168.1.3:8080/diagrams/";
 
   // bool _isListening = false;
 
@@ -74,7 +75,7 @@ class _RecordState extends State<Record> {
         reader.onLoadEnd.listen((e) async {
           final bytes = reader.result as List<int>;
 
-          var uri = Uri.parse('http://192.168.1.4:8080/whisper/');
+          var uri = Uri.parse('http://192.168.1.3:8080/whisper/');
           var request = http.MultipartRequest('POST', uri);
           request.files.add(http.MultipartFile.fromBytes(
             'file',
@@ -88,7 +89,7 @@ class _RecordState extends State<Record> {
           if (responseData.statusCode == 200) {
             var transcription = jsonDecode(responseData.body)['transcription'];
             _updateTranscription(transcription);
-            _getTransciptSummary(context.read()<DataProvider>().transcript);
+            // _getTransciptSummary(context.read()<DataProvider>().transcript);
           } else {
             print("Upload failed: ${responseData.statusCode}");
           }
@@ -99,7 +100,7 @@ class _RecordState extends State<Record> {
 
   Future<void> _getTransciptSummary(String WhisperTranscript) async {
     var SumURI = Uri.parse(sumURI);
-
+    // var DiagramsURI = Uri.parse(diagramsURI);
     final body = jsonEncode({
       "text": WhisperTranscript,
     });
@@ -109,7 +110,17 @@ class _RecordState extends State<Record> {
         final responseData = jsonDecode(SumRequest.body);
         print("Summary: ${responseData['summary']}");
         context.read<DataProvider>().setSummary(responseData['summary']);
-        _getRrequirements(WhisperTranscript, responseData['summary']);
+        // call to reqs func
+        // _getRrequirements(WhisperTranscript, responseData['summary']);
+        // call to diagrams
+        // final diagramsBody = {'transcription': responseData['summary']};
+        // var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
+        // if (DiagramsRequest.statusCode == 200) {
+        //   print('success');
+        // } else {
+        //   print("Server error: ${DiagramsRequest.statusCode}");
+        //   print("Error body: ${DiagramsRequest.body}");
+        // }
       } else {
         print("Server error: ${SumRequest.statusCode}");
         print("Error body: ${SumRequest.body}");
@@ -219,6 +230,74 @@ class _RecordState extends State<Record> {
               },
               child: Text('Printer'),
             ),
+            ElevatedButton(
+              onPressed: () {
+                // // Navigator.push(
+                // //   context,
+                // //   MaterialPageRoute(
+                // //       builder: (context) => RequirementsMenuScreen()),
+                // // );
+                // final sumprov = context.read<DataProvider>().summary;
+                // final transprov = context.read<DataProvider>().transcript;
+                // final reqprov = context.read<DataProvider>().requirements;
+                // // _getTransciptSummary(_transcription);
+                // print("provv  Summary: $sumprov");
+                // print("provv  Transcript: $transprov");
+                // print("provv  Requirements: $reqprov");
+                print('1 from tran sum');
+                _getTransciptSummary(_transcription);
+                print('2 from tran sum');
+              },
+              child: Text('tarnscropy summary'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // // Navigator.push(
+                // //   context,
+                // //   MaterialPageRoute(
+                // //       builder: (context) => RequirementsMenuScreen()),
+                // // );
+                // final sumprov = context.read<DataProvider>().summary;
+                // final transprov = context.read<DataProvider>().transcript;
+                // final reqprov = context.read<DataProvider>().requirements;
+                // // _getTransciptSummary(_transcription);
+                // print("provv  Summary: $sumprov");
+                // print("provv  Transcript: $transprov");
+                // print("provv  Requirements: $reqprov");
+                _getRrequirements(
+                    _transcription, context.read<DataProvider>().summary);
+              },
+              child: Text('requirements'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                var DiagramsURI = Uri.parse(diagramsURI);
+
+                final diagramsBody =
+                    jsonEncode({'transcription': _transcription});
+                var DiagramsRequest =
+                    await http.post(DiagramsURI, body: diagramsBody);
+                if (DiagramsRequest.statusCode == 200) {
+                  print('success ya gello');
+                } else {
+                  print("Server error: ${DiagramsRequest.statusCode}");
+                  print("Error body: ${DiagramsRequest.body}");
+                }
+                // // Navigator.push(
+                // //   context,
+                // //   MaterialPageRoute(
+                // //       builder: (context) => RequirementsMenuScreen()),
+                // // );
+                // final sumprov = context.read<DataProvider>().summary;
+                // final transprov = context.read<DataProvider>().transcript;
+                // final reqprov = context.read<DataProvider>().requirements;
+                // // _getTransciptSummary(_transcription);
+                // print("provv  Summary: $sumprov");
+                // print("provv  Transcript: $transprov");
+                // print("provv  Requirements: $reqprov");
+              },
+              child: Text('diagrams'),
+            ),
           ],
         ),
       ),
@@ -252,11 +331,11 @@ class _RecordState extends State<Record> {
               Spacer(),
               ElevatedButton(
                 onPressed: _handleUploadAudio,
-                child: Text('Upload'),
                 style: ElevatedButton.styleFrom(
                   textStyle: TextStyle(fontSize: 12),
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 ),
+                child: Text('Upload'),
               ),
             ],
           ),
