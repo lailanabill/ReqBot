@@ -561,24 +561,12 @@ IMPORTANT:
             return False
 
 
-def main():
+def SequenceDiagramDriver(desc):
     # Initialize generator
     generator = SequenceDiagramGenerator()
     
     # New Transcript for Testing - Smart Home Automation System
-    transcript = """
-    Smart Home Automation System Interaction Flow
-    
-    The homeowner arrives home and uses their smartphone to unlock the front door via the smart home app. 
-    As they enter, the motion sensors detect their presence and automatically turn on the lights. 
-    The homeowner uses a voice command to the smart speaker to adjust the temperature. 
-    The smart speaker processes the command and sends instructions to the thermostat. 
-    The thermostat adjusts the temperature and sends a confirmation to the central hub. 
-    Later, the homeowner sets up a scheduled routine through the app to automatically lock doors and turn off lights at 11 PM. 
-    The app sends this configuration to the central hub. 
-    At 11 PM, the central hub executes the routine, sending commands to the door locks and light controllers. 
-    The door locks and light controllers perform their actions and report status back to the central hub, which updates the app's status display.
-    """
+    transcript = desc
 
     # Use the complete workflow method
     success = generator.analyze_and_generate_diagrams(transcript)
@@ -591,5 +579,3 @@ def main():
    
 
 
-if __name__ == "__main__":
-    main()

@@ -446,62 +446,64 @@ IMPORTANT:
             print(f"Error generating diagram: {e}")
             return False
 
-def main():
+def UseCasDiagramDriver(desc):
     # Initialize converter
     converter = RequirementsConverter()
     
     # Complex Transcript for Software Development Lifecycle Management System
-    transcript = """
-   Software Development Lifecycle Management System Requirements
+    transcript = desc
+    
+  #   """
+  #  Software Development Lifecycle Management System Requirements
 
-    Our enterprise-level platform aims to streamline and optimize the entire software development process, 
-    providing comprehensive tools for requirement gathering, development, testing, and deployment.
+  #   Our enterprise-level platform aims to streamline and optimize the entire software development process, 
+  #   providing comprehensive tools for requirement gathering, development, testing, and deployment.
 
-    Key Workflow Components:
+  #   Key Workflow Components:
 
-    1. Requirement Gathering Process:
-       - Mandatory stakeholder analysis
-       - Optional risk assessment for complex projects
-       - Detailed documentation and traceability
-       - Collaborative requirement refinement
+  #   1. Requirement Gathering Process:
+  #      - Mandatory stakeholder analysis
+  #      - Optional risk assessment for complex projects
+  #      - Detailed documentation and traceability
+  #      - Collaborative requirement refinement
 
-    2. Feature Development Workflow:
-       - Integrated code review process
-       - Mandatory code quality checks
-       - Optional performance optimization
-       - Automated code style enforcement
+  #   2. Feature Development Workflow:
+  #      - Integrated code review process
+  #      - Mandatory code quality checks
+  #      - Optional performance optimization
+  #      - Automated code style enforcement
 
-    3. Testing and Quality Assurance:
-       - Comprehensive test case generation
-       - Mandatory regression testing
-       - Optional security vulnerability scanning
-       - Performance and load testing
+  #   3. Testing and Quality Assurance:
+  #      - Comprehensive test case generation
+  #      - Mandatory regression testing
+  #      - Optional security vulnerability scanning
+  #      - Performance and load testing
 
-    4. Deployment Pipeline:
-       - Automated environment configuration
-       - Continuous integration checks
-       - Optional rollback strategy for critical deployments
-       - Multi-environment support (dev, staging, production)
+  #   4. Deployment Pipeline:
+  #      - Automated environment configuration
+  #      - Continuous integration checks
+  #      - Optional rollback strategy for critical deployments
+  #      - Multi-environment support (dev, staging, production)
 
-    5. Project Management Features:
-       - Sprint planning and tracking
-       - Resource allocation
-       - Progress monitoring
-       - Automated reporting
+  #   5. Project Management Features:
+  #      - Sprint planning and tracking
+  #      - Resource allocation
+  #      - Progress monitoring
+  #      - Automated reporting
 
-    Actors and Their Interactions:
-    - Product Managers initiate and guide requirement gathering
-    - Developers execute feature development
-    - Testers perform comprehensive quality assurance
-    - DevOps engineers manage deployment pipelines
-    - Scrum Masters facilitate project management
+  #   Actors and Their Interactions:
+  #   - Product Managers initiate and guide requirement gathering
+  #   - Developers execute feature development
+  #   - Testers perform comprehensive quality assurance
+  #   - DevOps engineers manage deployment pipelines
+  #   - Scrum Masters facilitate project management
 
-    Additional Constraints:
-    - Support for agile and hybrid methodologies
-    - Seamless integration with existing tools
-    - Robust access control and audit logging
-    - Real-time collaboration capabilities
-    """
+  #   Additional Constraints:
+  #   - Support for agile and hybrid methodologies
+  #   - Seamless integration with existing tools
+  #   - Robust access control and audit logging
+  #   - Real-time collaboration capabilities
+  #   """
     
     # Extract requirements from transcript
     requirements_json = converter.extract_requirements_from_transcript(transcript)
@@ -530,5 +532,3 @@ def main():
     else:
         print("Failed to extract requirements from transcript")
 
-if __name__ == "__main__":
-    main()

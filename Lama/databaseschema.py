@@ -242,26 +242,12 @@ System Description:
             print(f"Error generating diagram: {e}")
             return False
 
-def main():
+def DbDiagramDriver(desc):
     # Initialize generator
     generator = DatabaseClassDiagramGenerator(model='llama3')
     
     # System description
-    description = """
-    Meeting Transcript: University Course Registration System Discussion
-
-    Team Lead (Alex): We need to design a comprehensive database schema for our University Course Registration System.
-
-    Database Architect (Sam): We'll need tables for Students, Courses, Enrollments, and Faculty.
-
-    Team Lead (Alex): Great. Students should have unique identifiers, personal information, and enrollment history.
-
-    Analyst (Jordan): Courses need details like course code, title, department, and capacity. Faculty members will be assigned to teach specific courses.
-
-    Designer (Priya): We'll create an Enrollments table to manage the relationship between students and courses, and ensure faculty are linked to their assigned courses.
-
-    Team Lead (Alex): Exactly. We want to track which faculty members are teaching which courses, and how students are enrolled in those courses.
-    """
+    description = desc
     
     # Generate class diagram
     class_diagram_json = generator.extract_database_schema_elements(description)
@@ -283,5 +269,3 @@ def main():
     else:
         print("Failed to generate class diagram")
 
-if __name__ == "__main__":
-    main()

@@ -318,26 +318,12 @@ IMPORTANT:
             print(f"Error generating diagram: {e}")
             return False
 
-def main():
+def ClassDiagramDriver(desc):
     # Initialize generator
     generator = ClassDiagramGenerator(model='llama3')
     
     # System description as a meeting transcript
-    description = """
-Meeting Transcript: University Course Registration System Discussion
-
-Team Lead (Alex): Okay, team, today we're discussing the University Course Registration System we're building. It's meant to streamline how students register for courses at the university, so let's map out the key classes and their interactions.
-
-Developer (Sam): We'll need classes for Students, Courses, Faculty, and Registration.
-
-Team Lead (Alex): Exactly. Students will have attributes like student ID, name, and enrolled courses. They'll be able to register for courses, view their schedule, and check prerequisites.
-
-Analyst (Jordan): Courses should have details like course code, title, description, and capacity. Faculty members will manage courses, set prerequisites, and view student enrollments.
-
-Designer (Priya): We'll need a Registration class to handle the registration process, tracking which students are enrolled in which courses, managing waitlists, and handling course capacity.
-
-Team Lead (Alex): Great points. We should also consider how we'll handle academic records, prerequisites, and potential conflicts in course scheduling.
-    """
+    description =desc
     
     # Extract class diagram elements
     class_diagram_json = generator.extract_class_diagram_elements(description)
@@ -358,12 +344,10 @@ Team Lead (Alex): Great points. We should also consider how we'll handle academi
         generator.generate_diagram_with_kroki(plantuml_code)
         
         # Print results
-        print("Extracted Class Diagram Elements:")
-        print(json.dumps(class_diagram_json, indent=2, ensure_ascii=False))
-        print("\nPlantUML Diagram Code:")
-        print(plantuml_code)
+        # print("Extracted Class Diagram Elements:")
+        # print(json.dumps(class_diagram_json, indent=2, ensure_ascii=False))
+        # print("\nPlantUML Diagram Code:")
+        # print(plantuml_code)
     else:
         print("Failed to extract class diagram elements from description")
 
-if __name__ == "__main__":
-    main()

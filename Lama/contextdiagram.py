@@ -703,28 +703,12 @@ IMPORTANT:
             print(f"Error generating diagram: {e}")
             return False
 
-def main():
+def ContextDiagramDriver(desc):
     # Initialize generator
     generator = ContextDiagramGenerator(model='llama3')
     
     # System description as a meeting transcript
-    description = """
-Meeting Transcript: University Course Registration System Discussion
-
-Team Lead (Alex): Okay, team, today we’re discussing the University Course Registration System we’re building. It’s meant to streamline how students register for courses at the university, so let’s map out the key interactions.
-
-Developer (Sam): Got it. What’s the main functionality of this system?
-
-Team Lead (Alex): The system handles the entire course registration process. Students can browse available courses, register for them, and view their schedules. Faculty members need to submit their course offerings—like the syllabus and schedule—and they also want to see who’s enrolled in their classes. Registrars are in charge of managing the course catalog and approving student registrations to make sure everything’s in order.
-
-Analyst (Jordan): So, students are registering and checking schedules, faculty are submitting course details and checking enrollments, and registrars are managing the catalog and approvals. Any external systems we need to connect to?
-
-Team Lead (Alex): Yes, there are a few. We need a Payment System to handle tuition fees when students register for courses. There’s also an Email Notification Service to send confirmations to students once their registration is approved. And we’ll connect to the Academic Records System to update student records with their registered courses.
-
-Designer (Priya): Sounds good! So, the system is interacting with students, faculty, registrars, and those external systems. I’ll make sure we capture all those flows clearly in the diagram.
-
-Team Lead (Alex): Exactly. Let’s get this documented so we can visualize how everything connects.
-    """
+    description = desc
     
     # Extract context elements
     context_json = generator.extract_context_elements(description)
@@ -751,6 +735,3 @@ Team Lead (Alex): Exactly. Let’s get this documented so we can visualize how e
         print(plantuml_code)
     else:
         print("Failed to extract context elements from description")
-
-if __name__ == "__main__":
-    main()

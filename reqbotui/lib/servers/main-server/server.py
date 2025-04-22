@@ -4,8 +4,23 @@ from fastapi.responses import JSONResponse
 import whisper
 from transformers import pipeline
 from dotenv import load_dotenv
-load_dotenv()
 
+
+
+import sys
+import os
+
+# Go up one level to reach project_root
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
+from Lama.SequenceDiagram import SequenceDiagramDriver
+from Lama.classdiagram import ClassDiagramDriver
+from Lama.contextdiagram import ContextDiagramDriver
+from Lama.databaseschema import DbDiagramDriver
+from Lama.usecasediagram import UseCasDiagramDriver
+
+
+load_dotenv()
 
 
 
@@ -93,10 +108,12 @@ async def transcribe_audio(file: UploadFile = File(...)):
                     "speaker": result_segment["speaker"],
                 }
             )
+            
+        
 
 
 
-
+        # del model , model_a , metadata , diarization_pipeline
         return JSONResponse(content={
             "transcription": MeetMins
             # "running":"large",   
@@ -150,7 +167,7 @@ Meeting Transcript:
         )
 
         response = subprocess.run(
-            ["ollama", "run", "llama3", "temperature ", "0.7"],
+            ["ollama", "run", "llama3", "temperature ", "0.7" ,"keep-alive","0"],
             input=prompt.encode(),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
@@ -214,7 +231,7 @@ async def extract_requirements(request: Request):
             )
 
         response = subprocess.run(
-            ["ollama", "run", "llama3", "temperature", "0", "top_p", "1", "top_k", "1", "seed","42"],
+            ["ollama", "run", "llama3", "temperature", "0", "top_p", "1", "top_k", "1", "seed","42","keep-alive","0"],
             input=prompt.encode(),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -228,6 +245,15 @@ async def extract_requirements(request: Request):
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
+@app.post("/diagrams/")
+async def generate_diagram(request: Request):
+    data = await request.json()
+    transcript= data.get("transcript", "")
+    ClassDiagramDriver(transcript)
+    ContextDiagramDriver(transcript)
+    DbDiagramDriver(transcript)
+    SequenceDiagramDriver(transcript)
+    UseCasDiagramDriver(transcript)
 
 import os
 import uvicorn
