@@ -17,7 +17,7 @@
         {
           "name": "enrolledCourses",
           "type": "List<Course>",
-          "visibility": "private"
+          "visibility": "public"
         }
       ],
       "methods": [
@@ -33,20 +33,8 @@
           "visibility": "public"
         },
         {
-          "name": "viewSchedule",
-          "parameters": [],
+          "name": "getEnrolledCourses",
           "return_type": "List<Course>",
-          "visibility": "public"
-        },
-        {
-          "name": "checkPrerequisites",
-          "parameters": [
-            {
-              "name": "courseCode",
-              "type": "String"
-            }
-          ],
-          "return_type": "Boolean",
           "visibility": "public"
         }
       ]
@@ -65,41 +53,35 @@
           "visibility": "private"
         },
         {
-          "name": "description",
-          "type": "String",
-          "visibility": "private"
-        },
-        {
-          "name": "capacity",
-          "type": "Integer",
-          "visibility": "private"
+          "name": "prerequisites",
+          "type": "List<Course>",
+          "visibility": "public"
         }
       ],
       "methods": [
         {
-          "name": "setPrerequisites",
+          "name": "checkPrerequisites",
           "parameters": [
             {
-              "name": "prerequisites",
-              "type": "List<Course>"
+              "name": "student",
+              "type": "Student"
             }
           ],
-          "return_type": "Void",
+          "return_type": "Boolean",
           "visibility": "public"
         },
         {
-          "name": "viewStudentEnrollments",
-          "parameters": [],
-          "return_type": "Map<String, List<Student>>",
+          "name": "getPrerequisites",
+          "return_type": "List<Course>",
           "visibility": "public"
         }
       ]
     },
     {
-      "name": "Faculty",
+      "name": "Instructor",
       "attributes": [
         {
-          "name": "facultyId",
+          "name": "instructorId",
           "type": "String",
           "visibility": "private"
         },
@@ -111,30 +93,8 @@
       ],
       "methods": [
         {
-          "name": "manageCourses",
-          "parameters": [],
-          "return_type": "Void",
-          "visibility": "public"
-        }
-      ]
-    },
-    {
-      "name": "Registration",
-      "attributes": [
-        {
-          "name": "waitlist",
-          "type": "List<Course>",
-          "visibility": "private"
-        }
-      ],
-      "methods": [
-        {
-          "name": "registerStudent",
+          "name": "teachCourse",
           "parameters": [
-            {
-              "name": "student",
-              "type": "Student"
-            },
             {
               "name": "courseCode",
               "type": "String"
@@ -144,9 +104,41 @@
           "visibility": "public"
         },
         {
-          "name": "manageCapacity",
-          "parameters": [],
-          "return_type": "Void",
+          "name": "getTeachingCourses",
+          "return_type": "List<Course>",
+          "visibility": "public"
+        }
+      ]
+    },
+    {
+      "name": "Department",
+      "attributes": [
+        {
+          "name": "departmentName",
+          "type": "String",
+          "visibility": "private"
+        },
+        {
+          "name": "coursesOffered",
+          "type": "List<Course>",
+          "visibility": "public"
+        }
+      ],
+      "methods": [
+        {
+          "name": "offerCourse",
+          "parameters": [
+            {
+              "name": "courseCode",
+              "type": "String"
+            }
+          ],
+          "return_type": "Boolean",
+          "visibility": "public"
+        },
+        {
+          "name": "getCoursesOffered",
+          "return_type": "List<Course>",
           "visibility": "public"
         }
       ]
@@ -156,16 +148,23 @@
     {
       "type": "association",
       "from": "Student",
-      "to": "Course",
+      "To": "Course",
       "multiplicity": "0..*",
       "label": "registers for"
     },
     {
       "type": "aggregation",
-      "from": "Registration",
+      "from": "Department",
       "to": "Course",
-      "multiplicity": "1..*",
-      "label": "enrolls students in"
+      "multiplicity": "0..*",
+      "label": "offers"
+    },
+    {
+      "type": "composition",
+      "from": "Course",
+      "to": "Instructor",
+      "multiplicity": "1",
+      "label": "taught by"
     }
   ]
 }

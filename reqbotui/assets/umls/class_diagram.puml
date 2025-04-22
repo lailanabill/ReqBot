@@ -10,29 +10,30 @@ skinparam class {
 class Student {
   - studentId: String
   - name: String
-  - enrolledCourses: List<Course>
+  + enrolledCourses: List<Course>
   + registerForCourse(courseCode: String): Boolean
-  + viewSchedule(): List<Course>
-  + checkPrerequisites(courseCode: String): Boolean
+  + getEnrolledCourses(): List<Course>
 }
 class Course {
   - courseCode: String
   - title: String
-  - description: String
-  - capacity: Integer
-  + setPrerequisites(prerequisites: List<Course>): Void
-  + viewStudentEnrollments(): Map<String, List<Student>>
+  + prerequisites: List<Course>
+  + checkPrerequisites(student: Student): Boolean
+  + getPrerequisites(): List<Course>
 }
-class Faculty {
-  - facultyId: String
+class Instructor {
+  - instructorId: String
   - name: String
-  + manageCourses(): Void
+  + teachCourse(courseCode: String): Boolean
+  + getTeachingCourses(): List<Course>
 }
-class Registration {
-  - waitlist: List<Course>
-  + registerStudent(student: Student, courseCode: String): Boolean
-  + manageCapacity(): Void
+class Department {
+  - departmentName: String
+  + coursesOffered: List<Course>
+  + offerCourse(courseCode: String): Boolean
+  + getCoursesOffered(): List<Course>
 }
-Student --> Course : registers for
-Registration o-- Course : enrolls students in
+Student --> UnknownClass : registers for
+Department o-- Course : offers
+Course *-- Instructor : taught by
 @enduml
