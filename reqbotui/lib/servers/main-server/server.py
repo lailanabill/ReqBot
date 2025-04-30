@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import replicate
 import whisper
 from transformers import pipeline
 from dotenv import load_dotenv
@@ -80,15 +81,46 @@ async def transcribe_audio(file: UploadFile = File(...)):
         audio_file = f"temp_{file.filename}"
         with open(audio_file, "wb") as temp_file:
             temp_file.write(await file.read())
+        audio_file_replicate=open(audio_file, "rb")
+        print(audio_file)
         _real_torch_load = torch.load
         def patched_load(*args, **kwargs):
             kwargs['weights_only'] = False  # force it to False!
             return _real_torch_load(*args, **kwargs)
         torch.load = patched_load  # 💥
-        model = whisperx.load_model(model_name, device ,compute_type=compute_type)
-        result = model.transcribe(audio_file,batch_size=batch_size, task="translate")
-        clean_gpu_memory();del model
-        segments = result["segments"]
+        ## replicate integration
+
+
+        
+
+        input={
+        
+        "audio_file": audio_file_replicate,
+        "debug": False,
+        "vad_onset": 0.5,
+        "batch_size": 8,
+        "vad_offset": 0.363,
+        "diarization": False,
+        "temperature": 0,
+        "align_output": False,
+        "language_detection_min_prob": 0,
+        "language_detection_max_tries": 5,
+    }
+
+        output = replicate.run(
+    "victor-upmeet/whisperx:84d2ad2d6194fe98a17d2b60bef1c7f910c46b2f6fd38996ca457afd9c8abfcb",
+    input=input,
+)
+
+
+
+
+        # model = whisperx.load_model(model_name, device ,compute_type=compute_type)
+        # result = model.transcribe(audio_file,batch_size=batch_size, task="translate")
+        # os.remove(audio_file)
+        clean_gpu_memory()
+        # clean_gpu_memory();del model
+        segments = output["segments"]
         model_a, metadata = load_align_model(language_code='en', device=device)
         result_aligned = align(segments, model_a, metadata, audio_file, device)
         clean_gpu_memory();del model_a, metadata
@@ -96,18 +128,29 @@ async def transcribe_audio(file: UploadFile = File(...)):
         diarization_result = diarization_pipeline(audio_file)
         clean_gpu_memory();del diarization_pipeline
         temp= assign_word_speakers(diarization_result, result_aligned)
-        result_segments = temp['segments'],
+        result_segments = temp['segments']
         # word_seg = temp['word_segments']
         MeetMins: List[Dict[str, Any]] = []
-        for result_segment in result_segments[0]:
-            MeetMins.append(
-                {
-                    # "start": result_segment["start"],
-                    # "end": result_segment["end"],
+        # print("result_segments",result_segments[0])
+        # print("result_segments",result_segments)
+        # for result_segment in result_segments:
+        #     MeetMins.append(
+        #         {
+        #             # "start": result_segment["start"],
+        #             # "end": result_segment["end"],
+        #             "text": result_segment["text"],
+        #             "speaker": result_segment["speaker"],
+        #         }
+        #     )
+        for result_segment in result_segments:
+            if "speaker" in result_segment and "text" in result_segment:
+                MeetMins.append({
                     "text": result_segment["text"],
                     "speaker": result_segment["speaker"],
-                }
-            )
+                })
+            else:
+                print("⚠️ Missing keys in result_segment:", result_segment)
+
             
         
 
