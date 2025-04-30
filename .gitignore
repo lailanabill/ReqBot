@@ -10,3 +10,6 @@ reqbotui/lib/servers/Lama/UseCaseDiagram.jpeg
 *.json
 temp_142.wav
 temp_bpb.mp3
+temp_x0xo.mp3
+reqbotui/lib/servers/main-server/x0xo.mp3
+.env
