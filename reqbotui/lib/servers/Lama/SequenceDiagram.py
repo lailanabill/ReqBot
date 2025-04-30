@@ -521,7 +521,7 @@ IMPORTANT:
             print(f"Error generating interactive HTML: {e}")
             return False
 
-    def analyze_and_generate_diagrams(self, transcript: str, output_file: str = 'reqbotui/assets/images/seq_diagram.png') -> bool:
+    def analyze_and_generate_diagrams(self, transcript: str,pid:int ,output_dir: str = 'reqbotui/assets/') -> bool:
         """
         Complete workflow to analyze transcript and generate all diagram formats
         """
@@ -534,7 +534,7 @@ IMPORTANT:
                 return False
                 
             # Save JSON
-            json_file = f"{output_prefix}.json"
+            json_file = f"{output_dir}jsons/seq_diagram_{pid}.json"
             with open(json_file, 'w', encoding='utf-8') as f:
                 json.dump(interactions_json, f, indent=2, ensure_ascii=False)
             print(f"Interactions saved to {json_file}")
@@ -543,13 +543,15 @@ IMPORTANT:
             plantuml_code = self.generate_plantuml(interactions_json)
             
             # Save PlantUML code
-            puml_file = f"{output_prefix}.puml"
+            puml_file = f"{output_dir}umls/seq_diagram_{pid}.uml"
+            # puml_file = f"{output_prefix}.puml"
             with open(puml_file, 'w', encoding='utf-8') as f:
                 f.write(plantuml_code)
             print(f"PlantUML code saved to {puml_file}")
             
             # Generate PNG diagram
-            png_file = f"{output_prefix}.png"
+            png_file = f"{output_dir}images/seq_diagram_{pid}.png"
+            # png_file = f"{output_prefix}.png"
             png_success = self.generate_diagram_with_kroki(plantuml_code, png_file)
             
           
@@ -561,7 +563,7 @@ IMPORTANT:
             return False
 
 
-def SequenceDiagramDriver(desc):
+def SequenceDiagramDriver(desc,pid):
     # Initialize generator
     generator = SequenceDiagramGenerator()
     
@@ -569,13 +571,31 @@ def SequenceDiagramDriver(desc):
     transcript = desc
 
     # Use the complete workflow method
-    success = generator.analyze_and_generate_diagrams(transcript)
+    success = generator.analyze_and_generate_diagrams(transcript,pid)
     
     if success:
         print("All diagram generation completed successfully!")
     else:
         print("There were issues generating some diagram formats.")
     
-   
+
+
+if __name__ == "__main__":
+    description = """Meeting Transcript: University Course Registration System Discussion
+
+Team Lead (Alex): Okay, team, today we're discussing the University Course Registration System we're building. It's meant to streamline how students register for courses at the university, so let's map out the key classes and their interactions.
+
+Developer (Sam): We'll need classes for Students, Courses, Faculty, and Registration.
+
+Team Lead (Alex): Exactly. Students will have attributes like student ID, name, and enrolled courses. They'll be able to register for courses, view their schedule, and check prerequisites.
+
+Analyst (Jordan): Courses should have details like course code, title, description, and capacity. Faculty members will manage courses, set prerequisites, and view student enrollments.
+
+Designer (Priya): We'll need a Registration class to handle the registration process, tracking which students are enrolled in which courses, managing waitlists, and handling course capacity.
+
+Team Lead (Alex): Great points. We should also consider how we'll handle academic records, prerequisites, and potential conflicts in course scheduling.
+"""
+    pid = 1  # Example process ID or unique identifier
+    SequenceDiagramDriver(description,pid)
 
 

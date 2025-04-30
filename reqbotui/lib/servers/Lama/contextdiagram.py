@@ -677,11 +677,12 @@ IMPORTANT:
         plantuml.append("@enduml")
         return '\n'.join(plantuml)
 
-    def generate_diagram_with_kroki(self, plantuml_code: str, output_file: str = 'context_diagram.png') -> bool:
+    def generate_diagram_with_kroki(self, plantuml_code: str,pid :int ,output_dir: str = 'reqbotui/assets/images/') -> bool:
         """
         Generate diagram using Kroki API
         """
         try:
+            output_file = f"{output_dir}context_diagram_{pid}.png"
             kroki_url = "https://kroki.io/plantuml/png/"
             
             plantuml_encoded = base64.urlsafe_b64encode(
@@ -703,7 +704,7 @@ IMPORTANT:
             print(f"Error generating diagram: {e}")
             return False
 
-def ContextDiagramDriver(desc):
+def ContextDiagramDriver(desc,pid):
     # Initialize generator
     generator = ContextDiagramGenerator(model='llama3')
     
@@ -715,18 +716,19 @@ def ContextDiagramDriver(desc):
     
     if context_json:
         # Save JSON
-        with open('context_diagram.json', 'w', encoding='utf-8') as f:
+        with open(f"reqbotui/assets/jsons/context_diagram_{pid}.json", 'w', encoding='utf-8') as f:
             json.dump(context_json, f, indent=2, ensure_ascii=False)
         
         # Generate PlantUML
         plantuml_code = generator.generate_plantuml(context_json)
         
         # Save PlantUML code
-        with open('context_diagram.puml', 'w', encoding='utf-8') as f:
+        with open(f"reqbotui/assets/umls/context_diagram_{pid}.puml", 'w', encoding='utf-8') as f:
             f.write(plantuml_code)
         
         # Generate diagram using Kroki
-        generator.generate_diagram_with_kroki(plantuml_code, 'context_diagram.png')
+        generator.generate_diagram_with_kroki(plantuml_code,pid)
+        # generator.generate_diagram_with_kroki(plantuml_code, 'context_diagram_{pid}.png')
         
         # Print results
         print("Extracted Context Elements:")
@@ -735,3 +737,26 @@ def ContextDiagramDriver(desc):
         print(plantuml_code)
     else:
         print("Failed to extract context elements from description")
+
+
+if __name__ == "__main__":
+    # Example usage
+    description = """
+Meeting Transcript: University Course Registration System Discussion
+
+Team Lead (Alex): Okay, team, today we're discussing the University Course Registration System we're building. It's meant to streamline how students register for courses at the university, so let's map out the key classes and their interactions.
+
+Developer (Sam): We'll need classes for Students, Courses, Faculty, and Registration.
+
+Team Lead (Alex): Exactly. Students will have attributes like student ID, name, and enrolled courses. They'll be able to register for courses, view their schedule, and check prerequisites.
+
+Analyst (Jordan): Courses should have details like course code, title, description, and capacity. Faculty members will manage courses, set prerequisites, and view student enrollments.
+
+Designer (Priya): We'll need a Registration class to handle the registration process, tracking which students are enrolled in which courses, managing waitlists, and handling course capacity.
+
+Team Lead (Alex): Great points. We should also consider how we'll handle academic records, prerequisites, and potential conflicts in course scheduling.
+
+
+"""
+    pid = 12345  # Example process ID
+    ContextDiagramDriver(description, pid)

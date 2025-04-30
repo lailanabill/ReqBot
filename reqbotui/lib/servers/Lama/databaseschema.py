@@ -215,9 +215,10 @@ System Description:
         plantuml.append("@enduml")
         return '\n'.join(plantuml)
 
-    def generate_diagram(self, plantuml_code: str,  output_file: str = 'reqbotui/assets/images/database_diagram.png') -> bool:
+    def generate_diagram(self, plantuml_code: str,  pid :int ,output_dir = "reqbotui/assets/images/") -> bool:
         """Generate diagram using Kroki"""
         try:
+            output_file = f"{output_dir}database_diagram_{pid}.png"
             kroki_url = self.url_generator.generate_kroki_url('plantuml', plantuml_code, 'png')
             
             if not kroki_url:
@@ -242,7 +243,7 @@ System Description:
             print(f"Error generating diagram: {e}")
             return False
 
-def DbDiagramDriver(desc):
+def DbDiagramDriver(desc,pid):
     # Initialize generator
     generator = DatabaseClassDiagramGenerator(model='llama3')
     
@@ -254,12 +255,16 @@ def DbDiagramDriver(desc):
     
     if class_diagram_json:
         # Save JSON
-        with open('database_class_diagram.json', 'w', encoding='utf-8') as f:
+        with open(f"reqbotui/assets/jsons/database_diagram_{pid}.json", 'w', encoding='utf-8') as f:
             json.dump(class_diagram_json, f, indent=2, ensure_ascii=False)
         
         # Generate and save diagram
         plantuml_code = generator.generate_plantuml(class_diagram_json)
-        generator.generate_diagram(plantuml_code)
+        # Save PlantUML code to file
+        with open(f"reqbotui/assets/umls/datbase_diagram_{pid}.puml", 'w', encoding='utf-8') as f:
+            f.write(plantuml_code)
+        
+        generator.generate_diagram(plantuml_code,pid)
         
         # Print results
         print("Generated Class Diagram Elements:")
@@ -269,3 +274,22 @@ def DbDiagramDriver(desc):
     else:
         print("Failed to generate class diagram")
 
+
+if __name__ == "__main__":
+    # Example usage
+    description = """Meeting Transcript: University Course Registration System Discussion
+
+Team Lead (Alex): Okay, team, today we're discussing the University Course Registration System we're building. It's meant to streamline how students register for courses at the university, so let's map out the key classes and their interactions.
+
+Developer (Sam): We'll need classes for Students, Courses, Faculty, and Registration.
+
+Team Lead (Alex): Exactly. Students will have attributes like student ID, name, and enrolled courses. They'll be able to register for courses, view their schedule, and check prerequisites.
+
+Analyst (Jordan): Courses should have details like course code, title, description, and capacity. Faculty members will manage courses, set prerequisites, and view student enrollments.
+
+Designer (Priya): We'll need a Registration class to handle the registration process, tracking which students are enrolled in which courses, managing waitlists, and handling course capacity.
+
+Team Lead (Alex): Great points. We should also consider how we'll handle academic records, prerequisites, and potential conflicts in course scheduling.
+"""
+    pid = 1  # Example process ID or unique identifier
+    DbDiagramDriver(description, pid)
