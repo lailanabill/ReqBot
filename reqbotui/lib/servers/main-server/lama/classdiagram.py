@@ -1,3 +1,4 @@
+import os
 import ollama
 import json
 import re
@@ -6,6 +7,18 @@ import requests
 import base64
 import zlib
 from typing import Dict, Any, Optional, List, Union
+
+
+
+from google.cloud import storage
+
+def upload_to_gcs(bucket_name, source_file_path, destination_blob_name):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(source_file_path)
+    print(f"Uploaded to: gs://{bucket_name}/{destination_blob_name}")
+    return f"https://storage.googleapis.com/{bucket_name}/{destination_blob_name}"
 
 class ClassDiagramGenerator:
     def __init__(self, model: str = 'llama3', temperature: float = 0.2):
@@ -331,21 +344,49 @@ def ClassDiagramDriver(desc,pid):
     
     if class_diagram_json:
         # Save JSON
-        with open(f"reqbotui/assets/jsons/class_diagram_{pid}.json", 'w', encoding='utf-8') as f:
+        os.makedirs("/tmp/jsons", exist_ok=True)
+        os.makedirs("/tmp/umls", exist_ok=True)
+        os.makedirs("/tmp/images", exist_ok=True)
+        json_path = f"/tmp/jsons/class_diagram_{pid}.json"
+        puml_path = f"/tmp/umls/class_diagram_{pid}.puml"
+        img_path = f"/tmp/images/class_diagram_{pid}.png"
+
+
+        # with open(f"reqbotui/assets/jsons/class_diagram_{pid}.json", 'w', encoding='utf-8') as f:
+            # json.dump(class_diagram_json, f, indent=2, ensure_ascii=False)
+        with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(class_diagram_json, f, indent=2, ensure_ascii=False)
-        
+
+
+
         # Generate PlantUML
+        # plantuml_code = generator.generate_plantuml(class_diagram_json)
         plantuml_code = generator.generate_plantuml(class_diagram_json)
-        
-        # Save PlantUML code
-        with open(f"reqbotui/assets/umls/class_diagram_{pid}.puml", 'w', encoding='utf-8') as f:
+        with open(puml_path, 'w', encoding='utf-8') as f:
             f.write(plantuml_code)
+        # Save PlantUML code
+        # with open(f"reqbotui/assets/umls/class_diagram_{pid}.puml", 'w', encoding='utf-8') as f:
+            # f.write(plantuml_code)
         
         # Generate diagram using Kroki
-        generator.generate_diagram_with_kroki(plantuml_code,pid)
+        generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/tmp/images/")
         
         # Print results
+        # Upload to GCS
+        bucket_name = "diagrams-data"  # replace with your bucket
+        json_url = upload_to_gcs(bucket_name, json_path, f"jsons/class_diagram_{pid}.json")
+        puml_url = upload_to_gcs(bucket_name, puml_path, f"umls/class_diagram_{pid}.puml")
+        png_url = upload_to_gcs(bucket_name, img_path, f"images/class_diagram_{pid}.png")
+
         print("class done")
+        return {
+            "pid": pid,
+            "json": json_url,
+            "puml": puml_url,
+            "image_png": png_url,
+        }
+    
+
         # print("Extracted Class Diagram Elements:")
         # print(json.dumps(class_diagram_json, indent=2, ensure_ascii=False))
         # print("\nPlantUML Diagram Code:")

@@ -1,3 +1,4 @@
+import os
 import ollama
 import json
 import re
@@ -6,6 +7,15 @@ import requests
 import base64
 import zlib
 from typing import Dict, Any, Optional
+
+from google.cloud import storage
+def upload_to_gcs(bucket_name, source_file_path, destination_blob_name):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(source_file_path)
+    print(f"Uploaded to: gs://{bucket_name}/{destination_blob_name}")
+    return f"https://storage.googleapis.com/{bucket_name}/{destination_blob_name}"
 
 class ContextDiagramGenerator:
     def __init__(self, model: str = 'llama3', temperature: float = 0.2):
@@ -715,23 +725,49 @@ def ContextDiagramDriver(desc,pid):
     context_json = generator.extract_context_elements(description)
     
     if context_json:
-        # Save JSON
-        with open(f"reqbotui/assets/jsons/context_diagram_{pid}.json", 'w', encoding='utf-8') as f:
+        # # Save JSON
+        # with open(f"reqbotui/assets/jsons/context_diagram_{pid}.json", 'w', encoding='utf-8') as f:
+        #     json.dump(context_json, f, indent=2, ensure_ascii=False)
+        
+        # # Generate PlantUML
+        # plantuml_code = generator.generate_plantuml(context_json)
+        
+        # # Save PlantUML code
+        # with open(f"reqbotui/assets/umls/context_diagram_{pid}.puml", 'w', encoding='utf-8') as f:
+        #     f.write(plantuml_code)
+        
+        # # Generate diagram using Kroki
+        # generator.generate_diagram_with_kroki(plantuml_code,pid)
+        # # generator.generate_diagram_with_kroki(plantuml_code, 'context_diagram_{pid}.png')
+        
+        # # Print results
+        # print("context done")
+        os.makedirs("/tmp/jsons", exist_ok=True)
+        os.makedirs("/tmp/umls", exist_ok=True)
+        os.makedirs("/tmp/images", exist_ok=True)
+        json_path = f"/tmp/jsons/context_diagram_{pid}.json"
+        puml_path = f"/tmp/umls/context_diagram_{pid}.puml"
+        img_path = f"/tmp/images/context_diagram_{pid}.png"
+        with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(context_json, f, indent=2, ensure_ascii=False)
-        
-        # Generate PlantUML
         plantuml_code = generator.generate_plantuml(context_json)
-        
-        # Save PlantUML code
-        with open(f"reqbotui/assets/umls/context_diagram_{pid}.puml", 'w', encoding='utf-8') as f:
+        with open(puml_path, 'w', encoding='utf-8') as f:
             f.write(plantuml_code)
-        
-        # Generate diagram using Kroki
-        generator.generate_diagram_with_kroki(plantuml_code,pid)
-        # generator.generate_diagram_with_kroki(plantuml_code, 'context_diagram_{pid}.png')
-        
-        # Print results
+        generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/tmp/images/")
+
+
+        bucket_name = "diagrams-data"  # replace with your bucket
+        json_url = upload_to_gcs(bucket_name, json_path, f"jsons/context_diagram_{pid}.json")
+        puml_url = upload_to_gcs(bucket_name, puml_path, f"umls/context_diagram_{pid}.puml")
+        png_url = upload_to_gcs(bucket_name, img_path, f"images/context_diagram_{pid}.png")
+
         print("context done")
+        return {
+            "pid": pid,
+            "json": json_url,
+            "puml": puml_url,
+            "image_png": png_url,
+        }
         # print("Extracted Context Elements:")
         # print(json.dumps(context_json, indent=2, ensure_ascii=False))
         # print("\nPlantUML Diagram Code:")

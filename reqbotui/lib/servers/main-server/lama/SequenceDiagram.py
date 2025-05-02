@@ -1,3 +1,4 @@
+import os
 import ollama
 import json
 import re
@@ -6,6 +7,17 @@ import requests
 import base64
 import zlib
 from typing import Dict, Any, Optional, List
+
+
+
+from google.cloud import storage
+def upload_to_gcs(bucket_name, source_file_path, destination_blob_name):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(source_file_path)
+    print(f"Uploaded to: gs://{bucket_name}/{destination_blob_name}")
+    return f"https://storage.googleapis.com/{bucket_name}/{destination_blob_name}"
 
 class SequenceDiagramGenerator:
     def __init__(self, model: str = 'llama3', temperature: float = 0.2):
@@ -339,11 +351,13 @@ IMPORTANT:
 
         return '\n'.join(plantuml)
 
-    def generate_diagram_with_kroki(self, plantuml_code: str,  output_file: str = 'reqbotui/assets/images/seq_diagram.png') -> bool:
+    def generate_diagram_with_kroki(self, plantuml_code: str,pid :int  ,output_dir : str = "reqbotui/assets/images/") -> bool:
         """
         Generate diagram using Kroki API
         """
         try:
+
+            output_file = f"{output_dir}sequence_diagram_{pid}.png"
             kroki_url = "https://kroki.io/plantuml/png/"
             
             plantuml_encoded = base64.urlsafe_b64encode(
@@ -534,29 +548,63 @@ IMPORTANT:
                 return False
                 
             # Save JSON
-            json_file = f"{output_dir}jsons/seq_diagram_{pid}.json"
-            with open(json_file, 'w', encoding='utf-8') as f:
+
+            os.makedirs("/tmp/jsons", exist_ok=True)
+            os.makedirs("/tmp/umls", exist_ok=True)
+            os.makedirs("/tmp/images", exist_ok=True)
+            json_path = f"/tmp/jsons/sequence_diagram_{pid}.json"
+            puml_path = f"/tmp/umls/sequence_diagram_{pid}.puml"
+            img_path = f"/tmp/images/sequence_diagram_{pid}.png"
+            # json_file = f"{output_dir}jsons/seq_diagram_{pid}.json"
+            # with open(json_file, 'w', encoding='utf-8') as f:
+            #     json.dump(interactions_json, f, indent=2, ensure_ascii=False)
+            with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(interactions_json, f, indent=2, ensure_ascii=False)
-            print(f"Interactions saved to {json_file}")
+            
             
             # Generate PlantUML
             plantuml_code = self.generate_plantuml(interactions_json)
             
+            
             # Save PlantUML code
-            puml_file = f"{output_dir}umls/seq_diagram_{pid}.uml"
+            # puml_file = f"{output_dir}umls/seq_diagram_{pid}.uml"
             # puml_file = f"{output_prefix}.puml"
-            with open(puml_file, 'w', encoding='utf-8') as f:
+            # with open(puml_file, 'w', encoding='utf-8') as f:
+            #     f.write(plantuml_code)
+            with open(puml_path, 'w', encoding='utf-8') as f:
                 f.write(plantuml_code)
-            print(f"PlantUML code saved to {puml_file}")
+            # print(f"PlantUML code saved to {puml_file}")
             
             # Generate PNG diagram
-            png_file = f"{output_dir}images/seq_diagram_{pid}.png"
+            # png_file = f"{output_dir}images/seq_diagram_{pid}.png"
             # png_file = f"{output_prefix}.png"
-            png_success = self.generate_diagram_with_kroki(plantuml_code, png_file)
+            png_success = self.generate_diagram_with_kroki(plantuml_code,pid ,img_path, output_dir="/tmp/images/")
             
-          
+            bucket_name = "diagrams-data"  # replace with your bucket
+            json_url = upload_to_gcs(bucket_name, json_path, f"jsons/sequence_diagram_{pid}.json")
+            puml_url = upload_to_gcs(bucket_name, puml_path, f"umls/sequence_diagram_{pid}.puml")
+            png_url = upload_to_gcs(bucket_name, img_path, f"images/sequence_diagram_{pid}.png")
             
-            return png_success 
+            return png_success , json_url, puml_url, png_url
+        
+
+
+
+            
+            
+            
+            # generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/tmp/images/")
+
+
+            
+
+            # print("class done")
+            # return {
+            #     "pid": pid,
+            #     "json": json_url,
+            #     "puml": puml_url,
+            #     "image_png": png_url,
+            # }
             
         except Exception as e:
             print(f"Error in analysis and generation workflow: {e}")
@@ -571,7 +619,7 @@ def SequenceDiagramDriver(desc,pid):
     transcript = desc
 
     # Use the complete workflow method
-    success = generator.analyze_and_generate_diagrams(transcript,pid)
+    success,_,_,_ = generator.analyze_and_generate_diagrams(transcript,pid)
     
     if success:
         print("sequence done")
