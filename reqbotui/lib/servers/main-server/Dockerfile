@@ -21,25 +21,26 @@
 
 
 # Use a Python base image
-FROM python:3.9
+# FROM python:3.11
 
-# Set environment variables to prevent prompts
+FROM ollama/ollama:latest
+
+ENV TZ=Africa/Cairo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV PYTHONUNBUFFERED=1
-
-# Install FFmpeg (needed for Whisper)
-RUN apt update && apt install -y ffmpeg
-
-# Set working directory
 WORKDIR /app
+RUN apt update && apt install -y ffmpeg python3 python3-pip 
+RUN pip install --upgrade pip setuptools typing-extensions packaging numpy
+RUN pip install ollama
 
-# Copy project files
-COPY . /app
-
-# Install dependencies
+# && ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port
+COPY . .
+RUN chmod +x /app/start.sh
 EXPOSE 8080
 
-# Run FastAPI with Uvicorn
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080"]
+# CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080"]
+ENTRYPOINT []
+CMD ["/app/start.sh"]

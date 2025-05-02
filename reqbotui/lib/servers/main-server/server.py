@@ -2,23 +2,25 @@ from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import replicate
-import whisper
-from transformers import pipeline
+# import whisper
+# from transformers import pipeline
 from dotenv import load_dotenv
 
 
 
-import sys
+# import sys
 import os
 
 # Go up one level to reach project_root
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(project_root)
-from Lama.SequenceDiagram import SequenceDiagramDriver
-from Lama.classdiagram import ClassDiagramDriver
-from Lama.contextdiagram import ContextDiagramDriver
-from Lama.databaseschema import DbDiagramDriver
-from Lama.usecasediagram import UseCasDiagramDriver
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# sys.path.append(project_root)
+# from lama.SequenceDiagram import SequenceDiagramDriver
+# from lama.classdiagram import ClassDiagramDriver
+# from lama.contextdiagram import ContextDiagramDriver
+# from lama.databaseschema import DbDiagramDriver
+# from lama.usecasediagram import UseCasDiagramDriver
+
+from lama import ClassDiagramDriver, ContextDiagramDriver, DbDiagramDriver, SequenceDiagramDriver, UseCasDiagramDriver
 
 
 load_dotenv()
@@ -30,23 +32,29 @@ load_dotenv()
 import os
 import subprocess
 from typing import Optional, List, Dict, Any
-import time
+# import time
 # import psutil
 # import GPUtil
 # from pytube import YouTube
 import matplotlib.pyplot as plt
-import whisperx
-import whisper
+# import whisperx
+# import whisper
 from whisperx import load_align_model, align
 from whisperx.diarize import DiarizationPipeline, assign_word_speakers
 import torch
 import gc
 torch.backends.cuda.matmul.allow_tf32 = False
 torch.backends.cudnn.allow_tf32 = False
+
+
+
 model_name = 'large-v2'
-device = "cuda"
+# device = "cuda"
+device = "cpu"
 hf_token = os.getenv("HF_TOKEN")
-compute_type = "float16"  # "int8_float16" or "int8"
+# hf_token = os.getenv("HF_TOKEN")
+# compute_type = "float16"  # "int8_float16" or "int8"
+compute_type = "int8"  # "int8_float16" or "int8"
 batch_size = 8
 
 
@@ -289,14 +297,20 @@ async def extract_requirements(request: Request):
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 @app.post("/diagrams/")
-async def generate_diagram(request: Request):
+async def generate_diagram(request: Request ):
     data = await request.json()
     transcript= data.get("transcript", "")
-    ClassDiagramDriver(transcript)
-    ContextDiagramDriver(transcript)
-    DbDiagramDriver(transcript)
-    SequenceDiagramDriver(transcript)
-    UseCasDiagramDriver(transcript)
+    pid = data.get("pid", 0)
+    ClassDiagramDriver(transcript,pid)
+    ContextDiagramDriver(transcript,pid)
+    DbDiagramDriver(transcript,pid)
+    SequenceDiagramDriver(transcript,pid)
+    UseCasDiagramDriver(transcript,pid)
+    return JSONResponse(content={
+        "message":"Diagrams generated successfully",
+        "pid":pid
+    })
+
 
 import os
 import uvicorn

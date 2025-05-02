@@ -28,10 +28,10 @@ class DiagramPage extends StatelessWidget {
               height: 20,
             ),
             Image.asset(
-              'assets/images/${dgrnam}_diagram.png',
+              'assets/images/${dgrnam}_diagram_4.png',
               width: screenWidth * 0.8,
               height: screenHeight * 0.6,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
           ],
         ),
