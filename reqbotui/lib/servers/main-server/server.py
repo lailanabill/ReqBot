@@ -61,8 +61,6 @@ batch_size = 8
 
 
 
-
-
 # summarizer = pipeline("summarization",model="facebook/bart-large-cnn")  
 # model = whisper.load_model("large")
 
@@ -310,6 +308,7 @@ async def generate_diagram(request: Request ):
         "message":"Diagrams generated successfully",
         "pid":pid
     })
+
 
 
 import os

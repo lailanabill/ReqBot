@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:reqbot/controllers/signin_controller.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/gradient_button.dart';
@@ -46,7 +49,7 @@ class _SignInPageState extends State<SignInPage> {
                     const SizedBox(height: 20),
                     GradientButton(
                       text: "Login",
-                      onTap: () {
+                      onTap: () async {
                         if (_formKey.currentState?.validate() ?? false) {
                           controller.login(context);
                         }
