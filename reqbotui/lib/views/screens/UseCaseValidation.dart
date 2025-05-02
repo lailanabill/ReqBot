@@ -11,64 +11,80 @@ class UseCaseValidation extends StatefulWidget {
 }
 
 class _UseCaseValidationState extends State<UseCaseValidation> {
+  Future<Map<String, dynamic>> loadPuml() async {
+    final url =
+        "https://storage.googleapis.com/diagrams-data/umls/use_case_diagram_5.puml";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return {'body': response.body, 'StatCode': response.statusCode};
+    } else {
+      throw Exception("Failed to load PUML file: ${response.statusCode}");
+    }
+  }
+
+  String _plantUmlCode = """
+
+""";
   bool _isLoading = true;
   String? _imageUrl;
   String? _errorMessage;
 
   // Store the PlantUML code as a class variable so we can modify it
-  String _plantUmlCode = '''@startuml
-left to right direction
-title Task Management System - Use Case Diagram
+//   String _plantUmlCode = '''@startuml
+// left to right direction
+// title Task Management System - Use Case Diagram
 
-skinparam usecase {
-    BackgroundColor LightBlue
-    BorderColor DarkBlue
-    ArrowColor DarkGray
-    ActorBorderColor Navy
-}
+// skinparam usecase {
+//     BackgroundColor LightBlue
+//     BorderColor DarkBlue
+//     ArrowColor DarkGray
+//     ActorBorderColor Navy
+// }
 
-actor "User" as User
-actor "Admin" as Admin
+// actor "User" as User
+// actor "Admin" as Admin
 
-rectangle "Task Management System" {
-    usecase "Create Task" as UC001
-    usecase "Assign Task" as UC002
-    usecase "Edit Task" as UC003
-    usecase "Delete Task" as UC004
-    usecase "View Task List" as UC005
-    usecase "Filter Tasks" as UC006
-    usecase "Receive Notifications" as UC007
-    usecase "Set Notification Preferences" as UC008
-    usecase "View Archived Notifications" as UC009
-    usecase "Enable Dark Mode" as UC010
-    usecase "Set Language Preferences" as UC011
-    usecase "See Confirmation Prompt" as UC012
-    usecase "Prevent Assignment to Deactivated Users" as UC013
-    usecase "Deactivate User" as UC014
+// rectangle "Task Management System" {
+//     usecase "Create Task" as UC001
+//     usecase "Assign Task" as UC002
+//     usecase "Edit Task" as UC003
+//     usecase "Delete Task" as UC004
+//     usecase "View Task List" as UC005
+//     usecase "Filter Tasks" as UC006
+//     usecase "Receive Notifications" as UC007
+//     usecase "Set Notification Preferences" as UC008
+//     usecase "View Archived Notifications" as UC009
+//     usecase "Enable Dark Mode" as UC010
+//     usecase "Set Language Preferences" as UC011
+//     usecase "See Confirmation Prompt" as UC012
+//     usecase "Prevent Assignment to Deactivated Users" as UC013
+//     usecase "Deactivate User" as UC014
 
-    UC004 ..> UC012 : <<include>>
-    UC002 ..> UC013 : <<extend>>
+//     UC004 ..> UC012 : <<include>>
+//     UC002 ..> UC013 : <<extend>>
 
-    note right of UC004 : Confirmation required before deletion
-    note right of UC002 : Cannot assign to deactivated users
+//     note right of UC004 : Confirmation required before deletion
+//     note right of UC002 : Cannot assign to deactivated users
 
-    User --> UC001
-    User --> UC002
-    User --> UC003
-    User --> UC004
-    User --> UC005
-    User --> UC006
-    User --> UC007
-    User --> UC008
-    User --> UC009
-    User --> UC010
-    User --> UC011
-    User --> UC012
+//     User --> UC001
+//     User --> UC002
+//     User --> UC003
+//     User --> UC004
+//     User --> UC005
+//     User --> UC006
+//     User --> UC007
+//     User --> UC008
+//     User --> UC009
+//     User --> UC010
+//     User --> UC011
+//     User --> UC012
 
-    Admin --> UC013
-    Admin --> UC014
-}
-@enduml''';
+//     Admin --> UC013
+//     Admin --> UC014
+// }
+// @enduml''';
 
   // List of actors extracted from the PlantUML code
   List<String> _actors = ['Librarian', 'Member', 'Admin'];
@@ -86,11 +102,18 @@ rectangle "Task Management System" {
       TextEditingController();
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
     _loadDiagram();
     _extractExistingRelationships();
-
+    final res = await loadPuml();
+    if (res['StatCode'] == 200) {
+      setState(() {
+        _plantUmlCode = res['body'];
+      });
+    } else {
+      print("Error loading PUML file: ${res['StatCode']}");
+    }
     if (_useCases.isNotEmpty) {
       _selectedUseCase = _useCases[0];
     }

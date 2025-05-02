@@ -13,69 +13,94 @@ class ClassDiagramEditor extends StatefulWidget {
 }
 
 class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
-  String plantumlCode = '''
-@startuml
-skinparam class {
-  BackgroundColor PaleGreen
-  BorderColor DarkGreen
-  ArrowColor DarkGray
-}
+  Future<Map<String, dynamic>> loadPuml() async {
+    final url =
+        "https://storage.googleapis.com/diagrams-data/umls/class_diagram_5.puml";
 
-class User {
-  -String userId
-  -String name
-  -Boolean isActive
-  +getName(): String
-  +setName(name: String): void
-  +isDeactivated(): Boolean
-}
+    final response = await http.get(Uri.parse(url));
 
-class Task {
-  -String taskId
-  -String title
-  -String description
-  -DateTime deadline
-  -Priority priority
-  -Status status
-  +assignUser(user: User): void
-  +editTask(): void
-  +deleteTask(): void
-}
+    if (response.statusCode == 200) {
+      return {'body': response.body, 'StatCode': response.statusCode};
+    } else {
+      throw Exception("Failed to load PUML file: ${response.statusCode}");
+    }
+  }
 
-class Notification {
-  -String notificationId
-  -String content
-  -Boolean isRead
-  -DateTime timestamp
-  +markAsRead(): void
-}
+  String plantumlCode = """
 
-class Preferences {
-  -Boolean pushEnabled
-  -Boolean dailySummary
-  -Boolean darkMode
-  +updatePreferences(): void
-}
+""";
 
-class LanguageSetting {
-  -String languageCode
-  +apply(): void
-}
+//   String plantumlCode = '''
+// @startuml
+// skinparam class {
+//   BackgroundColor PaleGreen
+//   BorderColor DarkGreen
+//   ArrowColor DarkGray
+// }
 
-User "1" --> "0..*" Task : creates
-Task "1" --> "0..*" User : assigned to
-User "1" --> "0..*" Notification : receives
-User "1" --> "1" Preferences : has
-User "1" --> "1" LanguageSetting : uses
-@enduml
-''';
+// class User {
+//   -String userId
+//   -String name
+//   -Boolean isActive
+//   +getName(): String
+//   +setName(name: String): void
+//   +isDeactivated(): Boolean
+// }
+
+// class Task {
+//   -String taskId
+//   -String title
+//   -String description
+//   -DateTime deadline
+//   -Priority priority
+//   -Status status
+//   +assignUser(user: User): void
+//   +editTask(): void
+//   +deleteTask(): void
+// }
+
+// class Notification {
+//   -String notificationId
+//   -String content
+//   -Boolean isRead
+//   -DateTime timestamp
+//   +markAsRead(): void
+// }
+
+// class Preferences {
+//   -Boolean pushEnabled
+//   -Boolean dailySummary
+//   -Boolean darkMode
+//   +updatePreferences(): void
+// }
+
+// class LanguageSetting {
+//   -String languageCode
+//   +apply(): void
+// }
+
+// User "1" --> "0..*" Task : creates
+// Task "1" --> "0..*" User : assigned to
+// User "1" --> "0..*" Notification : receives
+// User "1" --> "1" Preferences : has
+// User "1" --> "1" LanguageSetting : uses
+// @enduml
+// ''';
 
   String? _previousPlantumlCode;
   late TextEditingController _plantumlController;
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
+    final res = await loadPuml();
+    if (res['StatCode'] == 200) {
+      setState(() {
+        plantumlCode = res['body'];
+      });
+    } else {
+      print("Error loading PUML file: ${res['StatCode']}");
+    }
     _plantumlController = TextEditingController(text: plantumlCode);
     _previousPlantumlCode = plantumlCode;
   }
@@ -137,7 +162,8 @@ User "1" --> "1" LanguageSetting : uses
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                          const Icon(Icons.broken_image,
+                              size: 64, color: Colors.grey),
                           const SizedBox(height: 16),
                           Text('Failed to load image: $error'),
                           const SizedBox(height: 16),

@@ -4,6 +4,7 @@ import 'dart:convert'; // For base64 encoding
 import 'package:archive/archive.dart'; // For zlib compression
 import 'dart:async'; // For debouncing
 import 'package:reqbot/views/widgets/Contextdiagram/context_diagram_widgets.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const ContextDiagramEditorApp());
@@ -26,56 +27,86 @@ class ContextDiagramEditorScreen extends StatefulWidget {
   const ContextDiagramEditorScreen({super.key});
 
   @override
-  State<ContextDiagramEditorScreen> createState() => _ContextDiagramEditorScreenState();
+  State<ContextDiagramEditorScreen> createState() =>
+      _ContextDiagramEditorScreenState();
 }
 
-class _ContextDiagramEditorScreenState extends State<ContextDiagramEditorScreen> {
-  String plantumlCode = '''
-@startuml
-@startuml
-left to right direction
-skinparam monochrome true
+class _ContextDiagramEditorScreenState
+    extends State<ContextDiagramEditorScreen> {
+//loading the plantuml code
 
-actor "User" as user
-actor "Admin" as admin
-actor "QA Tester" as qa
-actor "UX Designer" as ux
-rectangle "Task Management System" as sys
-rectangle "Notification Service" as notify
-rectangle "Authentication Service" as auth
-rectangle "Frontend UI" as frontend
+  Future<Map<String, dynamic>> loadPuml() async {
+    final url =
+        "https://storage.googleapis.com/diagrams-data/umls/context_diagram_5.puml";
 
-user --> sys : "Creates/Edits Tasks"
-sys --> user : "Sends Notifications"
-admin --> sys : "Manages Users"
-qa --> sys : "Reports Issues"
-ux --> sys : "Provides UI Feedback"
+    final response = await http.get(Uri.parse(url));
 
-sys --> notify : "Triggers Notification"
-notify --> sys : "Sends Delivery Status"
+    if (response.statusCode == 200) {
+      return {'body': response.body, 'StatCode': response.statusCode};
+    } else {
+      throw Exception("Failed to load PUML file: ${response.statusCode}");
+    }
+  }
 
-sys --> auth : "Validates User"
-auth --> sys : "Returns Access Info"
+  String plantumlCode = """
 
-user --> frontend : "Uses Interface"
-frontend --> sys : "Calls APIs"
+""";
+//   String plantumlCode = '''
+// @startuml
+// @startuml
+// left to right direction
+// skinparam monochrome true
 
-@enduml
-''';
+// actor "User" as user
+// actor "Admin" as admin
+// actor "QA Tester" as qa
+// actor "UX Designer" as ux
+// rectangle "Task Management System" as sys
+// rectangle "Notification Service" as notify
+// rectangle "Authentication Service" as auth
+// rectangle "Frontend UI" as frontend
+
+// user --> sys : "Creates/Edits Tasks"
+// sys --> user : "Sends Notifications"
+// admin --> sys : "Manages Users"
+// qa --> sys : "Reports Issues"
+// ux --> sys : "Provides UI Feedback"
+
+// sys --> notify : "Triggers Notification"
+// notify --> sys : "Sends Delivery Status"
+
+// sys --> auth : "Validates User"
+// auth --> sys : "Returns Access Info"
+
+// user --> frontend : "Uses Interface"
+// frontend --> sys : "Calls APIs"
+
+// @enduml
+// ''';
 
   TextEditingController entityController = TextEditingController();
   TextEditingController interactionController = TextEditingController();
   late TextEditingController plantumlController;
   Timer? _debounce;
-  bool _isSystemEntity = false; // Toggle for entity type (person vs external system)
+  bool _isSystemEntity =
+      false; // Toggle for entity type (person vs external system)
 
   String? _imageUrl;
   bool _isLoading = true;
   String? _errorMessage;
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
+    final res = await loadPuml();
+    if (res['StatCode'] == 200) {
+      setState(() {
+        plantumlCode = res['body'];
+      });
+    } else {
+      print("Error loading PUML file: ${res['StatCode']}");
+    }
+
     plantumlController = TextEditingController(text: plantumlCode);
     plantumlController.addListener(() {
       if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -129,7 +160,8 @@ frontend --> sys : "Calls APIs"
     if (!newCode.startsWith('@startuml') || !newCode.endsWith('@enduml')) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('PlantUML code must start with @startuml and end with @enduml'),
+          content: Text(
+              'PlantUML code must start with @startuml and end with @enduml'),
         ),
       );
       return;
@@ -175,9 +207,8 @@ frontend --> sys : "Calls APIs"
 
     setState(() {
       // Default to labeled arrow if no label is provided
-      final formattedInteraction = interaction.contains(':') 
-          ? interaction 
-          : '$interaction : "Data"';
+      final formattedInteraction =
+          interaction.contains(':') ? interaction : '$interaction : "Data"';
       plantumlCode = plantumlCode.replaceFirst(
         '@enduml',
         '$formattedInteraction\n@enduml',

@@ -8,7 +8,11 @@ class DiagramsMenu extends StatelessWidget {
       'diagramName': 'use_case',
       'icon': Icons.account_tree
     },
-    {'name': 'Sequence Diagram', 'diagramName': 'seq', 'icon': Icons.timeline},
+    {
+      'name': 'Sequence Diagram',
+      'diagramName': 'sequence',
+      'icon': Icons.timeline
+    },
     {
       'name': 'Database Schema',
       'diagramName': 'database',

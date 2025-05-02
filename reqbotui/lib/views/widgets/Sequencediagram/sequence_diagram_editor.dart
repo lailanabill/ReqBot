@@ -11,30 +11,47 @@ class SequenceDiagramEditor extends StatefulWidget {
 }
 
 class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
+  Future<Map<String, dynamic>> loadPuml() async {
+    final url =
+        "https://storage.googleapis.com/diagrams-data/umls/sequence_diagram_5.puml";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return {'body': response.body, 'StatCode': response.statusCode};
+    } else {
+      throw Exception("Failed to load PUML file: ${response.statusCode}");
+    }
+  }
+
+  String _plantUmlCode = """
+
+""";
+
   bool _isLoading = true;
   String? _imageUrl;
   String? _errorMessage;
 
-  String _plantUmlCode = '''@startuml
-actor "User" as User
-participant "Task Management System" as System
-participant "Database" as Database
-participant "Notification Service" as Notify
+//   String _plantUmlCode = '''@startuml
+// actor "User" as User
+// participant "Task Management System" as System
+// participant "Database" as Database
+// participant "Notification Service" as Notify
 
-User -> System: Create Task
-System -> Database: Insert Task Data
-Database --> System: Task Created
+// User -> System: Create Task
+// System -> Database: Insert Task Data
+// Database --> System: Task Created
 
-User -> System: Assign Task to User(s)
-System -> Database: Update Task Assignees
-Database --> System: Assignment Confirmed
+// User -> System: Assign Task to User(s)
+// System -> Database: Update Task Assignees
+// Database --> System: Assignment Confirmed
 
-System -> Notify: Trigger Assignment Notification
-Notify --> System: Notification Sent
+// System -> Notify: Trigger Assignment Notification
+// Notify --> System: Notification Sent
 
-System --> User: Task Assigned & Notified
+// System --> User: Task Assigned & Notified
 
-@enduml''';
+// @enduml''';
 
   List<String> _lifelines = ['User', 'System', 'Database'];
   String _selectedLifeline = 'User';
@@ -52,10 +69,22 @@ System --> User: Task Assigned & Notified
       TextEditingController();
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
     _loadDiagram();
     _extractExistingMessages();
+    final res = await loadPuml();
+    if (res['StatCode'] == 200) {
+      setState(() {
+        _plantUmlCode = res['body'];
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _errorMessage = 'Failed to load PUML file: ${res['StatCode']}';
+        _isLoading = false;
+      });
+    }
   }
 
   @override

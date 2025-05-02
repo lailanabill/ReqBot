@@ -14,74 +14,98 @@ class DatabaseSchemaEditor extends StatefulWidget {
 }
 
 class _DatabaseSchemaEditorState extends State<DatabaseSchemaEditor> {
-  String plantumlCode = '''
-@startuml
-entity "Users" {
-  *id : INT <<PK>>
-  --
-  name : VARCHAR(100)
-  email : VARCHAR(100)
-  is_active : BOOLEAN
-}
+  Future<Map<String, dynamic>> loadPuml() async {
+    final url =
+        "https://storage.googleapis.com/diagrams-data/umls/database_diagram_5.puml";
 
-entity "Tasks" {
-  *task_id : INT <<PK>>
-  --
-  title : VARCHAR(255)
-  description : TEXT
-  deadline : DATETIME
-  priority : VARCHAR(20)
-  status : VARCHAR(20)
-  created_by : INT <<FK>>
-}
+    final response = await http.get(Uri.parse(url));
 
-entity "Task_Assignees" {
-  *id : INT <<PK>>
-  --
-  task_id : INT <<FK>>
-  user_id : INT <<FK>>
-}
+    if (response.statusCode == 200) {
+      return {'body': response.body, 'StatCode': response.statusCode};
+    } else {
+      throw Exception("Failed to load PUML file: ${response.statusCode}");
+    }
+  }
 
-entity "Notifications" {
-  *notification_id : INT <<PK>>
-  --
-  user_id : INT <<FK>>
-  content : TEXT
-  is_read : BOOLEAN
-  timestamp : DATETIME
-}
+  String plantumlCode = """
 
-entity "Preferences" {
-  *id : INT <<PK>>
-  --
-  user_id : INT <<FK>>
-  push_enabled : BOOLEAN
-  daily_summary : BOOLEAN
-  dark_mode : BOOLEAN
-}
+""";
+//   String plantumlCode = '''
+// @startuml
+// entity "Users" {
+//   *id : INT <<PK>>
+//   --
+//   name : VARCHAR(100)
+//   email : VARCHAR(100)
+//   is_active : BOOLEAN
+// }
 
-entity "Language_Settings" {
-  *id : INT <<PK>>
-  --
-  user_id : INT <<FK>>
-  language_code : VARCHAR(10)
-}
+// entity "Tasks" {
+//   *task_id : INT <<PK>>
+//   --
+//   title : VARCHAR(255)
+//   description : TEXT
+//   deadline : DATETIME
+//   priority : VARCHAR(20)
+//   status : VARCHAR(20)
+//   created_by : INT <<FK>>
+// }
 
-Users ||--o{ Tasks : creates
-Users ||--o{ Task_Assignees : assigned
-Tasks ||--o{ Task_Assignees
-Users ||--o{ Notifications : receives
-Users ||--|| Preferences : has
-Users ||--|| Language_Settings : uses
-@enduml
-''';
+// entity "Task_Assignees" {
+//   *id : INT <<PK>>
+//   --
+//   task_id : INT <<FK>>
+//   user_id : INT <<FK>>
+// }
+
+// entity "Notifications" {
+//   *notification_id : INT <<PK>>
+//   --
+//   user_id : INT <<FK>>
+//   content : TEXT
+//   is_read : BOOLEAN
+//   timestamp : DATETIME
+// }
+
+// entity "Preferences" {
+//   *id : INT <<PK>>
+//   --
+//   user_id : INT <<FK>>
+//   push_enabled : BOOLEAN
+//   daily_summary : BOOLEAN
+//   dark_mode : BOOLEAN
+// }
+
+// entity "Language_Settings" {
+//   *id : INT <<PK>>
+//   --
+//   user_id : INT <<FK>>
+//   language_code : VARCHAR(10)
+// }
+
+// Users ||--o{ Tasks : creates
+// Users ||--o{ Task_Assignees : assigned
+// Tasks ||--o{ Task_Assignees
+// Users ||--o{ Notifications : receives
+// Users ||--|| Preferences : has
+// Users ||--|| Language_Settings : uses
+// @enduml
+// ''';
 
   String? _previousPlantumlCode;
   late TextEditingController _plantumlController;
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
+    final res = await loadPuml();
+    if (res['StatCode'] == 200) {
+      setState(() {
+        plantumlCode = res['body'];
+      });
+    } else {
+      print("Error loading PUML file: ${res['StatCode']}");
+    }
     _plantumlController = TextEditingController(text: plantumlCode);
     _previousPlantumlCode = plantumlCode;
   }
@@ -136,7 +160,8 @@ Users ||--|| Language_Settings : uses
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                          const Icon(Icons.broken_image,
+                              size: 64, color: Colors.grey),
                           const SizedBox(height: 16),
                           Text('Failed to load image: $error'),
                           const SizedBox(height: 16),

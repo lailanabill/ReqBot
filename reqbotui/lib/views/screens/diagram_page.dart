@@ -27,12 +27,18 @@ class DiagramPage extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            Image.asset(
-              'assets/images/${dgrnam}_diagram_4.png',
+            // Image.asset(
+            //   'assets/images/${dgrnam}_diagram_4.png',
+            //   width: screenWidth * 0.8,
+            //   height: screenHeight * 0.6,
+            //   fit: BoxFit.contain,
+            // ),
+            Image.network(
+              "https://storage.googleapis.com/diagrams-data/images/${dgrnam}_diagram_5.png",
               width: screenWidth * 0.8,
               height: screenHeight * 0.6,
               fit: BoxFit.contain,
-            ),
+            )
           ],
         ),
       ),
