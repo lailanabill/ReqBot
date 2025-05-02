@@ -1,0 +1,19 @@
+# if __name__ == "__main__":
+#     # Example usage
+#     description = """
+# Meeting Transcript: University Course Registration System Discussion
+
+# Team Lead (Alex): Okay, team, today we're discussing the University Course Registration System we're building. It's meant to streamline how students register for courses at the university, so let's map out the key classes and their interactions.
+
+# Developer (Sam): We'll need classes for Students, Courses, Faculty, and Registration.
+
+# Team Lead (Alex): Exactly. Students will have attributes like student ID, name, and enrolled courses. They'll be able to register for courses, view their schedule, and check prerequisites.
+
+# Analyst (Jordan): Courses should have details like course code, title, description, and capacity. Faculty members will manage courses, set prerequisites, and view student enrollments.
+
+# Designer (Priya): We'll need a Registration class to handle the registration process, tracking which students are enrolled in which courses, managing waitlists, and handling course capacity.
+
+# Team Lead (Alex): Great points. We should also consider how we'll handle academic records, prerequisites, and potential conflicts in course scheduling.
+# """
+#     pid = 1  # Example process ID
+#     ClassDiagramDriver(description, pid)

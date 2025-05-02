@@ -1,0 +1,36 @@
+
+
+
+
+
+
+
+<br><br>
+just requirements extracted and we will calssify temp 0 top_p 1 3rd almost good
+<br><br>
+
+
+
+<br><br>
+ requirements extracted  temp 0 top_p 1 top_k 1 seed 42 new prompt telling it to give same output is same input 
+<br><br>
+
+"Here are the requirements extracted from the meeting transcript:<br><br>**Functional Requirements:**<br><br>1) The task management module should allow creating, editing, and deleting tasks.<br>2) The task management API should include endpoints for assigning tasks to multiple users and tracking deadlines.<br>3) The task list UI should display filtering options by date, priority, and status.<br>4) Task actions should be converted to modals for better UX consistency.<br>5) A safeguard is needed to prevent bypassing the confirmation prompt during bulk delete action.<br>6) Assigning a task to a deactivated user should not trigger any validation.<br>7) The system should allow users to assign tasks to multiple users and include deadline tracking.<br>8) The notification center should display archived notifications unless marked as important.<br>9) The system should support dark mode by next release.<br><br>**Non-Functional Requirements:**<br><br>1) The task management API should have modular and reusable code for error handling.<br>2) The notification system should not disappear too quickly, especially on slower machines.<br>3) The system should prioritize user preferences to toggle push notifications, daily summaries, and activity alerts.<br>4) The notifications endpoint should include pagination and lazy loading for users with thousands of notifications.<br>5) The system should have a way to retrieve archived notifications if needed.<br>6) All strings for the task and notification modules should be externalized and ready for translation.<br><br>Let me know if you'd like me to rephrase or clarify any of these requirements!<br><br>"
+
+
+
+<br><br>
+ requirements extracted  temp 0 top_p 1 top_k 1 seed 42 new prompt telling it to give same output is same input second
+<br><br> 
+
+
+'Functional Requirements:<br><br>1) The system shall allow users to create, edit, and delete tasks.<br>2) The system shall enable assigning tasks to multiple users with deadline tracking.<br>3) The task list UI shall display a list of tasks with filtering options by date, priority, and status.<br>4) Task actions shall be converted to modals for better UX consistency.<br>5) The system shall allow users to assign tasks to others, excluding deactivated accounts from the assignment dropdown.<br>6) The system shall provide bulk delete action with a confirmation prompt that awaits user input.<br>7) Users shall receive notifications for due tasks via push notifications and in-app messages, with options to toggle and customize notification preferences.<br><br>Non-Functional Requirements:<br><br>1) The system shall maintain performance by implementing pagination and lazy loading on the notifications endpoint.<br>2) The system shall ensure security by excluding deactivated accounts from the assignment API response and providing a safeguard against bypassing the confirmation prompt for bulk delete action.<br>3) The system shall be scalable by adding an "Archived" tab in the notification center to store older notifications.<br>4) The system shall prioritize usability by standardizing confirmation prompts with the new modal component, awaiting explicit user input.<br>5) The system shall maintain reliability by implementing a filter to exclude deactivated accounts from the assignment API response and ensuring toast notifications do not disappear too quickly.<br><br>Note: Some requirements may overlap between functional and non-functional categories, but I have categorized them based on their primary focus.<br><br>'
+
+
+<br><br>
+ requirements extracted  temp 0 top_p 1 top_k 1 seed 42 new prompt telling it to give same output is same input try re run if yes e3tmeddddd
+<br><br> 
+
+
+
+'Here are the extracted requirements:<br><br>Functional Requirements:<br>1) Create, edit, and delete tasks via API endpoints.<br>2) Assign tasks to multiple users with deadline tracking.<br>3) Implement task filtering by date, priority, and status in the UI.<br>4) Render assigned users\' avatars dynamically when there are more than five users on one task.<br>5) Convert all task actions to modals for better UX consistency.<br>6) Implement bulk delete action with confirmation prompt.<br>7) Prevent assigning tasks to deactivated users.<br>8) Allow push notifications for due tasks and in-app messages for stored notifications.<br>9) Provide user preferences for toggling push notifications, daily summaries, and activity alerts.<br>10) Support pagination and lazy loading on the notifications endpoint.<br>11) Auto-archive older notifications after 30 days unless marked as important.<br>12) Include an "Archived" tab in the notification center.<br>13) Externalize strings for task and notification modules for translation.<br>14) Add language headers to API responses for localized error messages.<br>15) Support dark mode by next release.<br><br>Non-Functional Requirements:<br>1) Standardize confirmation prompts using a new modal component and await explicit user confirmation.<br>2) Reduce inconsistencies across different modules by standardizing confirmation prompts.<br>3) Improve performance for users with thousands of notifications through pagination, lazy loading, and auto-archiving older notifications.<br>4) Ensure that toast notifications are visible for an adequate amount of time before disappearing, especially on slower machines.<br><br>'
