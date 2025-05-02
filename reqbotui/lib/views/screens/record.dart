@@ -9,6 +9,8 @@ import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:reqbot/views/screens/home_screen.dart';
+import 'package:reqbot/views/screens/waiting.dart';
 
 import 'dart:convert';
 
@@ -27,11 +29,12 @@ class _RecordState extends State<Record> {
   // final RecordController _controller = RecordController();
   String _transcription = '';
   String req_sumURI =
-      "https://server-nd-1016128810332.us-central1.run.app/reqsneww/";
+      "https://running-server-1016128810332.us-central1.run.app/reqsneww/";
   String sumURI =
-      "https://server-nd-1016128810332.us-central1.run.app/summarize/";
+      "https://running-server-1016128810332.us-central1.run.app/summarize/";
   String diagramsURI =
-      "https://server-nd-1016128810332.us-central1.run.app/diagrams/";
+      "https://running-server-1016128810332.us-central1.run.app/diagrams/";
+  bool _uploaded = false;
 
   // bool _isListening = false;
 
@@ -52,7 +55,7 @@ class _RecordState extends State<Record> {
     //   if (result != null) {
     //     File file = File(result.files.single.path!);
     //     var request = http.MultipartRequest(
-    //         'POST', Uri.parse('https://server-nd-1016128810332.us-central1.run.app/whisper/'));
+    //         'POST', Uri.parse('https://running-server-1016128810332.us-central1.run.app/whisper/'));
     //     request.files.add(await http.MultipartFile.fromPath('file', file.path));
     //     var response = await request.send();
     //     if (response.statusCode == 200) {
@@ -81,7 +84,7 @@ class _RecordState extends State<Record> {
           final bytes = reader.result as List<int>;
 
           var uri = Uri.parse(
-              'https://server-nd-1016128810332.us-central1.run.app/whisper/');
+              'https://running-server-1016128810332.us-central1.run.app/whisper/');
           var request = http.MultipartRequest('POST', uri);
           request.files.add(http.MultipartFile.fromBytes(
             'file',
@@ -95,6 +98,7 @@ class _RecordState extends State<Record> {
           if (responseData.statusCode == 200) {
             var transcription = jsonDecode(responseData.body)['transcription'];
             _updateTranscription(transcription);
+            _uploaded = true;
             // _getTransciptSummary(context.read()<DataProvider>().transcript);
           } else {
             print("Upload failed: ${responseData.statusCode}");
@@ -104,24 +108,32 @@ class _RecordState extends State<Record> {
     });
   }
 
-  Future<void> _getTransciptSummary(String WhisperTranscript) async {
+  Future<void> _Diagrams(String Trans) async {
     var DiagramsURI = Uri.parse(diagramsURI);
     // final pid = await Supabase.instance.client
     //     .from('projects')
     //     .select("id")
     //     .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
     //     .single();
-    final diagramsBody =
-        jsonEncode({'transcription': _transcription, 'pid': 5});
+
+    //diagrams call
+    final diagramsBody = jsonEncode({'transcription': Trans, 'pid': 5});
     var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
     if (DiagramsRequest.statusCode == 200) {
       print('success ya gello');
+      print(DiagramsRequest.body);
+      context.read<UserDataProvider>().setClickability(true);
     } else {
       print("Server error: ${DiagramsRequest.statusCode}");
       print("Error body: ${DiagramsRequest.body}");
     }
+  }
+
+  Future<void> _getTransciptSummary(String WhisperTranscript) async {
+    //diagrams call
+
     var SumURI = Uri.parse(sumURI);
-    // var DiagramsURI = Uri.parse(diagramsURI);
+
     final body = jsonEncode({
       "text": WhisperTranscript,
     });
@@ -129,19 +141,19 @@ class _RecordState extends State<Record> {
       var SumRequest = await http.post(SumURI, body: body);
       if (SumRequest.statusCode == 200) {
         final responseData = jsonDecode(SumRequest.body);
-        print("Summary: ${responseData['summary']}");
+        // print("Summary: ${responseData['summary']}");
         context.read<DataProvider>().setSummary(responseData['summary']);
         // call to reqs func
         _getRrequirements(WhisperTranscript, responseData['summary']);
         // call to diagrams
-        final diagramsBody = {'transcription': responseData['summary']};
-        var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
-        if (DiagramsRequest.statusCode == 200) {
-          print('success');
-        } else {
-          print("Server error: ${DiagramsRequest.statusCode}");
-          print("Error body: ${DiagramsRequest.body}");
-        }
+        // final diagramsBody = {'transcription': responseData['summary']};
+        // var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
+        // if (DiagramsRequest.statusCode == 200) {
+        //   print('success');
+        // } else {
+        //   print("Server error: ${DiagramsRequest.statusCode}");
+        //   print("Error body: ${DiagramsRequest.body}");
+        // }
       } else {
         print("Server error: ${SumRequest.statusCode}");
         print("Error body: ${SumRequest.body}");
@@ -163,8 +175,9 @@ class _RecordState extends State<Record> {
       var ReqSumRequest = await http.post(ReqSumURI, body: body);
       if (ReqSumRequest.statusCode == 200) {
         final responseData = jsonDecode(ReqSumRequest.body);
-        print("Requirements: ${responseData['reqs']}");
+        // print("Requirements: ${responseData['reqs']}");
         context.read<DataProvider>().setRequirements(responseData['reqs']);
+        _Diagrams(WhisperTranscript);
       } else {
         print("Server error: ${ReqSumRequest.statusCode}");
         print("Error body: ${ReqSumRequest.body}");
@@ -224,14 +237,17 @@ class _RecordState extends State<Record> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => RequirementsMenuScreen()),
-                // );
-                _getTransciptSummary(_transcription);
-              },
+              onPressed: _uploaded
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProcessingScreen(
+                                transcription: _transcription)),
+                      );
+                      _getTransciptSummary(_transcription);
+                    }
+                  : null,
               child: Text('Next'),
             ),
             // ElevatedButton(
@@ -290,39 +306,39 @@ class _RecordState extends State<Record> {
             //   },
             //   child: Text('requirements'),
             // ),
-            ElevatedButton(
-              onPressed: () async {
-                var DiagramsURI = Uri.parse(diagramsURI);
-                // final pid = await Supabase.instance.client
-                //     .from('projects')
-                //     .select("id")
-                //     .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
-                //     .single();
-                final diagramsBody =
-                    jsonEncode({'transcription': _transcription, 'pid': 5});
-                var DiagramsRequest =
-                    await http.post(DiagramsURI, body: diagramsBody);
-                if (DiagramsRequest.statusCode == 200) {
-                  print('success ya gello');
-                } else {
-                  print("Server error: ${DiagramsRequest.statusCode}");
-                  print("Error body: ${DiagramsRequest.body}");
-                }
-                // // Navigator.push(
-                // //   context,
-                // //   MaterialPageRoute(
-                // //       builder: (context) => RequirementsMenuScreen()),
-                // // );
-                // final sumprov = context.read<DataProvider>().summary;
-                // final transprov = context.read<DataProvider>().transcript;
-                // final reqprov = context.read<DataProvider>().requirements;
-                // // _getTransciptSummary(_transcription);
-                // print("provv  Summary: $sumprov");
-                // print("provv  Transcript: $transprov");
-                // print("provv  Requirements: $reqprov");
-              },
-              child: Text('diagrams'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () async {
+            //     var DiagramsURI = Uri.parse(diagramsURI);
+            // final pid = await Supabase.instance.client
+            //     .from('projects')
+            //     .select("id")
+            //     .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
+            //     .single();
+            // final diagramsBody =
+            //     jsonEncode({'transcription': _transcription, 'pid': 5});
+            // var DiagramsRequest =
+            //     await http.post(DiagramsURI, body: diagramsBody);
+            // if (DiagramsRequest.statusCode == 200) {
+            //   print('success ya gello');
+            // } else {
+            //   print("Server error: ${DiagramsRequest.statusCode}");
+            //   print("Error body: ${DiagramsRequest.body}");
+            // }
+            // // Navigator.push(
+            // //   context,
+            // //   MaterialPageRoute(
+            // //       builder: (context) => RequirementsMenuScreen()),
+            // // );
+            // final sumprov = context.read<DataProvider>().summary;
+            // final transprov = context.read<DataProvider>().transcript;
+            // final reqprov = context.read<DataProvider>().requirements;
+            // // _getTransciptSummary(_transcription);
+            // print("provv  Summary: $sumprov");
+            // print("provv  Transcript: $transprov");
+            // print("provv  Requirements: $reqprov");
+            //   },
+            //   child: Text('diagrams'),
+            // ),
           ],
         ),
       ),
