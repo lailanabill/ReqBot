@@ -14,6 +14,8 @@ import 'dart:convert';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../services/providers/userProvider.dart';
+
 class Record extends StatefulWidget {
   const Record({super.key});
 
@@ -24,9 +26,12 @@ class Record extends StatefulWidget {
 class _RecordState extends State<Record> {
   // final RecordController _controller = RecordController();
   String _transcription = '';
-  String req_sumURI = "http://192.168.1.3:8080/reqsneww/";
-  String sumURI = "http://192.168.1.3:8080/summarize/";
-  String diagramsURI = "http://192.168.1.3:8080/diagrams/";
+  String req_sumURI =
+      "https://server-nd-1016128810332.us-central1.run.app/reqsneww/";
+  String sumURI =
+      "https://server-nd-1016128810332.us-central1.run.app/summarize/";
+  String diagramsURI =
+      "https://server-nd-1016128810332.us-central1.run.app/diagrams/";
 
   // bool _isListening = false;
 
@@ -47,7 +52,7 @@ class _RecordState extends State<Record> {
     //   if (result != null) {
     //     File file = File(result.files.single.path!);
     //     var request = http.MultipartRequest(
-    //         'POST', Uri.parse('http://192.168.1.4:8080/whisper/'));
+    //         'POST', Uri.parse('https://server-nd-1016128810332.us-central1.run.app/whisper/'));
     //     request.files.add(await http.MultipartFile.fromPath('file', file.path));
     //     var response = await request.send();
     //     if (response.statusCode == 200) {
@@ -75,7 +80,8 @@ class _RecordState extends State<Record> {
         reader.onLoadEnd.listen((e) async {
           final bytes = reader.result as List<int>;
 
-          var uri = Uri.parse('http://192.168.1.3:8080/whisper/');
+          var uri = Uri.parse(
+              'https://server-nd-1016128810332.us-central1.run.app/whisper/');
           var request = http.MultipartRequest('POST', uri);
           request.files.add(http.MultipartFile.fromBytes(
             'file',
@@ -99,6 +105,21 @@ class _RecordState extends State<Record> {
   }
 
   Future<void> _getTransciptSummary(String WhisperTranscript) async {
+    var DiagramsURI = Uri.parse(diagramsURI);
+    // final pid = await Supabase.instance.client
+    //     .from('projects')
+    //     .select("id")
+    //     .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
+    //     .single();
+    final diagramsBody =
+        jsonEncode({'transcription': _transcription, 'pid': 5});
+    var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
+    if (DiagramsRequest.statusCode == 200) {
+      print('success ya gello');
+    } else {
+      print("Server error: ${DiagramsRequest.statusCode}");
+      print("Error body: ${DiagramsRequest.body}");
+    }
     var SumURI = Uri.parse(sumURI);
     // var DiagramsURI = Uri.parse(diagramsURI);
     final body = jsonEncode({
@@ -111,16 +132,16 @@ class _RecordState extends State<Record> {
         print("Summary: ${responseData['summary']}");
         context.read<DataProvider>().setSummary(responseData['summary']);
         // call to reqs func
-        // _getRrequirements(WhisperTranscript, responseData['summary']);
+        _getRrequirements(WhisperTranscript, responseData['summary']);
         // call to diagrams
-        // final diagramsBody = {'transcription': responseData['summary']};
-        // var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
-        // if (DiagramsRequest.statusCode == 200) {
-        //   print('success');
-        // } else {
-        //   print("Server error: ${DiagramsRequest.statusCode}");
-        //   print("Error body: ${DiagramsRequest.body}");
-        // }
+        final diagramsBody = {'transcription': responseData['summary']};
+        var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
+        if (DiagramsRequest.statusCode == 200) {
+          print('success');
+        } else {
+          print("Server error: ${DiagramsRequest.statusCode}");
+          print("Error body: ${DiagramsRequest.body}");
+        }
       } else {
         print("Server error: ${SumRequest.statusCode}");
         print("Error body: ${SumRequest.body}");
@@ -213,68 +234,72 @@ class _RecordState extends State<Record> {
               },
               child: Text('Next'),
             ),
-            ElevatedButton(
-              onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => RequirementsMenuScreen()),
-                // );
-                final sumprov = context.read<DataProvider>().summary;
-                final transprov = context.read<DataProvider>().transcript;
-                final reqprov = context.read<DataProvider>().requirements;
-                // _getTransciptSummary(_transcription);
-                print("provv  Summary: $sumprov");
-                print("provv  Transcript: $transprov");
-                print("provv  Requirements: $reqprov");
-              },
-              child: Text('Printer'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // // Navigator.push(
-                // //   context,
-                // //   MaterialPageRoute(
-                // //       builder: (context) => RequirementsMenuScreen()),
-                // // );
-                // final sumprov = context.read<DataProvider>().summary;
-                // final transprov = context.read<DataProvider>().transcript;
-                // final reqprov = context.read<DataProvider>().requirements;
-                // // _getTransciptSummary(_transcription);
-                // print("provv  Summary: $sumprov");
-                // print("provv  Transcript: $transprov");
-                // print("provv  Requirements: $reqprov");
-                print('1 from tran sum');
-                _getTransciptSummary(_transcription);
-                print('2 from tran sum');
-              },
-              child: Text('tarnscropy summary'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // // Navigator.push(
-                // //   context,
-                // //   MaterialPageRoute(
-                // //       builder: (context) => RequirementsMenuScreen()),
-                // // );
-                // final sumprov = context.read<DataProvider>().summary;
-                // final transprov = context.read<DataProvider>().transcript;
-                // final reqprov = context.read<DataProvider>().requirements;
-                // // _getTransciptSummary(_transcription);
-                // print("provv  Summary: $sumprov");
-                // print("provv  Transcript: $transprov");
-                // print("provv  Requirements: $reqprov");
-                _getRrequirements(
-                    _transcription, context.read<DataProvider>().summary);
-              },
-              child: Text('requirements'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     // Navigator.push(
+            //     //   context,
+            //     //   MaterialPageRoute(
+            //     //       builder: (context) => RequirementsMenuScreen()),
+            //     // );
+            //     final sumprov = context.read<DataProvider>().summary;
+            //     final transprov = context.read<DataProvider>().transcript;
+            //     final reqprov = context.read<DataProvider>().requirements;
+            //     // _getTransciptSummary(_transcription);
+            //     print("provv  Summary: $sumprov");
+            //     print("provv  Transcript: $transprov");
+            //     print("provv  Requirements: $reqprov");
+            //   },
+            //   child: Text('Printer'),
+            // ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     // // Navigator.push(
+            //     // //   context,
+            //     // //   MaterialPageRoute(
+            //     // //       builder: (context) => RequirementsMenuScreen()),
+            //     // // );
+            //     // final sumprov = context.read<DataProvider>().summary;
+            //     // final transprov = context.read<DataProvider>().transcript;
+            //     // final reqprov = context.read<DataProvider>().requirements;
+            //     // // _getTransciptSummary(_transcription);
+            //     // print("provv  Summary: $sumprov");
+            //     // print("provv  Transcript: $transprov");
+            //     // print("provv  Requirements: $reqprov");
+            //     print('1 from tran sum');
+            //     _getTransciptSummary(_transcription);
+            //     print('2 from tran sum');
+            //   },
+            //   child: Text('tarnscropy summary'),
+            // ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     // // Navigator.push(
+            //     // //   context,
+            //     // //   MaterialPageRoute(
+            //     // //       builder: (context) => RequirementsMenuScreen()),
+            //     // // );
+            //     // final sumprov = context.read<DataProvider>().summary;
+            //     // final transprov = context.read<DataProvider>().transcript;
+            //     // final reqprov = context.read<DataProvider>().requirements;
+            //     // // _getTransciptSummary(_transcription);
+            //     // print("provv  Summary: $sumprov");
+            //     // print("provv  Transcript: $transprov");
+            //     // print("provv  Requirements: $reqprov");
+            //     _getRrequirements(
+            //         _transcription, context.read<DataProvider>().summary);
+            //   },
+            //   child: Text('requirements'),
+            // ),
             ElevatedButton(
               onPressed: () async {
                 var DiagramsURI = Uri.parse(diagramsURI);
-
+                // final pid = await Supabase.instance.client
+                //     .from('projects')
+                //     .select("id")
+                //     .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
+                //     .single();
                 final diagramsBody =
-                    jsonEncode({'transcription': _transcription});
+                    jsonEncode({'transcription': _transcription, 'pid': 5});
                 var DiagramsRequest =
                     await http.post(DiagramsURI, body: diagramsBody);
                 if (DiagramsRequest.statusCode == 200) {
