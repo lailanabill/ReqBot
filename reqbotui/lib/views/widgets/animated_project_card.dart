@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/favorites_provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 
 class AnimatedProjectCard extends StatelessWidget {
   final String projectName;
@@ -18,6 +20,7 @@ class AnimatedProjectCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoritesProvider>(context);
     final isFavorite = favoritesProvider.isFavorite(projectName);
+    final bool click = context.read<UserDataProvider>().Clickable;
 
     return TweenAnimationBuilder(
       duration: const Duration(milliseconds: 500),
@@ -38,7 +41,7 @@ class AnimatedProjectCard extends StatelessWidget {
               ),
               child: ListTile(
                 title: Text(projectName),
-                onTap: onTap,
+                onTap: click ? onTap : null,
                 trailing: IconButton(
                   icon: Icon(
                     isFavorite ? Icons.favorite : Icons.favorite_border,

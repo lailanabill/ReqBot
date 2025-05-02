@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'views/themes/light_theme.dart';
 import 'views/themes/dark_theme.dart';
 import 'views/widgets/app_routes.dart';
@@ -17,6 +18,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => DataProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserDataProvider(),
         ),
       ],
       child: const ReqBotApp(),

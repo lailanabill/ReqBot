@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:reqbot/controllers/home_controller.dart';
 import 'package:reqbot/models/project_model.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/ProjectToDB.dart';
+import 'package:reqbot/views/screens/diagramsmenu.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_action_buttons.dart';
 import '../widgets/animated_project_card.dart';
@@ -46,10 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
           .single();
 
       final clientid = analyid['analyzer_id'];
-      final response = await _supabase
-          .from('projects')
-          .select()
-          .eq('analyzer_id', clientid) as List;
+
+      final response =
+          await _supabase.from('projects').select().eq('analyzer_id', clientid);
       setState(() {
         _projects = response.map((p) => ProjectModel.fromMap(p)).toList();
       });
@@ -57,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error loading projects: $e")),
       );
+      print("Error loading projects: $e");
     }
   }
 
@@ -176,12 +178,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ProjectDetailsScreen(
-                                      projectId: project.id,
-                                      projectName: project.name,
-                                      transcription: project.transcription,
-                                    ),
-                                  ),
+                                      builder: (context) => DiagramsMenu()
+                                      // builder: (context) => ProjectDetailsScreen(
+                                      //   projectId: project.id,
+                                      //   projectName: project.name,
+                                      //   transcription: project.transcription,
+                                      // ),
+                                      ),
                                 ),
                               );
                             },
