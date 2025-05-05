@@ -4,7 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:reqbot/controllers/signin_controller.dart';
 import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
+ import '../widgets/auth_header.dart';
+ import '../widgets/custom_text_field.dart';
+ import '../widgets/gradient_button.dart';
+ import '../widgets/social_auth_buttons.dart';
+ import '../widgets/auth_navigation.dart';
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
@@ -151,7 +156,7 @@ class _SignInPageState extends State<SignInPage> {
             });
           },
           activeColor: Colors.white,
-          activeTrackColor: Colors.blue,
+          activeTrackColor: Color.fromARGB(255, 0, 54, 218),
           inactiveThumbColor: Colors.white,
           inactiveTrackColor: Colors.grey,
         ),
