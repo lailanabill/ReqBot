@@ -81,9 +81,9 @@ flutter:
     - assets/images/clock.png
     - assets/images/light-1.png
     - assets/images/light-2.png
-    - assets/images/Facebook.png
-    - assets/images/Google.png
-    - assets/images/Linkedin.png
+    # - assets/images/Facebook.png
+    # - assets/images/Google.png
+    # - assets/images/Linkedin.png
     # - assets/images/context_diagram.png
    # - assets/images/class_diagram_4.png
     # - assets/images/use_case_diagram.png
