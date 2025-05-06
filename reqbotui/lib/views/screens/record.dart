@@ -29,11 +29,11 @@ class _RecordState extends State<Record> {
   // final RecordController _controller = RecordController();
   String _transcription = '';
   String req_sumURI =
-      "https://running-server-1016128810332.us-central1.run.app/reqsneww/";
+      "https://final-land-1016128810332.us-central1.run.app/reqsneww/";
   String sumURI =
-      "https://running-server-1016128810332.us-central1.run.app/summarize/";
+      "https://final-land-1016128810332.us-central1.run.app/summarize/";
   String diagramsURI =
-      "https://running-server-1016128810332.us-central1.run.app/diagrams/";
+      "https://final-land-1016128810332.us-central1.run.app/diagrams/";
   bool _uploaded = false;
 
   // bool _isListening = false;
@@ -55,7 +55,7 @@ class _RecordState extends State<Record> {
     //   if (result != null) {
     //     File file = File(result.files.single.path!);
     //     var request = http.MultipartRequest(
-    //         'POST', Uri.parse('https://running-server-1016128810332.us-central1.run.app/whisper/'));
+    //         'POST', Uri.parse('https://final-land-1016128810332.us-central1.run.app/whisper/'));
     //     request.files.add(await http.MultipartFile.fromPath('file', file.path));
     //     var response = await request.send();
     //     if (response.statusCode == 200) {
@@ -84,7 +84,7 @@ class _RecordState extends State<Record> {
           final bytes = reader.result as List<int>;
 
           var uri = Uri.parse(
-              'https://running-server-1016128810332.us-central1.run.app/whisper/');
+              'https://final-land-1016128810332.us-central1.run.app/whisper/');
           var request = http.MultipartRequest('POST', uri);
           request.files.add(http.MultipartFile.fromBytes(
             'file',
@@ -92,16 +92,28 @@ class _RecordState extends State<Record> {
             filename: file.name,
             contentType: MediaType('audio', 'wav'),
           ));
-
+          print('1');
           var response = await request.send();
+          print('2');
           var responseData = await http.Response.fromStream(response);
+          print('3');
           if (responseData.statusCode == 200) {
+            print('4');
             var transcription = jsonDecode(responseData.body)['transcription'];
+            print('5');
             _updateTranscription(transcription);
+            print('6');
             _uploaded = true;
-            // _getTransciptSummary(context.read()<DataProvider>().transcript);
+            print('7');
+            print("success ya gello link");
+            print('8');
+            _getTransciptSummary(context.read<DataProvider>().transcript);
+            print('9');
           } else {
             print("Upload failed: ${responseData.statusCode}");
+            print("Error body: ${responseData.body}");
+            print("Error: ${responseData.reasonPhrase}");
+            print('error henaaa');
           }
         });
       }

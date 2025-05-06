@@ -549,12 +549,12 @@ IMPORTANT:
                 
             # Save JSON
 
-            os.makedirs("/tmp/jsons", exist_ok=True)
-            os.makedirs("/tmp/umls", exist_ok=True)
-            os.makedirs("/tmp/images", exist_ok=True)
-            json_path = f"/tmp/jsons/sequence_diagram_{pid}.json"
-            puml_path = f"/tmp/umls/sequence_diagram_{pid}.puml"
-            img_path = f"/tmp/images/sequence_diagram_{pid}.png"
+            os.makedirs("/jsons", exist_ok=True)
+            os.makedirs("/umls", exist_ok=True)
+            os.makedirs("/images", exist_ok=True)
+            json_path = f"/jsons/sequence_diagram_{pid}.json"
+            puml_path = f"/umls/sequence_diagram_{pid}.puml"
+            img_path = f"/images/sequence_diagram_{pid}.png"
             # json_file = f"{output_dir}jsons/seq_diagram_{pid}.json"
             # with open(json_file, 'w', encoding='utf-8') as f:
             #     json.dump(interactions_json, f, indent=2, ensure_ascii=False)
@@ -578,14 +578,14 @@ IMPORTANT:
             # Generate PNG diagram
             # png_file = f"{output_dir}images/seq_diagram_{pid}.png"
             # png_file = f"{output_prefix}.png"
-            png_success = self.generate_diagram_with_kroki(plantuml_code,pid ,img_path, output_dir="/tmp/images/")
+            png_success = self.generate_diagram_with_kroki(plantuml_code,pid ,img_path, output_dir="/images/")
             
             bucket_name = "diagrams-data"  # replace with your bucket
-            json_url = upload_to_gcs(bucket_name, json_path, f"jsons/sequence_diagram_{pid}.json")
-            puml_url = upload_to_gcs(bucket_name, puml_path, f"umls/sequence_diagram_{pid}.puml")
-            png_url = upload_to_gcs(bucket_name, img_path, f"images/sequence_diagram_{pid}.png")
+            upload_to_gcs(bucket_name, json_path, f"jsons/sequence_diagram_{pid}.json")
+            upload_to_gcs(bucket_name, puml_path, f"umls/sequence_diagram_{pid}.puml")
+            upload_to_gcs(bucket_name, img_path, f"images/sequence_diagram_{pid}.png")
             
-            return png_success , json_url, puml_url, png_url
+            return png_success 
         
 
 
@@ -593,7 +593,7 @@ IMPORTANT:
             
             
             
-            # generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/tmp/images/")
+            # generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/images/")
 
 
             
@@ -619,7 +619,7 @@ def SequenceDiagramDriver(desc,pid):
     transcript = desc
 
     # Use the complete workflow method
-    success,_,_,_ = generator.analyze_and_generate_diagrams(transcript,pid)
+    success = generator.analyze_and_generate_diagrams(transcript,pid)
     
     if success:
         print("sequence done")

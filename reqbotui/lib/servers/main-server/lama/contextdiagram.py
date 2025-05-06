@@ -742,18 +742,18 @@ def ContextDiagramDriver(desc,pid):
         
         # # Print results
         # print("context done")
-        os.makedirs("/tmp/jsons", exist_ok=True)
-        os.makedirs("/tmp/umls", exist_ok=True)
-        os.makedirs("/tmp/images", exist_ok=True)
-        json_path = f"/tmp/jsons/context_diagram_{pid}.json"
-        puml_path = f"/tmp/umls/context_diagram_{pid}.puml"
-        img_path = f"/tmp/images/context_diagram_{pid}.png"
+        os.makedirs("/jsons", exist_ok=True)
+        os.makedirs("/umls", exist_ok=True)
+        os.makedirs("/images", exist_ok=True)
+        json_path = f"/jsons/context_diagram_{pid}.json"
+        puml_path = f"/umls/context_diagram_{pid}.puml"
+        img_path = f"/images/context_diagram_{pid}.png"
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(context_json, f, indent=2, ensure_ascii=False)
         plantuml_code = generator.generate_plantuml(context_json)
         with open(puml_path, 'w', encoding='utf-8') as f:
             f.write(plantuml_code)
-        generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/tmp/images/")
+        generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/images/")
 
 
         bucket_name = "diagrams-data"  # replace with your bucket

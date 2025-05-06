@@ -344,12 +344,12 @@ def ClassDiagramDriver(desc,pid):
     
     if class_diagram_json:
         # Save JSON
-        os.makedirs("/tmp/jsons", exist_ok=True)
-        os.makedirs("/tmp/umls", exist_ok=True)
-        os.makedirs("/tmp/images", exist_ok=True)
-        json_path = f"/tmp/jsons/class_diagram_{pid}.json"
-        puml_path = f"/tmp/umls/class_diagram_{pid}.puml"
-        img_path = f"/tmp/images/class_diagram_{pid}.png"
+        os.makedirs("/jsons", exist_ok=True)
+        os.makedirs("/umls", exist_ok=True)
+        os.makedirs("/images", exist_ok=True)
+        json_path = f"/jsons/class_diagram_{pid}.json"
+        puml_path = f"/umls/class_diagram_{pid}.puml"
+        img_path = f"/images/class_diagram_{pid}.png"
 
 
         # with open(f"reqbotui/assets/jsons/class_diagram_{pid}.json", 'w', encoding='utf-8') as f:
@@ -369,7 +369,7 @@ def ClassDiagramDriver(desc,pid):
             # f.write(plantuml_code)
         
         # Generate diagram using Kroki
-        generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/tmp/images/")
+        generator.generate_diagram_with_kroki(plantuml_code,pid, output_dir="/images/")
         
         # Print results
         # Upload to GCS
