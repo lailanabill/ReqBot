@@ -29,11 +29,11 @@ class _RecordState extends State<Record> {
   // final RecordController _controller = RecordController();
   String _transcription = '';
   String req_sumURI =
-      "https://final-land-1016128810332.us-central1.run.app/reqsneww/";
+      "https://server-final-1016128810332.us-central1.run.app/reqsneww/";
   String sumURI =
-      "https://final-land-1016128810332.us-central1.run.app/summarize/";
+      "https://server-final-1016128810332.us-central1.run.app/summarize/";
   String diagramsURI =
-      "https://final-land-1016128810332.us-central1.run.app/diagrams/";
+      "https://server-final-1016128810332.us-central1.run.app/diagrams/";
   bool _uploaded = false;
 
   // bool _isListening = false;
@@ -55,7 +55,7 @@ class _RecordState extends State<Record> {
     //   if (result != null) {
     //     File file = File(result.files.single.path!);
     //     var request = http.MultipartRequest(
-    //         'POST', Uri.parse('https://final-land-1016128810332.us-central1.run.app/whisper/'));
+    //         'POST', Uri.parse('https://server-final-1016128810332.us-central1.run.app/whisper/'));
     //     request.files.add(await http.MultipartFile.fromPath('file', file.path));
     //     var response = await request.send();
     //     if (response.statusCode == 200) {
@@ -84,7 +84,7 @@ class _RecordState extends State<Record> {
           final bytes = reader.result as List<int>;
 
           var uri = Uri.parse(
-              'https://final-land-1016128810332.us-central1.run.app/whisper/');
+              'https://server-final-1016128810332.us-central1.run.app/whisper/');
           var request = http.MultipartRequest('POST', uri);
           request.files.add(http.MultipartFile.fromBytes(
             'file',
