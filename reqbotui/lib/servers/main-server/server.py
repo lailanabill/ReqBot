@@ -101,20 +101,16 @@ async def transcribe_audio(file: UploadFile = File(...)):
 
         input={
         
-        "audio_file": audio_file_replicate,
-        "debug": False,
-        "vad_onset": 0.5,
-        "batch_size": 8,
-        "vad_offset": 0.363,
-        "diarization": False,
-        "temperature": 0,
-        "align_output": False,
-        "language_detection_min_prob": 0,
-        "language_detection_max_tries": 5,
+        "file": audio_file_replicate,
+        "prompt": "LLama, AI, Meta.",
+        "file_url": "",
+        "language": "en",
+        "translate": False,
+        "group_segments": True
     }
 
         output = replicate.run(
-    "victor-upmeet/whisperx:84d2ad2d6194fe98a17d2b60bef1c7f910c46b2f6fd38996ca457afd9c8abfcb",
+    "thomasmol/whisper-diarization:1495a9cddc83b2203b0d8d3516e38b80fd1572ebc4bc5700ac1da56a9b3ed886",
     input=input,
 )
 
