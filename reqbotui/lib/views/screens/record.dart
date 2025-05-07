@@ -29,11 +29,11 @@ class _RecordState extends State<Record> {
   // final RecordController _controller = RecordController();
   String _transcription = '';
   String req_sumURI =
-      "https://server-final-1016128810332.us-central1.run.app/reqsneww/";
+      "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
   String sumURI =
-      "https://server-final-1016128810332.us-central1.run.app/summarize/";
+      "https://main-server-last-1016128810332.us-central1.run.app/summarize/";
   String diagramsURI =
-      "https://server-final-1016128810332.us-central1.run.app/diagrams/";
+      "https://main-server-last-1016128810332.us-central1.run.app/diagrams/";
   bool _uploaded = false;
 
   // bool _isListening = false;
@@ -55,7 +55,7 @@ class _RecordState extends State<Record> {
     //   if (result != null) {
     //     File file = File(result.files.single.path!);
     //     var request = http.MultipartRequest(
-    //         'POST', Uri.parse('https://server-final-1016128810332.us-central1.run.app/whisper/'));
+    //         'POST', Uri.parse('https://main-server-last-1016128810332.us-central1.run.app/whisper/'));
     //     request.files.add(await http.MultipartFile.fromPath('file', file.path));
     //     var response = await request.send();
     //     if (response.statusCode == 200) {
@@ -84,7 +84,7 @@ class _RecordState extends State<Record> {
           final bytes = reader.result as List<int>;
 
           var uri = Uri.parse(
-              'https://server-final-1016128810332.us-central1.run.app/whisper/');
+              'https://main-server-last-1016128810332.us-central1.run.app/whisper/');
           var request = http.MultipartRequest('POST', uri);
           request.files.add(http.MultipartFile.fromBytes(
             'file',
@@ -92,23 +92,23 @@ class _RecordState extends State<Record> {
             filename: file.name,
             contentType: MediaType('audio', 'wav'),
           ));
-          print('1');
+          // print('1');
           var response = await request.send();
-          print('2');
+          // print('2');
           var responseData = await http.Response.fromStream(response);
-          print('3');
+          // print('3');
           if (responseData.statusCode == 200) {
-            print('4');
+            // print('4');
             var transcription = jsonDecode(responseData.body)['transcription'];
-            print('5');
+            // print('5');
             _updateTranscription(transcription);
-            print('6');
+            // print('6');
             _uploaded = true;
-            print('7');
+            // print('7');
             print("success ya gello link");
-            print('8');
-            _getTransciptSummary(context.read<DataProvider>().transcript);
-            print('9');
+            // print('8');
+            // _getTransciptSummary(context.read<DataProvider>().transcript);
+            // print('9');
           } else {
             print("Upload failed: ${responseData.statusCode}");
             print("Error body: ${responseData.body}");
@@ -122,14 +122,10 @@ class _RecordState extends State<Record> {
 
   Future<void> _Diagrams(String Trans) async {
     var DiagramsURI = Uri.parse(diagramsURI);
-    // final pid = await Supabase.instance.client
-    //     .from('projects')
-    //     .select("id")
-    //     .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
-    //     .single();
 
     //diagrams call
-    final diagramsBody = jsonEncode({'transcription': Trans, 'pid': 5});
+    print("alo diagrams: ${Trans}");
+    final diagramsBody = jsonEncode({'transcript': Trans, 'pid': 5});
     var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
     if (DiagramsRequest.statusCode == 200) {
       print('success ya gello');
@@ -144,6 +140,7 @@ class _RecordState extends State<Record> {
   Future<void> _getTransciptSummary(String WhisperTranscript) async {
     //diagrams call
 
+    print("alo : ${WhisperTranscript}");
     var SumURI = Uri.parse(sumURI);
 
     final body = jsonEncode({
@@ -178,7 +175,7 @@ class _RecordState extends State<Record> {
   Future<void> _getRrequirements(
       String WhisperTranscript, String SummaryText) async {
     var ReqSumURI = Uri.parse(req_sumURI);
-
+    print("alo reqq: ${WhisperTranscript}");
     final body = jsonEncode({
       "summ": SummaryText,
       "orig": WhisperTranscript,

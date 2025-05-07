@@ -50,6 +50,7 @@ dependencies:
   mailer: ^6.3.0
   flutter_dotenv: ^5.2.1
   google_fonts: ^6.2.1
+  dio: ^5.8.0+1
 
 dev_dependencies:
   flutter_test:
@@ -89,11 +90,7 @@ flutter:
     # - assets/images/use_case_diagram.png
     # - assets/images/database_diagram.png
     # - assets/images/seq_diagram.png
-    # - assets/umls/class_diagram.puml
-    # - assets/umls/context_diagram.puml
-    # - assets/umls/sequence_diagram.puml
-    # - assets/umls/use_case_diagram.puml
-    # - assets/umls/database_diagram.puml
+    - assets/umls/
     - .env
 
 
