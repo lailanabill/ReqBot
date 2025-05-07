@@ -1,7 +1,14 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:archive/archive.dart'; // For zlib compression
+import 'dart:convert';
+
+import 'dart:html' as html;
 
 class UseCaseValidation extends StatefulWidget {
   const UseCaseValidation({Key? key}) : super(key: key);
@@ -11,22 +18,65 @@ class UseCaseValidation extends StatefulWidget {
 }
 
 class _UseCaseValidationState extends State<UseCaseValidation> {
-  Future<Map<String, dynamic>> loadPuml() async {
-    final url =
-        "https://storage.googleapis.com/diagrams-data/umls/use_case_diagram_5.puml";
+  // Future<Map<String, dynamic>> loadPuml() async {
+  //   final url =
+  //       "https://storage.googleapis.com/diagrams-data/umls/use_case_diagram_5.puml";
 
-    final response = await http.get(Uri.parse(url));
+  //   final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      return {'body': response.body, 'StatCode': response.statusCode};
-    } else {
-      throw Exception("Failed to load PUML file: ${response.statusCode}");
+  //   if (response.statusCode == 200) {
+  //     return {'body': response.body, 'StatCode': response.statusCode};
+  //   } else {
+  //     throw Exception("Failed to load PUML file: ${response.statusCode}");
+  //   }
+  // }
+
+  Future<void> downloadFile(String fileName) async {
+    // Future<void> downloadFile(String url, String fileName) async {
+    try {
+      // // if mobile
+      // final filePath =
+      //     'F:/collage/year 4/grad/github grad/ReqBot/Lama/mainOfScripts.txt';
+      // Dio dio = Dio();
+      // await dio.download(url, filePath);
+
+      // final file = File(filePath);
+
+      // if (await file.exists()) {
+      // setState(() async {
+      //   _plantUmlCode = await file.readAsString();
+      // });
+      print('found it');
+      // return contents;
+      // } else {
+      //   throw Exception("File not found at: $filePath");
+      // }
+      // // if web
+      // final response = await http.get(Uri.parse(url));
+      // if (response.statusCode == 200) {
+      //   setState(() {
+      //     _plantUmlCode = response.body; // This is your PUML code
+      //   });
+      //   print("wasal ");
+      //   print(_plantUmlCode);
+      // } else {
+      //   throw Exception('Failed to load file: ${response.statusCode}');
+      // }
+
+      final contents =
+          await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
+      setState(() {
+        _plantUmlCode = contents;
+      });
+      print("PUML Loaded:\n$_plantUmlCode");
+    } catch (e) {
+      print("Download failed: $e");
     }
   }
 
   String _plantUmlCode = """
 
-""";
+// """;
   bool _isLoading = true;
   String? _imageUrl;
   String? _errorMessage;
@@ -102,18 +152,19 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
       TextEditingController();
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     _loadDiagram();
     _extractExistingRelationships();
-    final res = await loadPuml();
-    if (res['StatCode'] == 200) {
-      setState(() {
-        _plantUmlCode = res['body'];
-      });
-    } else {
-      print("Error loading PUML file: ${res['StatCode']}");
-    }
+    // final res = await loadPuml();
+    // if (res['StatCode'] == 200) {
+    //   setState(() {
+    //     _plantUmlCode = res['body'];
+    //   });
+    // } else {
+    //   print("Error loading PUML file: ${res['StatCode']}");
+    // }
+    downloadFile('use_case_diagram_5.puml');
     if (_useCases.isNotEmpty) {
       _selectedUseCase = _useCases[0];
     }
@@ -1042,6 +1093,7 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // ElevatedButton(onPressed: loadPuml, child: Text("uml")),
             Text(
               'Validation Tools',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

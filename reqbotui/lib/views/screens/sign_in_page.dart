@@ -5,11 +5,12 @@ import 'package:reqbot/controllers/signin_controller.dart';
 import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
- import '../widgets/auth_header.dart';
- import '../widgets/custom_text_field.dart';
- import '../widgets/gradient_button.dart';
- import '../widgets/social_auth_buttons.dart';
- import '../widgets/auth_navigation.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/gradient_button.dart';
+import '../widgets/social_auth_buttons.dart';
+import '../widgets/auth_navigation.dart';
+
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
@@ -37,15 +38,15 @@ class _SignInPageState extends State<SignInPage> {
                 children: [
                   const SizedBox(height: 40),
                   Center(
-  child: Text(
-    "Login To Your Account",
-    textAlign: TextAlign.center,
-    style: GoogleFonts.inter(
-      fontSize: 24,
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-),
+                    child: Text(
+                      "Login To Your Account",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 32),
                   // Email Field
                   Text(
@@ -65,7 +66,8 @@ class _SignInPageState extends State<SignInPage> {
                         color: Colors.grey,
                         fontSize: 14,
                       ),
-                      prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
+                      prefixIcon:
+                          const Icon(Icons.email_outlined, color: Colors.grey),
                       contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -73,11 +75,13 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey, width: 1),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey, width: 1),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -103,8 +107,10 @@ class _SignInPageState extends State<SignInPage> {
                         color: Colors.grey,
                         fontSize: 14,
                       ),
-                      prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
-                      suffixIcon: const Icon(Icons.visibility_off, color: Colors.grey),
+                      prefixIcon:
+                          const Icon(Icons.lock_outline, color: Colors.grey),
+                      suffixIcon:
+                          const Icon(Icons.visibility_off, color: Colors.grey),
                       contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -112,62 +118,64 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey, width: 1),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.grey, width: 1),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1),
                       ),
                       filled: true,
                       fillColor: Colors.white,
                     ),
                   ),
                   // Forgot Password & Remember Me
-                 Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: () {
-          // Forgot password functionality
-        },
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: Text(
-          "Forgot password ?",
-          style: GoogleFonts.inter(
-            color: Colors.black,
-            fontSize: 14,
-          ),
-        ),
-      ),
-    ),
-    Row(
-      children: [
-        Switch(
-          value: _rememberMe,
-          onChanged: (value) {
-            setState(() {
-              _rememberMe = value;
-            });
-          },
-          activeColor: Colors.white,
-          activeTrackColor: Color.fromARGB(255, 0, 54, 218),
-          inactiveThumbColor: Colors.white,
-          inactiveTrackColor: Colors.grey,
-        ),
-        Text(
-          "Remember me",
-          style: GoogleFonts.inter(fontSize: 14),
-        ),
-      ],
-    ),
-  ],
-),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            // Forgot password functionality
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            "Forgot password ?",
+                            style: GoogleFonts.inter(
+                              color: Colors.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Switch(
+                            value: _rememberMe,
+                            onChanged: (value) {
+                              setState(() {
+                                _rememberMe = value;
+                              });
+                            },
+                            activeColor: Colors.white,
+                            activeTrackColor: Color.fromARGB(255, 0, 54, 218),
+                            inactiveThumbColor: Colors.white,
+                            inactiveTrackColor: Colors.grey,
+                          ),
+                          Text(
+                            "Remember me",
+                            style: GoogleFonts.inter(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
 
                   const SizedBox(height: 20),
                   // Login Button

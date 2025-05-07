@@ -38,6 +38,10 @@ class DiagramPage extends StatelessWidget {
               width: screenWidth * 0.8,
               height: screenHeight * 0.6,
               fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Text("Image failed to load: ${stackTrace}");
+              },
+              // print(error);
             )
           ],
         ),

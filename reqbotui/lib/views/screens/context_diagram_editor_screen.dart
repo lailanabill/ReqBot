@@ -35,16 +35,59 @@ class _ContextDiagramEditorScreenState
     extends State<ContextDiagramEditorScreen> {
 //loading the plantuml code
 
-  Future<Map<String, dynamic>> loadPuml() async {
-    final url =
-        "https://storage.googleapis.com/diagrams-data/umls/context_diagram_5.puml";
+  // Future<Map<String, dynamic>> loadPuml() async {
+  //   final url =
+  //       "https://storage.googleapis.com/diagrams-data/umls/context_diagram_5.puml";
 
-    final response = await http.get(Uri.parse(url));
+  //   final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      return {'body': response.body, 'StatCode': response.statusCode};
-    } else {
-      throw Exception("Failed to load PUML file: ${response.statusCode}");
+  //   if (response.statusCode == 200) {
+  //     return {'body': response.body, 'StatCode': response.statusCode};
+  //   } else {
+  //     throw Exception("Failed to load PUML file: ${response.statusCode}");
+  //   }
+  // }
+
+  Future<void> downloadFile(String fileName) async {
+    // Future<void> downloadFile(String url, String fileName) async {
+    try {
+      // // if mobile
+      // final filePath =
+      //     'F:/collage/year 4/grad/github grad/ReqBot/Lama/mainOfScripts.txt';
+      // Dio dio = Dio();
+      // await dio.download(url, filePath);
+
+      // final file = File(filePath);
+
+      // if (await file.exists()) {
+      // setState(() async {
+      //   _plantUmlCode = await file.readAsString();
+      // });
+      print('found it');
+      // return contents;
+      // } else {
+      //   throw Exception("File not found at: $filePath");
+      // }
+      // // if web
+      // final response = await http.get(Uri.parse(url));
+      // if (response.statusCode == 200) {
+      //   setState(() {
+      //     _plantUmlCode = response.body; // This is your PUML code
+      //   });
+      //   print("wasal ");
+      //   print(_plantUmlCode);
+      // } else {
+      //   throw Exception('Failed to load file: ${response.statusCode}');
+      // }
+
+      final contents =
+          await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
+      setState(() {
+        plantumlCode = contents;
+      });
+      print("PUML Loaded:\n$plantumlCode");
+    } catch (e) {
+      print("Download failed: $e");
     }
   }
 
@@ -98,14 +141,15 @@ class _ContextDiagramEditorScreenState
   @override
   Future<void> initState() async {
     super.initState();
-    final res = await loadPuml();
-    if (res['StatCode'] == 200) {
-      setState(() {
-        plantumlCode = res['body'];
-      });
-    } else {
-      print("Error loading PUML file: ${res['StatCode']}");
-    }
+    // final res = await loadPuml();
+    // if (res['StatCode'] == 200) {
+    //   setState(() {
+    //     plantumlCode = res['body'];
+    //   });
+    // } else {
+    //   print("Error loading PUML file: ${res['StatCode']}");
+    // }
+    downloadFile('context_diagram_5.puml');
 
     plantumlController = TextEditingController(text: plantumlCode);
     plantumlController.addListener(() {
