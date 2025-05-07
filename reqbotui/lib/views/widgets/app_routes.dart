@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:reqbot/views/screens/summary.dart';
+import 'package:reqbot/views/screens/transcript.dart';
 // import 'package:reqbot/views/screens/selectReqs.dart';
 
 import '/views/screens/record.dart';
@@ -11,7 +13,7 @@ import '/views/screens/favorites_screen.dart';
 class AppRoutes {
   static final Map<String, WidgetBuilder> routes = {
     '/': (context) => WelcomePage(),
-    // '/': (context) => Record(),
+    // '/': (context) => TranscriptScreen(),
     '/sign-in': (context) => SignInPage(),
     '/sign-up': (context) => SignUpPage(),
     '/HomeScreen': (context) => HomeScreen(),
