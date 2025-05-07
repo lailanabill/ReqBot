@@ -121,6 +121,7 @@ class _RecordState extends State<Record> {
   }
 
   Future<void> _Diagrams(String Trans) async {
+    // const { data, error } = await supabase.from('projects').insert([{ some_column: 'someValue', other_column: 'otherValue' },]);
     var DiagramsURI = Uri.parse(diagramsURI);
 
     //diagrams call

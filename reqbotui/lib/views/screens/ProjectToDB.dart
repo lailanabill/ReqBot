@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 
 import 'package:reqbot/views/screens/record.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -69,19 +71,22 @@ class _ProjectToDBState extends State<ProjectToDB> {
             ElevatedButton(
               onPressed: _accepted && ProjName.text.isNotEmpty
                   ? () async {
-                      final user = Supabase.instance.client.auth.currentUser;
-                      final userId = user!.id;
-                      final analyid = await Supabase.instance.client
-                          .from('users')
-                          .select("analyzer_id")
-                          .eq('id', userId)
-                          .single();
+                      // final user = Supabase.instance.client.auth.currentUser;
+                      // final userId = user!.id;
+                      // final analyid = await Supabase.instance.client
+                      //     .from('users')
+                      //     .select("analyzer_id")
+                      //     .eq('id', userId)
+                      //     .single();
                       await Supabase.instance.client.from('projects').insert(
                         {
-                          "analyzer_id": analyid['analyzer_id'],
+                          "analyzer_id":
+                              context.read<UserDataProvider>().AnalyzerID,
+                          // "analyzer_id": analyid['analyzer_id'],
                           "name": ProjName.text
                         },
                       );
+                      // context.read
                       // Continue action
                       Navigator.push(
                         context,

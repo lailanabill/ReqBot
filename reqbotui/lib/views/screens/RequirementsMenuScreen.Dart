@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:reqbot/views/screens/diagramsmenu.dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/non_functional_requirements_screen.dart';
+import 'package:reqbot/views/screens/summary.dart';
+import 'package:reqbot/views/screens/transcript.dart';
 
 class RequirementsMenuScreen extends StatelessWidget {
   @override
@@ -38,6 +40,32 @@ class RequirementsMenuScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => NonFunctionalRequirementsScreen()),
+                );
+              },
+            ),
+            const Divider(),
+            // Non-Functional Requirements Button
+            ListTile(
+              title: const Text('Summary'),
+              leading: const Icon(Icons.summarize, color: Color.fromARGB(255, 187, 151, 236)),
+              onTap: () {
+                // Navigate to Non-Functional Requirements screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SummaryScreen()),
+                );
+              },
+            ),
+            const Divider(),
+            // Non-Functional Requirements Button
+            ListTile(
+              title: const Text('Trasncription'),
+              leading: const Icon(Icons.transcribe, color: Color.fromARGB(255, 187, 151, 236)),
+              onTap: () {
+                // Navigate to Non-Functional Requirements screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TranscriptScreen()),
                 );
               },
             ),

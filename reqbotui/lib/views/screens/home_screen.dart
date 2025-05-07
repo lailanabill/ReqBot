@@ -6,6 +6,7 @@ import 'package:reqbot/models/project_model.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/ProjectToDB.dart';
+import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'package:reqbot/views/screens/diagramsmenu.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_action_buttons.dart';
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _isLoading = true; // Set to loading state before fetch
     });
-    
+
     try {
       final user = Supabase.instance.client.auth.currentUser;
       final userId = user!.id;
@@ -52,11 +53,13 @@ class _HomeScreenState extends State<HomeScreen> {
           .eq('id', userId)
           .single();
 
+      context.read<UserDataProvider>().setAnalyzerId(analyid['analyzer_id']);
+
       final clientid = analyid['analyzer_id'];
 
       final response =
           await _supabase.from('projects').select().eq('analyzer_id', clientid);
-      
+
       setState(() {
         _projects = response.map((p) => ProjectModel.fromMap(p)).toList();
         _isLoading = false; // Set loading to false after data is ready
@@ -66,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SnackBar(content: Text("Error loading projects: $e")),
       );
       print("Error loading projects: $e");
-      
+
       setState(() {
         _isLoading = false; // Also set loading to false in case of error
       });
@@ -157,7 +160,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                          color: const Color.fromARGB(255, 0, 54, 218)
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Center(
@@ -220,9 +224,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            
+
             const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-            
+
             // Main Content
             Expanded(
               child: Padding(
@@ -242,9 +246,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                            color: const Color.fromARGB(255, 0, 54, 218)
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -258,12 +264,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Project List with loading state
                     Expanded(
-                      child: _isLoading 
+                      child: _isLoading
                           ? Center(
                               child: CircularProgressIndicator(
                                 color: Color.fromARGB(255, 0, 54, 218),
@@ -273,16 +279,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? _buildEmptyState()
                               : ListView.separated(
                                   itemCount: _projects.length,
-                                  separatorBuilder: (context, index) => const SizedBox(height: 16),
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 16),
                                   itemBuilder: (context, index) {
                                     final project = _projects[index];
                                     return _buildProjectCard(project, index);
                                   },
                                 ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Action Buttons
                     Row(
                       children: [
@@ -305,13 +312,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(255, 0, 54, 218),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 0, 54, 218),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 elevation: 0,
-                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 0),
                               ),
                             ),
                           ),
@@ -319,11 +328,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 12),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                            color: const Color.fromARGB(255, 0, 54, 218)
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: IconButton(
-                            onPressed: () => Navigator.pushNamed(context, '/FavoritesScreen'),
+                            onPressed: () => Navigator.pushNamed(
+                                context, '/FavoritesScreen'),
                             icon: const Icon(
                               Icons.favorite_outline,
                               color: Color.fromARGB(255, 0, 54, 218),
@@ -363,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(12),
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DiagramsMenu()),
+            MaterialPageRoute(builder: (context) => RequirementsMenuScreen()),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -373,7 +384,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                    color:
+                        const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Center(
@@ -409,7 +421,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Using Consumer for better reactivity
                 Consumer<FavoritesProvider>(
                   builder: (context, favoritesProvider, _) {
-                    final isFavorite = favoritesProvider.favoriteProjects.contains(project.name);
+                    final isFavorite = favoritesProvider.favoriteProjects
+                        .contains(project.name);
                     return IconButton(
                       icon: Icon(
                         isFavorite ? Icons.favorite : Icons.favorite_outline,
