@@ -42,24 +42,237 @@ class DatabaseClassDiagramGenerator:
         self.url_generator = DiagramUrlGenerator()
 
     def extract_database_schema_elements(self, description: str) -> Optional[Dict[str, Any]]:
-        prompt = f"""You are an expert Database Architect designing a comprehensive Class-based Database Schema.
+        prompt = f"""You are an expert Database Architect tasked with designing a comprehensive Class-based Database Schema from a system description.
 
-CRITICAL REQUIREMENTS:
-1. RETURN A COMPLETE, VALID JSON OBJECT
-2. INCLUDE ALL TABLES AS CLASSES WITH MEANINGFUL RELATIONSHIPS
-3. NO ISOLATED CLASSES
-4. USE PRECISE, DESCRIPTIVE ATTRIBUTES AND METHODS
+GUIDELINES FOR DATABASE SCHEMA DESIGN:
+1. Identify all entities in the system as classes (representing database tables).
+2. Ensure each class has meaningful attributes that reflect the entity’s properties.
+3. Define attributes with appropriate data types (e.g., String, Integer, Date, Boolean).
+4. Mark primary keys and specify if attributes are nullable.
+5. Include methods that represent key operations on the entity (e.g., CRUD operations, business logic).
+6. Establish relationships between classes (e.g., one-to-many, many-to-many) with clear descriptions.
+7. Avoid isolated classes; ensure all classes are connected via relationships.
+8. Use precise, descriptive names for classes, attributes, methods, and relationships.
+9. Ensure the schema supports the system’s functionality as described.
+10. Include foreign keys in attributes where relationships exist.
+11. Follow database normalization principles (e.g., avoid redundancy, ensure referential integrity).
+12. Maintain consistency in naming conventions (e.g., camelCase for attributes).
 
 JSON STRUCTURE TEMPLATE:
 {{
-  "system_name": "University Course Registration Database",
+  "system_name": "System Name",
   "classes": [
     {{
-      "name": "Student",
-      "description": "Represents a student in the system",
+      "name": "ClassName",
+      "description": "Description of the class",
       "attributes": [
         {{
-          "name": "studentId",
+          "name": "attributeName",
+          "type": "DataType",
+          "is_primary_key": true/false,
+          "is_nullable": true/false,
+          "is_foreign_key": true/false,
+          "references": "RelatedClassName (optional)"
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "methodName",
+          "parameters": [
+            {{
+              "name": "paramName",
+              "type": "DataType"
+            }}
+          ],
+          "return_type": "ReturnType"
+        }}
+      ]
+    }}
+  ],
+  "relationships": [
+    {{
+      "type": "relationship_type",
+      "from_class": "ClassName1",
+      "to_class": "ClassName2",
+      "description": "Description of the relationship"
+    }}
+  ]
+}}
+
+EXAMPLE 1 - ONLINE BOOKSTORE SYSTEM:
+System Description:
+The system manages an online bookstore where customers can browse books, place orders, and leave reviews. Books have authors, and each book belongs to a category. Customers can have multiple orders, and each order can contain multiple books. The system tracks inventory and processes payments.
+
+JSON Output:
+{{
+  "system_name": "Online Bookstore Database",
+  "classes": [
+    {{
+      "name": "Customer",
+      "description": "Represents a customer in the bookstore",
+      "attributes": [
+        {{
+          "name": "customerId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        }},
+        {{
+          "name": "email",
+          "type": "String",
+          "is_nullable": false
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "placeOrder",
+          "parameters": [
+            {{
+              "name": "orderDetails",
+              "type": "List<String>"
+            }}
+          ],
+          "return_type": "boolean"
+        }},
+        {{
+          "name": "writeReview",
+          "parameters": [
+            {{
+              "name": "bookId",
+              "type": "String"
+            }},
+            {{
+              "name": "rating",
+              "type": "Integer"
+            }}
+          ],
+          "return_type": "boolean"
+        }}
+      ]
+    }},
+    {{
+      "name": "Book",
+      "description": "Represents a book in the bookstore",
+      "attributes": [
+        {{
+          "name": "bookId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "title",
+          "type": "String",
+          "is_nullable": false
+        }},
+        {{
+          "name": "authorId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Author"
+        }},
+        {{
+          "name": "categoryId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Category"
+        }},
+        {{
+          "name": "stock",
+          "type": "Integer",
+          "is_nullable": false
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "updateStock",
+          "parameters": [
+            {{
+              "name": "quantity",
+              "type": "Integer"
+            }}
+          ],
+          "return_type": "void"
+        }}
+      ]
+    }},
+    {{
+      "name": "Order",
+      "description": "Represents a customer order",
+      "attributes": [
+        {{
+          "name": "orderId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "customerId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Customer"
+        }},
+        {{
+          "name": "orderDate",
+          "type": "Date",
+          "is_nullable": false
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "addBook",
+          "parameters": [
+            {{
+              "name": "bookId",
+              "type": "String"
+            }}
+          ],
+          "return_type": "boolean"
+        }}
+      ]
+    }},
+    {{
+      "name": "OrderBook",
+      "description": "Junction table for Order and Book (many-to-many)",
+      "attributes": [
+        {{
+          "name": "orderId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Order"
+        }},
+        {{
+          "name": "bookId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Book"
+        }},
+        {{
+          "name": "quantity",
+          "type": "Integer",
+          "is_nullable": false
+        }}
+      ],
+      "methods": []
+    }},
+    {{
+      "name": "Author",
+      "description": "Represents an author of books",
+      "attributes": [
+        {{
+          "name": "authorId",
           "type": "String",
           "is_primary_key": true,
           "is_nullable": false
@@ -70,32 +283,307 @@ JSON STRUCTURE TEMPLATE:
           "is_nullable": false
         }}
       ],
+      "methods": []
+    }},
+    {{
+      "name": "Category",
+      "description": "Represents a book category",
+      "attributes": [
+        {{
+          "name": "categoryId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        }}
+      ],
+      "methods": []
+    }},
+    {{
+      "name": "Review",
+      "description": "Represents a customer review of a book",
+      "attributes": [
+        {{
+          "name": "reviewId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "customerId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Customer"
+        }},
+        {{
+          "name": "bookId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Book"
+        }},
+        {{
+          "name": "rating",
+          "type": "Integer",
+          "is_nullable": false
+        }},
+        {{
+          "name": "comment",
+          "type": "String",
+          "is_nullable": true
+        }}
+      ],
+      "methods": []
+    }}
+  ],
+  "relationships": [
+    {{
+      "type": "one_to_many",
+      "from_class": "Customer",
+      "to_class": "Order",
+      "description": "A customer can place multiple orders"
+    }},
+    {{
+      "type": "many_to_many",
+      "from_class": "Order",
+      "to_class": "Book",
+      "description": "An order can contain multiple books, implemented via OrderBook junction table"
+    }},
+    {{
+      "type": "one_to_many",
+      "from_class": "Author",
+      "to_class": "Book",
+      "description": "An author can write multiple books"
+    }},
+    {{
+      "type": "one_to_many",
+      "from_class": "Category",
+      "to_class": "Book",
+      "description": "A category can have multiple books"
+    }},
+    {{
+      "type": "one_to_many",
+      "from_class": "Customer",
+      "to_class": "Review",
+      "description": "A customer can write multiple reviews"
+    }},
+    {{
+      "type": "one_to_many",
+      "from_class": "Book",
+      "to_class": "Review",
+      "description": "A book can have multiple reviews"
+    }}
+  ]
+}}
+
+EXAMPLE 2 - HOSPITAL MANAGEMENT SYSTEM:
+System Description:
+The system manages a hospital where patients are assigned to doctors. Each patient can have multiple appointments, and doctors can schedule appointments. The hospital has departments, and each doctor belongs to a department. The system also tracks prescriptions issued during appointments.
+
+JSON Output:
+{{
+  "system_name": "Hospital Management Database",
+  "classes": [
+    {{
+      "name": "Patient",
+      "description": "Represents a patient in the hospital",
+      "attributes": [
+        {{
+          "name": "patientId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        }},
+        {{
+          "name": "dob",
+          "type": "Date",
+          "is_nullable": false
+        }}
+      ],
       "methods": [
         {{
-          "name": "registerForCourse",
+          "name": "scheduleAppointment",
           "parameters": [
             {{
-              "name": "courseId",
+              "name": "doctorId",
+              "type": "String"
+            }},
+            {{
+              "name": "date",
+              "type": "Date"
+            }}
+          ],
+          "return_type": "boolean"
+        }}
+      ]
+    }},
+    {{
+      "name": "Doctor",
+      "description": "Represents a doctor in the hospital",
+      "attributes": [
+        {{
+          "name": "doctorId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        }},
+        {{
+          "name": "departmentId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Department"
+        }}
+      ],
+      "methods": [
+        {{
+          "name": "prescribeMedication",
+          "parameters": [
+            {{
+              "name": "appointmentId",
+              "type": "String"
+            }},
+            {{
+              "name": "medication",
               "type": "String"
             }}
           ],
           "return_type": "boolean"
         }}
       ]
+    }},
+    {{
+      "name": "Department",
+      "description": "Represents a department in the hospital",
+      "attributes": [
+        {{
+          "name": "departmentId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "name",
+          "type": "String",
+          "is_nullable": false
+        }}
+      ],
+      "methods": []
+    }},
+    {{
+      "name": "Appointment",
+      "description": "Represents an appointment between a patient and a doctor",
+      "attributes": [
+        {{
+          "name": "appointmentId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "patientId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Patient"
+        }},
+        {{
+          "name": "doctorId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Doctor"
+        }},
+        {{
+          "name": "date",
+          "type": "Date",
+          "is_nullable": false
+        }}
+      ],
+      "methods": []
+    }},
+    {{
+      "name": "Prescription",
+      "description": "Represents a prescription issued during an appointment",
+      "attributes": [
+        {{
+          "name": "prescriptionId",
+          "type": "String",
+          "is_primary_key": true,
+          "is_nullable": false
+        }},
+        {{
+          "name": "appointmentId",
+          "type": "String",
+          "is_nullable": false,
+          "is_foreign_key": true,
+          "references": "Appointment"
+        }},
+        {{
+          "name": "medication",
+          "type": "String",
+          "is_nullable": false
+        }}
+      ],
+      "methods": []
     }}
   ],
   "relationships": [
     {{
       "type": "one_to_many",
-      "from_class": "Student",
-      "to_class": "Course",
-      "description": "Student enrolls in multiple courses"
+      "from_class": "Patient",
+      "to_class": "Appointment",
+      "description": "A patient can have multiple appointments"
+    }},
+    {{
+      "type": "one_to_many",
+      "from_class": "Doctor",
+      "to_class": "Appointment",
+      "description": "A doctor can have multiple appointments"
+    }},
+    {{
+      "type": "one_to_many",
+      "from_class": "Department",
+      "to_class": "Doctor",
+      "description": "A department can have multiple doctors"
+    }},
+    {{
+      "type": "one_to_many",
+      "from_class": "Appointment",
+      "to_class": "Prescription",
+      "description": "An appointment can have multiple prescriptions"
     }}
   ]
 }}
 
+Now, design a Class-based Database Schema based on the following system description:
+
 System Description:
-{description}"""
+{description}
+
+IMPORTANT:
+- Analyze the system description thoroughly.
+- Return ONLY a valid JSON object with system_name, classes, and relationships.
+- Each class must include description, attributes, and methods (if applicable).
+- Each attribute must include name, type, is_primary_key, is_nullable, and is_foreign_key (with references if applicable).
+- Each relationship must include type, from_class, to_class, and description.
+- Ensure the schema is comprehensive, normalized, and supports the system’s functionality.
+"""
 
         for attempt in range(self.max_retries):
             try:

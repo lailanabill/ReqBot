@@ -578,7 +578,7 @@ IMPORTANT:
             # Generate PNG diagram
             # png_file = f"{output_dir}images/seq_diagram_{pid}.png"
             # png_file = f"{output_prefix}.png"
-            png_success = self.generate_diagram_with_kroki(plantuml_code,pid ,img_path, output_dir="/images/")
+            png_success = self.generate_diagram_with_kroki(plantuml_code,pid , output_dir="/images/")
             
             bucket_name = "diagrams-data"  # replace with your bucket
             upload_to_gcs(bucket_name, json_path, f"jsons/sequence_diagram_{pid}.json")
@@ -626,7 +626,6 @@ def SequenceDiagramDriver(desc,pid):
     else:
         print("There were issues generating some diagram formats.")
     
-
 
 
 
