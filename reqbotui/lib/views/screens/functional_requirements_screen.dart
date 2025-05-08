@@ -191,6 +191,45 @@ class _FunctionalRequirementsScreenState
             
             const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
             
+            // Info Message for Diagram Generation
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: primaryColor.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: primaryColor,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Please review the listed requirements and select the ones that match your needs. You can edit or delete any requirements that do not apply. Once finalized, you may proceed to generate the corresponding diagrams',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: Colors.black87,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
             // Main Content
             Expanded(
               child: Padding(
@@ -641,16 +680,28 @@ class _FunctionalRequirementsScreenState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: Text(
-          'Delete Requirement',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.delete_outline,
+              color: primaryColor,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Delete Requirement',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
+              ),
+            ),
+          ],
         ),
         content: Text(
           'Are you sure you want to delete this requirement?',
           style: GoogleFonts.inter(
             fontSize: 15,
+            color: Colors.black87,
           ),
         ),
         actions: [
@@ -664,15 +715,22 @@ class _FunctionalRequirementsScreenState
               ),
             ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               _removeRequirement(title);
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             child: Text(
               'Delete',
               style: GoogleFonts.inter(
-                color: Colors.red.shade400,
                 fontWeight: FontWeight.w500,
               ),
             ),
