@@ -25,14 +25,18 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final AuthServices _authServices = AuthServices();
   final SupabaseClient _supabase = Supabase.instance.client;
 
   List<ProjectModel> _projects = [];
   ProjectModel? _lastRemovedProject;
   int? _lastRemovedProjectIndex;
-  bool _isLoading = true; // Added loading state
+  bool _isLoading = true;
+  
+  // Add animation controller for removal animation
+  late AnimationController _removeAnimationController;
+  int? _removingProjectId;
 
   // Future<void> getId() async {
   //   final user = Supabase.instance.client.auth.currentUser;
@@ -47,12 +51,24 @@ class _HomeScreenState extends State<HomeScreen> {
   // }
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     _loadProjects();
     // getId();
     // setState(() {});
     // print(context.read<UserDataProvider>().AnalyzerID);
+    
+    // Initialize remove animation controller
+    _removeAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _removeAnimationController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadProjects() async {
@@ -101,50 +117,55 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _removeProject(int index) async {
-    _lastRemovedProject = _projects[index];
-    _lastRemovedProjectIndex = index;
-
     setState(() {
-      _projects.removeAt(index);
+      _removingProjectId = _projects[index].id;
+      _lastRemovedProject = _projects[index];
+      _lastRemovedProjectIndex = index;
     });
+    
+    _removeAnimationController.reset();
+    _removeAnimationController.forward().then((_) {
+      setState(() {
+        _projects.removeAt(index);
+        _removingProjectId = null;
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${_lastRemovedProject!.name} removed'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            if (_lastRemovedProject != null &&
-                _lastRemovedProjectIndex != null) {
-              setState(() {
-                _projects.insert(
-                    _lastRemovedProjectIndex!, _lastRemovedProject!);
-              });
-              _lastRemovedProject = null;
-              _lastRemovedProjectIndex = null;
-            }
-          },
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_lastRemovedProject!.name} removed'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              if (_lastRemovedProject != null && _lastRemovedProjectIndex != null) {
+                setState(() {
+                  _projects.insert(_lastRemovedProjectIndex!, _lastRemovedProject!);
+                });
+                _lastRemovedProject = null;
+                _lastRemovedProjectIndex = null;
+              }
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    // Proceed with actual deletion in Supabase only if the action isn't undone
-    await Future.delayed(const Duration(seconds: 5), () async {
-      if (_lastRemovedProject != null) {
-        try {
-          await _supabase
-              .from('projects')
-              .delete()
-              .eq('id', _lastRemovedProject!.id as Object);
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error deleting project: $e")),
-          );
-        } finally {
-          _lastRemovedProject = null;
-          _lastRemovedProjectIndex = null;
+      // Proceed with actual deletion in Supabase only if the action isn't undone
+      Future.delayed(const Duration(seconds: 5), () async {
+        if (_lastRemovedProject != null) {
+          try {
+            await _supabase
+                .from('projects')
+                .delete()
+                .eq('id', _lastRemovedProject!.id as Object);
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Error deleting project: $e")),
+            );
+          } finally {
+            _lastRemovedProject = null;
+            _lastRemovedProjectIndex = null;
+          }
         }
-      }
+      });
     });
   }
 
@@ -380,94 +401,115 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildProjectCard(ProjectModel project, int index) {
     // Using Consumer for better reactivity to favorite changes
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    final bool isRemoving = _removingProjectId == project.id;
+    final Animation<double> removeAnimation = CurvedAnimation(
+      parent: _removeAnimationController,
+      curve: Curves.easeInOut,
+    );
+
+    return AnimatedBuilder(
+      animation: _removeAnimationController,
+      builder: (context, child) {
+        if (isRemoving) {
+          return Opacity(
+            opacity: 1 - removeAnimation.value,
+            child: Transform.translate(
+              offset: Offset(300 * removeAnimation.value, 0),
+              child: Transform.scale(
+                scale: 1 - (0.2 * removeAnimation.value),
+                child: child,
+              ),
+            ),
+          );
+        }
+        return child!;
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => RequirementsMenuScreen()),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color:
-                        const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.description_outlined,
-                      color: Color.fromARGB(255, 0, 54, 218),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RequirementsMenuScreen()),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.description_outlined,
+                        color: Color.fromARGB(255, 0, 54, 218),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        project.name,
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          project.name,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Tap to open project',
-                        style: GoogleFonts.inter(
-                          color: Colors.black54,
-                          fontSize: 13,
+                        const SizedBox(height: 4),
+                        Text(
+                          'Tap to open project',
+                          style: GoogleFonts.inter(
+                            color: Colors.black54,
+                            fontSize: 13,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                // Using Consumer for better reactivity
-                Consumer<FavoritesProvider>(
-                  builder: (context, favoritesProvider, _) {
-                    final isFavorite = favoritesProvider.favoriteProjects
-                        .contains(project.name);
-                    return IconButton(
-                      icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_outline,
-                        color: isFavorite ? Colors.red : Colors.grey,
-                        size: 22,
-                      ),
-                      onPressed: () {
-                        favoritesProvider.toggleFavorite(project.name);
-                      },
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
-                    size: 22,
+                  Consumer<FavoritesProvider>(
+                    builder: (context, favoritesProvider, _) {
+                      final isFavorite = favoritesProvider.favoriteProjects.contains(project.name);
+                      return IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_outline,
+                          color: isFavorite ? Colors.red : Colors.grey,
+                          size: 22,
+                        ),
+                        onPressed: () {
+                          favoritesProvider.toggleFavorite(project.name);
+                        },
+                      );
+                    },
                   ),
-                  onPressed: () => _removeProject(index),
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                      size: 22,
+                    ),
+                    onPressed: () => _removeProject(index),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
