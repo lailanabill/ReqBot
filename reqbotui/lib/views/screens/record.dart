@@ -38,12 +38,28 @@ class _RecordState extends State<Record> {
 
   // bool _isListening = false;
 
+  void SaveToDb(String Column, int Pid, int AnalyzerId, String Data) async {
+    await Supabase.instance.client
+        .from('projects')
+        .update({Column: Data})
+        .eq('id', Pid)
+        .eq('analyzer_id', AnalyzerId)
+        .select();
+    print(context.read<UserDataProvider>().AnalyzerID);
+  }
+
   void _updateTranscription(List<dynamic> transcription) {
     setState(() {
       _transcription = transcription
           .map((item) => "${item['speaker']}: ${item['text']}")
           .join("\n");
       context.read<DataProvider>().setTranscript(_transcription);
+
+      SaveToDb(
+          'transcription',
+          context.read<UserDataProvider>().ProjectId,
+          context.read<UserDataProvider>().AnalyzerID,
+          context.read<DataProvider>().transcript);
     });
   }
 
@@ -126,7 +142,10 @@ class _RecordState extends State<Record> {
 
     //diagrams call
     print("alo diagrams: ${Trans}");
-    final diagramsBody = jsonEncode({'transcript': Trans, 'pid': 5});
+    final diagramsBody = jsonEncode({
+      'transcript': Trans,
+      'pid': context.read<UserDataProvider>().ProjectId
+    });
     var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
     if (DiagramsRequest.statusCode == 200) {
       print('success ya gello');
@@ -153,6 +172,12 @@ class _RecordState extends State<Record> {
         final responseData = jsonDecode(SumRequest.body);
         // print("Summary: ${responseData['summary']}");
         context.read<DataProvider>().setSummary(responseData['summary']);
+
+        SaveToDb(
+            'summary',
+            context.read<UserDataProvider>().ProjectId,
+            context.read<UserDataProvider>().AnalyzerID,
+            context.read<DataProvider>().summary);
         // call to reqs func
         _getRrequirements(WhisperTranscript, responseData['summary']);
         // call to diagrams
@@ -187,6 +212,11 @@ class _RecordState extends State<Record> {
         final responseData = jsonDecode(ReqSumRequest.body);
         // print("Requirements: ${responseData['reqs']}");
         context.read<DataProvider>().setRequirements(responseData['reqs']);
+        SaveToDb(
+            'status',
+            context.read<UserDataProvider>().ProjectId,
+            context.read<UserDataProvider>().AnalyzerID,
+            context.read<DataProvider>().requirements);
         _Diagrams(WhisperTranscript);
       } else {
         print("Server error: ${ReqSumRequest.statusCode}");

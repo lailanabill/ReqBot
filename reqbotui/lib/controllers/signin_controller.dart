@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:reqbot/services/auth/auth_services.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignInController {
   final AuthServices authServices = AuthServices();
@@ -41,6 +45,19 @@ class SignInController {
       if (!context.mounted) return;
 
       if (response.session != null) {
+        final user = Supabase.instance.client.auth.currentUser;
+        final userId = user!.id;
+        final analyid = await Supabase.instance.client
+            .from('users')
+            .select("analyzer_id")
+            .eq('id', userId)
+            .single();
+
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setInt('analyzer_id', analyid['analyzer_id']);
+
+        context.read<UserDataProvider>().setAnalyzerId(analyid['analyzer_id']);
+
         Navigator.pushReplacementNamed(context, '/HomeScreen');
         _showSuccessMessage(context, "Login successful!");
       } else {

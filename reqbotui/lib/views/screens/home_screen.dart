@@ -8,6 +8,7 @@ import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/ProjectToDB.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'package:reqbot/views/screens/diagramsmenu.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_action_buttons.dart';
 import '../widgets/animated_project_card.dart';
@@ -33,36 +34,59 @@ class _HomeScreenState extends State<HomeScreen> {
   int? _lastRemovedProjectIndex;
   bool _isLoading = true; // Added loading state
 
+  // Future<void> getId() async {
+  //   final user = Supabase.instance.client.auth.currentUser;
+  //   final userId = user!.id;
+  //   final analyid = await Supabase.instance.client
+  //       .from('users')
+  //       .select("analyzer_id")
+  //       .eq('id', userId)
+  //       .single();
+
+  //   context.read<UserDataProvider>().setAnalyzerId(analyid['analyzer_id']);
+  // }
+
   @override
   initState() {
     super.initState();
     _loadProjects();
+    // getId();
+    // setState(() {});
+    // print(context.read<UserDataProvider>().AnalyzerID);
   }
 
   Future<void> _loadProjects() async {
     setState(() {
       _isLoading = true; // Set to loading state before fetch
+      // getId();
     });
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt('analyzer_id') ?? 0;
+    context.read<UserDataProvider>().setAnalyzerId(id);
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      final userId = user!.id;
-      final analyid = await Supabase.instance.client
-          .from('users')
-          .select("analyzer_id")
-          .eq('id', userId)
-          .single();
+      // final user = Supabase.instance.client.auth.currentUser;
+      // final userId = user!.id;
+      // final analyid = await Supabase.instance.client
+      //     .from('users')
+      //     .select("analyzer_id")
+      //     .eq('id', userId)
+      //     .single();
 
-      context.read<UserDataProvider>().setAnalyzerId(analyid['analyzer_id']);
+      // context.read<UserDataProvider>().setAnalyzerId(analyid['analyzer_id']);
 
-      final clientid = analyid['analyzer_id'];
+      // final clientid = analyid['analyzer_id'];
 
-      final response =
-          await _supabase.from('projects').select().eq('analyzer_id', clientid);
+      final response = await _supabase
+          .from('projects')
+          .select()
+          .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID);
 
       setState(() {
         _projects = response.map((p) => ProjectModel.fromMap(p)).toList();
         _isLoading = false; // Set loading to false after data is ready
+
+        // print(_projects[76].name);
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

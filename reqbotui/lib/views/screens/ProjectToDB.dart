@@ -71,23 +71,18 @@ class _ProjectToDBState extends State<ProjectToDB> {
             ElevatedButton(
               onPressed: _accepted && ProjName.text.isNotEmpty
                   ? () async {
-                      // final user = Supabase.instance.client.auth.currentUser;
-                      // final userId = user!.id;
-                      // final analyid = await Supabase.instance.client
-                      //     .from('users')
-                      //     .select("analyzer_id")
-                      //     .eq('id', userId)
-                      //     .single();
-                      await Supabase.instance.client.from('projects').insert(
+                      final x0 = await Supabase.instance.client
+                          .from('projects')
+                          .insert(
                         {
                           "analyzer_id":
                               context.read<UserDataProvider>().AnalyzerID,
-                          // "analyzer_id": analyid['analyzer_id'],
                           "name": ProjName.text
                         },
-                      );
-                      // context.read
-                      // Continue action
+                      ).select();
+                      context
+                          .read<UserDataProvider>()
+                          .setProjectId(x0[0]['id']);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -95,7 +90,7 @@ class _ProjectToDBState extends State<ProjectToDB> {
                         ),
                       );
                     }
-                  : null, // disabled if not accepted
+                  : null,
               child: Text("Continue"),
             ),
 

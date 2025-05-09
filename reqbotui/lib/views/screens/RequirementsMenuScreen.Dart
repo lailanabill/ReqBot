@@ -4,6 +4,7 @@ import 'package:reqbot/views/screens/diagramsmenu.dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/non_functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/summary.dart';
+import 'package:reqbot/views/screens/reqsMark.dart';
 import 'package:reqbot/views/screens/transcript.dart';
 
 class RequirementsMenuScreen extends StatefulWidget {
@@ -28,6 +29,12 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
       'subtitle': 'System qualities and constraints',
       'icon': Icons.speed_outlined, 
       'route': const NonFunctionalRequirementsScreen(),
+    },
+    {
+      'title': 'Requirements',
+      'subtitle': 'Requirements',
+      'icon': Icons.mark_as_unread_outlined, 
+      'route': const ReqsMarkScreen(),
     },
     {
       'title': 'Summary',

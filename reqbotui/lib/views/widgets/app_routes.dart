@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reqbot/views/screens/dbtest.dart';
 import 'package:reqbot/views/screens/summary.dart';
 import 'package:reqbot/views/screens/transcript.dart';
 // import 'package:reqbot/views/screens/selectReqs.dart';
@@ -17,6 +18,7 @@ class AppRoutes {
     '/sign-in': (context) => SignInPage(),
     '/sign-up': (context) => SignUpPage(),
     '/HomeScreen': (context) => HomeScreen(),
+    // '/HomeScreen': (context) => DbTestScreen(),
     '/record': (context) => Record(),
     '/FavoritesScreen': (context) => FavoritesScreen(),
     // '/Requirements': (context) => SelectReqs(myreqs: ,),

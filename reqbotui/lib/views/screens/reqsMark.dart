@@ -5,19 +5,24 @@ import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/summary.dart';
+import 'package:reqbot/views/screens/transcript.dart';
 import '../widgets/requirement_item.dart';
 import '../widgets/custom_dialog.dart';
 
-class TranscriptScreen extends StatefulWidget {
-  const TranscriptScreen({super.key});
+class ReqsMarkScreen extends StatefulWidget {
+  const ReqsMarkScreen({super.key});
 
   @override
-  _TranscriptScreenState createState() => _TranscriptScreenState();
+  _ReqsMarkScreenState createState() => _ReqsMarkScreenState();
 }
 
-class _TranscriptScreenState extends State<TranscriptScreen>
+class _ReqsMarkScreenState extends State<ReqsMarkScreen>
     with TickerProviderStateMixin {
-  String Trasncription = "";
+  // final Map<String, bool> _requirements = {
+  //   "Non-Functional Requirement 1": false,
+  //   // "Non-Functional Requirement 2": false,
+  // };
+  String Requirements = "";
   final TextEditingController _editingController = TextEditingController();
   // String? _editingKey;
   late AnimationController _animationController;
@@ -27,8 +32,9 @@ class _TranscriptScreenState extends State<TranscriptScreen>
 
   @override
   void initState() {
-    Trasncription = context.read<DataProvider>().transcript;
     super.initState();
+    Requirements = context.read<DataProvider>().requirements;
+    print(Requirements);
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -53,7 +59,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
       appBar: AppBar(
         title: Center(
           child: const Text(
-            'Transcription',
+            'Requirements',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -150,18 +156,17 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                       child: Row(
                         children: [
                           Expanded(
-                            child: MarkdownBody(
-                              data: Trasncription.isEmpty
-                                  ? "Trasncription is yet to be provided"
-                                  : Trasncription,
-                              styleSheet: MarkdownStyleSheet(
-                                p: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              child: MarkdownBody(
+                            data: Requirements.isEmpty
+                                ? "Requirements is yet to be provided"
+                                : Requirements,
+                            styleSheet: MarkdownStyleSheet(
+                              p: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ),
+                          )),
                           Transform.scale(
                             scale: 1.2,
                           ),
