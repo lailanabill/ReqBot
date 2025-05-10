@@ -1,0 +1,30 @@
+@startuml
+title School System Class Diagram
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+class User {
+  - username: String
+  - password: String
+  + login(): Boolean
+  + signup(): Boolean
+}
+class Admin {
+  - username: String
+  - password: String
+  + login(): Boolean
+  + getAdminDashboard(): String
+}
+class Product {
+  - id: Integer
+  - name: String
+  + addProduct(): Boolean
+  + editProduct(): Boolean
+}
+Admin --> Product : manages
+User <|-- Admin : is a type of
+@enduml

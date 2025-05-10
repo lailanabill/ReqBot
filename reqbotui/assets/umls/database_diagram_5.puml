@@ -1,0 +1,31 @@
+@startuml
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+skinparam classAttributeIconSize 0
+title School System Class Diagram
+class User {
+.. Represents a user in the school system. ..
+
++ userId: String {PK, NOT NULL}
+- username: String {NOT NULL}
+- password: String {NOT NULL}
+
++ login(): boolean
++ signup(username: String, password: String): boolean
+}
+class Product {
+.. Represents a product in the school system. ..
+
++ productId: String {PK, NOT NULL}
+- productName: String {NOT NULL}
+- price: Double {NOT NULL}
+
++ addProduct(productName: String, price: Double): boolean
++ editProduct(productId: String, productName: String, price: Double): boolean
++ deleteProduct(productId: String): boolean
+}
+User "1" -- "1" Product : A user can have one product, and a product belongs to one user.
+@enduml

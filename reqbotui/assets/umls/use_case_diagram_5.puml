@@ -1,0 +1,28 @@
+@startuml
+left to right direction
+title School System Requirements Diagram
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkGray
+    ActorBorderColor Navy
+}
+
+actor "Student" as Student
+actor "Administrator" as Administrator
+
+rectangle "School System" {
+    usecase "User Sign-up" as FR001
+    Student --> FR001
+    usecase "User Login" as FR002
+    Student --> FR002
+    usecase "Admin Dashboard" as FR003
+    usecase "Add Product" as FR004
+    FR003 ..> FR004 : <<include>>
+    usecase "Edit Product" as FR005
+    FR003 ..> FR005 : <<include>>
+    usecase "Delete Product" as FR006
+    FR003 ..> FR006 : <<include>>
+    Administrator --> FR003
+}
+@enduml

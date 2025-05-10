@@ -194,7 +194,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
       parent: _animationController,
       curve: Interval(
         index * 0.1, // Stagger start times
-        0.5 + index * 0.1, // Stagger end times
+        (index * 0.1 + 0.5).clamp(0.0, 1.0), // Stagger end times
+        // 0.5 + index * 0.1, // Stagger end times
         curve: Curves.easeOut,
       ),
     );

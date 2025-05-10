@@ -1,0 +1,25 @@
+@startuml
+skinparam monochrome true
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+    FontSize 12
+}
+skinparam circle {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam ArrowThickness 1
+skinparam ArrowFontSize 10
+
+circle "School System" as SysName
+
+rectangle "User" as EE1
+rectangle "Admin" as EE2
+
+SysName --> EE1: Login Information
+EE1 --> SysName: Registration Data
+SysName --> EE2: Product Information & Tools
+EE2 --> SysName: Product Add/Edit/Delete Requests
+@enduml

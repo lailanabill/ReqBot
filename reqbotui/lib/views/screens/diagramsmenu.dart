@@ -9,7 +9,8 @@ class DiagramsMenu extends StatefulWidget {
   State<DiagramsMenu> createState() => _DiagramsMenuState();
 }
 
-class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderStateMixin {
+class _DiagramsMenuState extends State<DiagramsMenu>
+    with SingleTickerProviderStateMixin {
   final List<Map<String, dynamic>> diagrams = [
     {
       'name': 'Use Case Diagram',
@@ -31,7 +32,8 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
     },
     {
       'name': 'Class Diagram',
-      'description': 'Show structure of the system with classes and relationships',
+      'description':
+          'Show structure of the system with classes and relationships',
       'diagramName': 'class',
       'icon': Icons.schema_outlined
     },
@@ -44,7 +46,7 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
   ];
 
   late AnimationController _animationController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +56,7 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
     );
     _animationController.forward();
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -78,7 +80,8 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
+                        icon: const Icon(Icons.arrow_back_ios,
+                            color: Colors.black87, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -107,7 +110,8 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                      color: const Color.fromARGB(255, 0, 54, 218)
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
@@ -121,9 +125,9 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
                 ],
               ),
             ),
-            
+
             const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-            
+
             // Main Content
             Expanded(
               child: Padding(
@@ -147,7 +151,7 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
                       ),
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Diagram List
                     Expanded(
                       child: LayoutBuilder(
@@ -198,36 +202,36 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
   }
 
   Widget _buildAnimatedDiagramCard(BuildContext context, int index) {
-  final Animation<double> animation = CurvedAnimation(
-    parent: _animationController,
-    curve: Interval(
-      (index / diagrams.length) * 0.75,
-      0.75 + (index / diagrams.length) * 0.25,
-      curve: Curves.easeOut, // Changed from easeOutBack to a safer curve
-    ),
-  );
-  
-  return AnimatedBuilder(
-    animation: animation,
-    builder: (context, child) {
-      // Clamp the opacity value to ensure it stays between 0.0 and 1.0
-      final double safeOpacity = animation.value.clamp(0.0, 1.0);
-      
-      return Transform.translate(
-        offset: Offset(0, 50 * (1 - animation.value)),
-        child: Opacity(
-          opacity: safeOpacity, // Use the clamped value
-          child: child,
-        ),
-      );
-    },
-    child: _buildDiagramCard(context, index),
-  );
-}
+    final Animation<double> animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Interval(
+        (index / diagrams.length) * 0.75,
+        0.75 + (index / diagrams.length) * 0.25,
+        curve: Curves.easeOut, // Changed from easeOutBack to a safer curve
+      ),
+    );
+
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        // Clamp the opacity value to ensure it stays between 0.0 and 1.0
+        final double safeOpacity = animation.value.clamp(0.0, 1.0);
+
+        return Transform.translate(
+          offset: Offset(0, 50 * (1 - animation.value)),
+          child: Opacity(
+            opacity: safeOpacity, // Use the clamped value
+            child: child,
+          ),
+        );
+      },
+      child: _buildDiagramCard(context, index),
+    );
+  }
 
   Widget _buildDiagramCard(BuildContext context, int index) {
     final Map<String, dynamic> diagram = diagrams[index];
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -337,9 +341,9 @@ class _DiagramsMenuState extends State<DiagramsMenu> with SingleTickerProviderSt
               Text(
                 diagram['name'],
                 style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87),
               ),
               const SizedBox(height: 4),
               Text(

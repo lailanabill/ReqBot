@@ -1,0 +1,16 @@
+@startuml
+title Sequence Diagram
+skinparam sequence {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkGray
+    ActorBorderColor Navy
+}
+
+actor SPEAKER_00 as "SPEAKER_00"
+actor User as "User"
+actor Admin as "Admin"
+participant System as "System"
+SPEAKER_00 -> User: Log in and sign up
+SPEAKER_00 -> Admin: Admin dashboard to add, edit, and delete products
+@enduml
