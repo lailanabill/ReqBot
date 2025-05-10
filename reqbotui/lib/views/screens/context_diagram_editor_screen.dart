@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'dart:convert'; // For base64 encoding
 import 'package:archive/archive.dart'; // For zlib compression
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'dart:async'; // For debouncing
 import 'package:reqbot/views/widgets/Contextdiagram/context_diagram_widgets.dart';
 import 'package:http/http.dart' as http;
@@ -66,8 +68,8 @@ class _ContextDiagramEditorScreenState
       //   _plantUmlCode = await file.readAsString();
       // });
 
-      final contents =
-          await rootBundle.loadString('assets/umls/context_diagram_5.puml');
+      final contents = await rootBundle.loadString(
+          'assets/umls/context_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       final cleaned = contents.trim().replaceAll('\r\n', '\n');
 
       setState(() {

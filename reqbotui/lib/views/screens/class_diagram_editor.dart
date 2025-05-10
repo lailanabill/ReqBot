@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/widgets/Classdiagram/editor_tools.dart'; // Adjust path as needed
 
 class ClassDiagramEditor extends StatefulWidget {
@@ -42,8 +44,8 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
       //   _plantUmlCode = await file.readAsString();
       // });
 
-      final contents =
-          await rootBundle.loadString('assets/umls/class_diagram_5.puml');
+      final contents = await rootBundle.loadString(
+          'assets/umls/class_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       final cleaned = contents.trim().replaceAll('\r\n', '\n');
       setState(() {
         plantumlCode = cleaned;

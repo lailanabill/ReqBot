@@ -6,9 +6,12 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:archive/archive.dart'; // For zlib compression
+import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import 'dart:html' as html;
+
+import 'package:reqbot/services/providers/userProvider.dart';
 
 class UseCaseValidation extends StatefulWidget {
   const UseCaseValidation({Key? key}) : super(key: key);
@@ -81,8 +84,8 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
       //   _plantUmlCode = await file.readAsString();
       // });
 
-      final contents =
-          await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
+      final contents = await rootBundle.loadString(
+          'assets/umls/use_case_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       setState(() {
         _plantUmlCode = contents;
         // _plantUmlCode = cleanedContents;

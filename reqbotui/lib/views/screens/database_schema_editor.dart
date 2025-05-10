@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/widgets/Database_schema/management.dart';
 import 'package:reqbot/views/widgets/Database_schema/editing.dart';
 
@@ -43,8 +45,8 @@ class _DatabaseSchemaEditorState extends State<DatabaseSchemaEditor> {
       //   _plantUmlCode = await file.readAsString();
       // });
 
-      final contents =
-          await rootBundle.loadString('assets/umls/database_diagram_5.puml');
+      final contents = await rootBundle.loadString(
+          'assets/umls/database_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       setState(() {
         plantumlCode = contents;
         _plantumlController = TextEditingController(text: plantumlCode);

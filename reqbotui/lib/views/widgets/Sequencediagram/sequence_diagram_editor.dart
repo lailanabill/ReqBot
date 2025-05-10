@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:archive/archive.dart'; // For zlib compression
+import 'package:archive/archive.dart';
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart'; // For zlib compression
 
 class SequenceDiagramEditor extends StatefulWidget {
   const SequenceDiagramEditor({Key? key}) : super(key: key);
@@ -83,8 +85,8 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
       //   _plantUmlCode = await file.readAsString();
       // });
 
-      final contents =
-          await rootBundle.loadString('assets/umls/sequence_diagram_5.puml');
+      final contents = await rootBundle.loadString(
+          'assets/umls/sequence_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       setState(() {
         _plantUmlCode = contents;
       });
