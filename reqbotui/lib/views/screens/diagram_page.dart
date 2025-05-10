@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/context_diagram_editor_screen.dart';
 import 'package:reqbot/views/screens/database_schema_editor.dart';
 import 'package:reqbot/views/screens/sequence_diagram_screen.dart';
@@ -17,6 +19,7 @@ class DiagramPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final int diagramIndex = context.read<UserDataProvider>().SelectedProjectId;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -139,7 +142,7 @@ class DiagramPage extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(
-                            "https://storage.googleapis.com/diagrams-data/images/${dgrnam}_diagram_5.png",
+                            "https://storage.googleapis.com/diagrams-data/images/${dgrnam}_diagram_${diagramIndex}.png",
                             width: screenWidth * 0.9,
                             height: screenHeight * 0.6,
                             fit: BoxFit.contain,

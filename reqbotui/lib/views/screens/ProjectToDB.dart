@@ -15,109 +15,106 @@ class ProjectToDB extends StatefulWidget {
   _ProjectToDBState createState() => _ProjectToDBState();
 }
 
-class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStateMixin {
+class _ProjectToDBState extends State<ProjectToDB>
+    with SingleTickerProviderStateMixin {
   bool _accepted = false;
   final projNameController = TextEditingController();
   final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
   bool _isLoading = false;
-  
+
   // Animation controllers
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _checkboxAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Set up animations
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
       ),
     );
-    
+
     _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
       ),
     );
-    
+
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.2, 0.8, curve: Curves.easeOutBack),
       ),
     );
-    
+
     _checkboxAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.6, 1.0, curve: Curves.elasticOut),
       ),
     );
-    
+
     // Start the animations
     _animationController.forward();
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();
     projNameController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _handleContinue() async {
     if (!_accepted || projNameController.text.isEmpty) return;
-    
+
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       HapticFeedback.mediumImpact();
-      
+
       // Show loading dialog
       _showLoadingDialog();
-      
+
       // Insert project into Supabase
-      final response = await Supabase.instance.client
-        .from('projects')
-        .insert({
-          "analyzer_id": context.read<UserDataProvider>().AnalyzerID,
-          "name": projNameController.text
-        })
-        .select();
-      
+      final response = await Supabase.instance.client.from('projects').insert({
+        "analyzer_id": context.read<UserDataProvider>().AnalyzerID,
+        "name": projNameController.text
+      }).select();
+
       // Set project ID in provider
       context.read<UserDataProvider>().setProjectId(response[0]['id']);
-      
+
       // Close loading dialog
       Navigator.pop(context);
-      
+
       // Show success animation
       _showSuccessDialog();
-      
     } catch (e) {
       // Close loading dialog if open
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
-      
+
       setState(() {
         _isLoading = false;
       });
-      
+
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -128,7 +125,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       );
     }
   }
-  
+
   void _showLoadingDialog() {
     showDialog(
       context: context,
@@ -176,7 +173,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       ),
     );
   }
-  
+
   void _showSuccessDialog() {
     showDialog(
       context: context,
@@ -264,7 +261,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
           children: [
             // Custom App Bar
             _buildCustomAppBar(),
-            
+
             // Main Content
             Expanded(
               child: SingleChildScrollView(
@@ -276,19 +273,19 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
                     children: [
                       // Header with title and description
                       _buildAnimatedHeader(),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Project Name Input
                       _buildAnimatedProjectNameInput(),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Terms & Conditions
                       _buildAnimatedTermsAndConditions(),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Information Card
                       _buildAnimatedInfoCard(),
                     ],
@@ -296,7 +293,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
                 ),
               ),
             ),
-            
+
             // Continue Button at bottom
             _buildContinueButton(),
           ],
@@ -304,7 +301,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       ),
     );
   }
-  
+
   Widget _buildCustomAppBar() {
     return AnimatedBuilder(
       animation: _fadeInAnimation,
@@ -372,7 +369,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       },
     );
   }
-  
+
   Widget _buildAnimatedHeader() {
     return AnimatedBuilder(
       animation: _animationController,
@@ -409,7 +406,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       ),
     );
   }
-  
+
   Widget _buildAnimatedProjectNameInput() {
     return AnimatedBuilder(
       animation: _animationController,
@@ -504,7 +501,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       ),
     );
   }
-  
+
   Widget _buildAnimatedTermsAndConditions() {
     return AnimatedBuilder(
       animation: _animationController,
@@ -526,10 +523,13 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
         },
         child: Container(
           decoration: BoxDecoration(
-            color: _accepted ? primaryColor.withOpacity(0.05) : Colors.transparent,
+            color:
+                _accepted ? primaryColor.withOpacity(0.05) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: _accepted ? primaryColor.withOpacity(0.3) : Colors.grey.withOpacity(0.3),
+              color: _accepted
+                  ? primaryColor.withOpacity(0.3)
+                  : Colors.grey.withOpacity(0.3),
             ),
           ),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -547,7 +547,9 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
                         color: _accepted ? primaryColor : Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: _accepted ? primaryColor : Colors.grey.withOpacity(0.5),
+                          color: _accepted
+                              ? primaryColor
+                              : Colors.grey.withOpacity(0.5),
                           width: 2,
                         ),
                       ),
@@ -579,7 +581,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       ),
     );
   }
-  
+
   Widget _buildAnimatedInfoCard() {
     return AnimatedBuilder(
       animation: _animationController,
@@ -626,7 +628,7 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
                   Text(
                     'After creating your project, you\'ll be able to record requirements through audio transcription.',
                     style: GoogleFonts.inter(
-                                      fontSize: 14,
+                      fontSize: 14,
                       color: Colors.black54,
                       height: 1.5,
                     ),
@@ -679,10 +681,10 @@ class _ProjectToDBState extends State<ProjectToDB> with SingleTickerProviderStat
       ),
     );
   }
-  
+
   Widget _buildContinueButton() {
     final bool isValid = _accepted && projNameController.text.isNotEmpty;
-    
+
     return AnimatedBuilder(
       animation: _fadeInAnimation,
       builder: (context, child) {

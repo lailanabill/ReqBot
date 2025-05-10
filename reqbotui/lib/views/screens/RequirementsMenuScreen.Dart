@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/diagramsmenu.dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/non_functional_requirements_screen.dart';
@@ -8,15 +10,19 @@ import 'package:reqbot/views/screens/reqsMark.dart';
 import 'package:reqbot/views/screens/transcript.dart';
 
 class RequirementsMenuScreen extends StatefulWidget {
-  const RequirementsMenuScreen({Key? key}) : super(key: key);
+  final int projectID;
+  const RequirementsMenuScreen({Key? key, required this.projectID})
+      : super(key: key);
 
   @override
   State<RequirementsMenuScreen> createState() => _RequirementsMenuScreenState();
 }
 
-class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with SingleTickerProviderStateMixin {
+class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  
+  late int projectID;
+
   final List<Map<String, dynamic>> _menuItems = [
     {
       'title': 'Functional Requirements',
@@ -27,13 +33,13 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
     {
       'title': 'Non-Functional Requirements',
       'subtitle': 'System qualities and constraints',
-      'icon': Icons.speed_outlined, 
+      'icon': Icons.speed_outlined,
       'route': const NonFunctionalRequirementsScreen(),
     },
     {
       'title': 'Requirements',
       'subtitle': 'Requirements',
-      'icon': Icons.mark_as_unread_outlined, 
+      'icon': Icons.mark_as_unread_outlined,
       'route': const ReqsMarkScreen(),
     },
     {
@@ -65,13 +71,17 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
   @override
   void initState() {
     super.initState();
+    projectID = widget.projectID;
+    context.read<UserDataProvider>().setSelectedProjectId(projectID);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
     _animationController.forward();
+
+    print("Requirements Menu Screen initialized ${projectID}");
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -95,7 +105,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
+                        icon: const Icon(Icons.arrow_back_ios,
+                            color: Colors.black87, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -124,7 +135,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                      color: const Color.fromARGB(255, 0, 54, 218)
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
@@ -138,9 +150,9 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
                 ],
               ),
             ),
-            
+
             const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-            
+
             // Main Content
             Expanded(
               child: Padding(
@@ -164,12 +176,13 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
                       ),
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Menu Items List with animations
                     Expanded(
                       child: ListView.separated(
                         itemCount: _menuItems.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 12),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           return _buildAnimatedMenuItem(index);
                         },
@@ -188,7 +201,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
   Widget _buildAnimatedMenuItem(int index) {
     final Map<String, dynamic> item = _menuItems[index];
     final bool isDisabled = item['route'] == null;
-    
+
     // Create staggered animations
     final Animation<double> animation = CurvedAnimation(
       parent: _animationController,
@@ -199,13 +212,13 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
         curve: Curves.easeOut,
       ),
     );
-    
+
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
         // Ensure opacity stays within valid range
         final double safeOpacity = animation.value.clamp(0.0, 1.0);
-        
+
         return Transform.translate(
           offset: Offset(100 * (1 - animation.value), 0),
           child: Opacity(
@@ -236,7 +249,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: isDisabled 
+          onTap: isDisabled
               ? () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Coming soon!')),
@@ -246,15 +259,18 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
                   Navigator.push(
                     context,
                     PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) => item['route'],
-                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          item['route'],
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
                         const begin = Offset(1.0, 0.0);
                         const end = Offset.zero;
                         const curve = Curves.easeInOutCubic;
-                        
-                        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
                         var offsetAnimation = animation.drive(tween);
-                        
+
                         return SlideTransition(
                           position: offsetAnimation,
                           child: FadeTransition(
@@ -287,7 +303,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
                     decoration: BoxDecoration(
                       color: isDisabled
                           ? Colors.grey.withOpacity(0.1)
-                          : const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                          : const Color.fromARGB(255, 0, 54, 218)
+                              .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -319,7 +336,9 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen> with Si
                         item['subtitle'],
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: isDisabled ? Colors.grey.shade400 : Colors.black54,
+                          color: isDisabled
+                              ? Colors.grey.shade400
+                              : Colors.black54,
                         ),
                       ),
                     ],

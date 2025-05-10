@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   ProjectModel? _lastRemovedProject;
   int? _lastRemovedProjectIndex;
   bool _isLoading = true;
-  
+
   // Add animation controller for removal animation
   late AnimationController _removeAnimationController;
   int? _removingProjectId;
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // getId();
     // setState(() {});
     // print(context.read<UserDataProvider>().AnalyzerID);
-    
+
     // Initialize remove animation controller
     _removeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 400),
@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _lastRemovedProject = _projects[index];
       _lastRemovedProjectIndex = index;
     });
-    
+
     _removeAnimationController.reset();
     _removeAnimationController.forward().then((_) {
       setState(() {
@@ -136,9 +136,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () {
-              if (_lastRemovedProject != null && _lastRemovedProjectIndex != null) {
+              if (_lastRemovedProject != null &&
+                  _lastRemovedProjectIndex != null) {
                 setState(() {
-                  _projects.insert(_lastRemovedProjectIndex!, _lastRemovedProject!);
+                  _projects.insert(
+                      _lastRemovedProjectIndex!, _lastRemovedProject!);
                 });
                 _lastRemovedProject = null;
                 _lastRemovedProjectIndex = null;
@@ -328,7 +330,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       const SizedBox(height: 16),
                                   itemBuilder: (context, index) {
                                     final project = _projects[index];
-                                    return _buildProjectCard(project, index);
+                                    context
+                                        .read<UserDataProvider>()
+                                        .setProjectId(project.id);
+                                    print(project.id);
+                                    return _buildProjectCard(
+                                        project, index, project.id);
                                   },
                                 ),
                     ),
@@ -399,7 +406,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildProjectCard(ProjectModel project, int index) {
+  Widget _buildProjectCard(ProjectModel project, int index, int ProjectID) {
     // Using Consumer for better reactivity to favorite changes
     final bool isRemoving = _removingProjectId == project.id;
     final Animation<double> removeAnimation = CurvedAnimation(
@@ -442,7 +449,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(12),
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => RequirementsMenuScreen()),
+              MaterialPageRoute(
+                  builder: (context) =>
+                      RequirementsMenuScreen(projectID: ProjectID)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -452,7 +461,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                      color: const Color.fromARGB(255, 0, 54, 218)
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Center(
@@ -487,7 +497,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   Consumer<FavoritesProvider>(
                     builder: (context, favoritesProvider, _) {
-                      final isFavorite = favoritesProvider.favoriteProjects.contains(project.name);
+                      final isFavorite = favoritesProvider.favoriteProjects
+                          .contains(project.name);
                       return IconButton(
                         icon: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_outline,

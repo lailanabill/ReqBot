@@ -3,9 +3,11 @@ import 'package:flutter/foundation.dart';
 class UserDataProvider with ChangeNotifier {
   int _AnalyzerId = 0;
   int _ProjectId = 0;
+  int _SelectedProjectId = 0;
   bool clickable = false;
   int get AnalyzerID => _AnalyzerId;
   int get ProjectId => _ProjectId;
+  int get SelectedProjectId => _SelectedProjectId;
   bool get Clickable => clickable;
 
   void setAnalyzerId(int AnalyzerId) {
@@ -15,6 +17,11 @@ class UserDataProvider with ChangeNotifier {
 
   void setProjectId(int ProjectId) {
     _ProjectId = ProjectId;
+    notifyListeners();
+  }
+
+  void setSelectedProjectId(int SelectedProjectId) {
+    _SelectedProjectId = SelectedProjectId;
     notifyListeners();
   }
 
