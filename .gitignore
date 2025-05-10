@@ -4,7 +4,7 @@ Lama/dump.txt
 Lama/xoxo.html
 Lama/summReq.ipynb
 reqbotui/lib/servers/Lama/UseCaseDiagram.jpeg
-*.puml
+
 *.jpeg
 *.png
 *.json
@@ -14,8 +14,6 @@ temp_x0xo.mp3
 reqbotui/lib/servers/main-server/x0xo.mp3
 .env
 reqbotui/.env
-reqbotui/.env
-reqbotui/.env
 Lama/mainOfScripts.txt
 reqbotui/.env
 temp_new142.wav
@@ -23,3 +21,10 @@ temp_newMult.wav
 temp_newshahd.wav
 Lama/mainOfScripts.txt
 reqbotui/.env
+reqbotui/lib/views/screens/dbtest.dart
+class_diagram_5.puml
+context_diagram.puml
+database_diagram.puml
+Lama/mainOfScripts.txt
+reqbotui/.env
+reqbotui/lib/controllers/DbController.dart

@@ -60,10 +60,14 @@ class _SignInPageState extends State<SignInPage> {
                   TextFormField(
                     controller: controller.emailController,
                     validator: controller.validateEmail,
+                    style: GoogleFonts.inter(
+                      color: Colors.black,
+                      fontSize: 14,
+                    ),
                     decoration: InputDecoration(
                       hintText: "Enter your username e-mail",
                       hintStyle: GoogleFonts.inter(
-                        color: Colors.grey,
+                        color: Colors.black,
                         fontSize: 14,
                       ),
                       prefixIcon:
@@ -100,11 +104,15 @@ class _SignInPageState extends State<SignInPage> {
                   TextFormField(
                     controller: controller.passwordController,
                     validator: controller.validatePassword,
+                    style: GoogleFonts.inter(
+                      color: Colors.black,
+                      fontSize: 14,
+                    ),
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: "Enter your password",
                       hintStyle: GoogleFonts.inter(
-                        color: Colors.grey,
+                        color: Colors.black,
                         fontSize: 14,
                       ),
                       prefixIcon:
