@@ -25,7 +25,49 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
   //   }
   // }
 
-  Future<void> downloadFile(String fileName) async {
+  void _extractLifelinesFromPuml() {
+    final RegExp lifelineRegex = RegExp(r'participant\s+"?([^"]+)"?');
+    final matches = lifelineRegex.allMatches(_plantUmlCode);
+
+    setState(() {
+      _lifelines = matches.map((m) => m.group(1)!).toList();
+
+      if (_lifelines.isNotEmpty) {
+        _selectedLifeline = _lifelines.first;
+        _lifelineToRemove = _lifelines.first;
+        _lifelineToRename = _lifelines.first;
+      }
+    });
+  }
+
+  void _extractMessagesFromPuml() {
+    final RegExp messageRegex = RegExp(r'(\w+)\s*([-><]+)\s*(\w+)\s*:\s*(.+)');
+
+    _existingMessages = [];
+
+    for (var match in messageRegex.allMatches(_plantUmlCode)) {
+      if (match.groupCount >= 4) {
+        _existingMessages.add({
+          'source': match.group(1)!,
+          'arrow': match.group(2)!,
+          'target': match.group(3)!,
+          'label': match.group(4)!,
+          'line': match.group(0)!
+        });
+      }
+    }
+
+    if (_existingMessages.isNotEmpty) {
+      _selectedMessageIndex = 0;
+      _sourceLifeline = _existingMessages[0]['source'];
+      _targetLifeline = _existingMessages[0]['target'];
+      _messageType = _existingMessages[0]['arrow'];
+    }
+
+    setState(() {});
+  }
+
+  void downloadFile(String fileName) async {
     // Future<void> downloadFile(String url, String fileName) async {
     try {
       // // if mobile
@@ -40,28 +82,16 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
       // setState(() async {
       //   _plantUmlCode = await file.readAsString();
       // });
-      print('found it');
-      // return contents;
-      // } else {
-      //   throw Exception("File not found at: $filePath");
-      // }
-      // // if web
-      // final response = await http.get(Uri.parse(url));
-      // if (response.statusCode == 200) {
-      //   setState(() {
-      //     _plantUmlCode = response.body; // This is your PUML code
-      //   });
-      //   print("wasal ");
-      //   print(_plantUmlCode);
-      // } else {
-      //   throw Exception('Failed to load file: ${response.statusCode}');
-      // }
 
       final contents =
-          await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
+          await rootBundle.loadString('assets/umls/sequence_diagram_5.puml');
       setState(() {
         _plantUmlCode = contents;
       });
+      _extractLifelinesFromPuml();
+      _extractMessagesFromPuml();
+      _loadDiagram();
+      _extractExistingMessages();
       print("PUML Loaded:\n$_plantUmlCode");
     } catch (e) {
       print("Download failed: $e");
@@ -76,30 +106,9 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
   String? _imageUrl;
   String? _errorMessage;
 
-//   String _plantUmlCode = '''@startuml
-// actor "User" as User
-// participant "Task Management System" as System
-// participant "Database" as Database
-// participant "Notification Service" as Notify
-
-// User -> System: Create Task
-// System -> Database: Insert Task Data
-// Database --> System: Task Created
-
-// User -> System: Assign Task to User(s)
-// System -> Database: Update Task Assignees
-// Database --> System: Assignment Confirmed
-
-// System -> Notify: Trigger Assignment Notification
-// Notify --> System: Notification Sent
-
-// System --> User: Task Assigned & Notified
-
-// @enduml''';
-
-  List<String> _lifelines = ['User', 'System', 'Database'];
-  String _selectedLifeline = 'User';
-  String _lifelineToRemove = 'User';
+  List<String> _lifelines = [];
+  String _selectedLifeline = '';
+  String _lifelineToRemove = '';
   String _sourceLifeline = '';
   String _targetLifeline = '';
   String _messageType = '->';
@@ -113,8 +122,9 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
       TextEditingController();
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
+    downloadFile('sequence_diagram_5.puml');
     _loadDiagram();
     _extractExistingMessages();
     // final res = await loadPuml();
@@ -129,7 +139,6 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
     //     _isLoading = false;
     //   });
     // }
-    downloadFile('sequence_diagram_5.puml');
   }
 
   @override

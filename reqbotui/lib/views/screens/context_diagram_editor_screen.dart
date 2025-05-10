@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'dart:convert'; // For base64 encoding
@@ -48,7 +50,7 @@ class _ContextDiagramEditorScreenState
   //   }
   // }
 
-  Future<void> downloadFile(String fileName) async {
+  void downloadFile(String fileName) async {
     // Future<void> downloadFile(String url, String fileName) async {
     try {
       // // if mobile
@@ -63,28 +65,16 @@ class _ContextDiagramEditorScreenState
       // setState(() async {
       //   _plantUmlCode = await file.readAsString();
       // });
-      print('found it');
-      // return contents;
-      // } else {
-      //   throw Exception("File not found at: $filePath");
-      // }
-      // // if web
-      // final response = await http.get(Uri.parse(url));
-      // if (response.statusCode == 200) {
-      //   setState(() {
-      //     _plantUmlCode = response.body; // This is your PUML code
-      //   });
-      //   print("wasal ");
-      //   print(_plantUmlCode);
-      // } else {
-      //   throw Exception('Failed to load file: ${response.statusCode}');
-      // }
 
       final contents =
-          await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
+          await rootBundle.loadString('assets/umls/context_diagram_5.puml');
+      final cleaned = contents.trim().replaceAll('\r\n', '\n');
+
       setState(() {
-        plantumlCode = contents;
+        plantumlCode = cleaned;
+        plantumlController = TextEditingController(text: plantumlCode);
       });
+      _loadDiagram();
       print("PUML Loaded:\n$plantumlCode");
     } catch (e) {
       print("Download failed: $e");
@@ -96,34 +86,29 @@ class _ContextDiagramEditorScreenState
 """;
 //   String plantumlCode = '''
 // @startuml
-// @startuml
-// left to right direction
 // skinparam monochrome true
+// skinparam class {
+//     BackgroundColor White
+//     BorderColor Black
+//     ArrowColor Black
+//     FontSize 12
+// }
+// skinparam circle {
+//     BackgroundColor White
+//     BorderColor Black
+// }
+// skinparam ArrowThickness 1
+// skinparam ArrowFontSize 10
 
-// actor "User" as user
-// actor "Admin" as admin
-// actor "QA Tester" as qa
-// actor "UX Designer" as ux
-// rectangle "Task Management System" as sys
-// rectangle "Notification Service" as notify
-// rectangle "Authentication Service" as auth
-// rectangle "Frontend UI" as frontend
+// circle "School System" as SysName
 
-// user --> sys : "Creates/Edits Tasks"
-// sys --> user : "Sends Notifications"
-// admin --> sys : "Manages Users"
-// qa --> sys : "Reports Issues"
-// ux --> sys : "Provides UI Feedback"
+// rectangle "User" as EE1
+// rectangle "Admin" as EE2
 
-// sys --> notify : "Triggers Notification"
-// notify --> sys : "Sends Delivery Status"
-
-// sys --> auth : "Validates User"
-// auth --> sys : "Returns Access Info"
-
-// user --> frontend : "Uses Interface"
-// frontend --> sys : "Calls APIs"
-
+// SysName --> EE1: Login Information
+// EE1 --> SysName: Registration Data
+// SysName --> EE2: Product Information & Tools
+// EE2 --> SysName: Product Add/Edit/Delete Requests
 // @enduml
 // ''';
 
@@ -139,18 +124,9 @@ class _ContextDiagramEditorScreenState
   String? _errorMessage;
 
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
-    // final res = await loadPuml();
-    // if (res['StatCode'] == 200) {
-    //   setState(() {
-    //     plantumlCode = res['body'];
-    //   });
-    // } else {
-    //   print("Error loading PUML file: ${res['StatCode']}");
-    // }
     downloadFile('context_diagram_5.puml');
-
     plantumlController = TextEditingController(text: plantumlCode);
     plantumlController.addListener(() {
       if (_debounce?.isActive ?? false) _debounce!.cancel();

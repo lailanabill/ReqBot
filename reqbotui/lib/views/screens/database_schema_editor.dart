@@ -27,7 +27,7 @@ class _DatabaseSchemaEditorState extends State<DatabaseSchemaEditor> {
   //   }
   // }
 
-  Future<void> downloadFile(String fileName) async {
+  void downloadFile(String fileName) async {
     // Future<void> downloadFile(String url, String fileName) async {
     try {
       // // if mobile
@@ -42,27 +42,13 @@ class _DatabaseSchemaEditorState extends State<DatabaseSchemaEditor> {
       // setState(() async {
       //   _plantUmlCode = await file.readAsString();
       // });
-      print('found it');
-      // return contents;
-      // } else {
-      //   throw Exception("File not found at: $filePath");
-      // }
-      // // if web
-      // final response = await http.get(Uri.parse(url));
-      // if (response.statusCode == 200) {
-      //   setState(() {
-      //     _plantUmlCode = response.body; // This is your PUML code
-      //   });
-      //   print("wasal ");
-      //   print(_plantUmlCode);
-      // } else {
-      //   throw Exception('Failed to load file: ${response.statusCode}');
-      // }
 
       final contents =
-          await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
+          await rootBundle.loadString('assets/umls/database_diagram_5.puml');
       setState(() {
         plantumlCode = contents;
+        _plantumlController = TextEditingController(text: plantumlCode);
+        _previousPlantumlCode = plantumlCode;
       });
       print("PUML Loaded:\n$plantumlCode");
     } catch (e) {
@@ -73,82 +59,14 @@ class _DatabaseSchemaEditorState extends State<DatabaseSchemaEditor> {
   String plantumlCode = """
 
 """;
-//   String plantumlCode = '''
-// @startuml
-// entity "Users" {
-//   *id : INT <<PK>>
-//   --
-//   name : VARCHAR(100)
-//   email : VARCHAR(100)
-//   is_active : BOOLEAN
-// }
-
-// entity "Tasks" {
-//   *task_id : INT <<PK>>
-//   --
-//   title : VARCHAR(255)
-//   description : TEXT
-//   deadline : DATETIME
-//   priority : VARCHAR(20)
-//   status : VARCHAR(20)
-//   created_by : INT <<FK>>
-// }
-
-// entity "Task_Assignees" {
-//   *id : INT <<PK>>
-//   --
-//   task_id : INT <<FK>>
-//   user_id : INT <<FK>>
-// }
-
-// entity "Notifications" {
-//   *notification_id : INT <<PK>>
-//   --
-//   user_id : INT <<FK>>
-//   content : TEXT
-//   is_read : BOOLEAN
-//   timestamp : DATETIME
-// }
-
-// entity "Preferences" {
-//   *id : INT <<PK>>
-//   --
-//   user_id : INT <<FK>>
-//   push_enabled : BOOLEAN
-//   daily_summary : BOOLEAN
-//   dark_mode : BOOLEAN
-// }
-
-// entity "Language_Settings" {
-//   *id : INT <<PK>>
-//   --
-//   user_id : INT <<FK>>
-//   language_code : VARCHAR(10)
-// }
-
-// Users ||--o{ Tasks : creates
-// Users ||--o{ Task_Assignees : assigned
-// Tasks ||--o{ Task_Assignees
-// Users ||--o{ Notifications : receives
-// Users ||--|| Preferences : has
-// Users ||--|| Language_Settings : uses
-// @enduml
-// ''';
 
   String? _previousPlantumlCode;
   late TextEditingController _plantumlController;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
-    // final res = await loadPuml();
-    // if (res['StatCode'] == 200) {
-    //   setState(() {
-    //     plantumlCode = res['body'];
-    //   });
-    // } else {
-    //   print("Error loading PUML file: ${res['StatCode']}");
-    // }
+
     downloadFile("database_diagram_5.puml");
     _plantumlController = TextEditingController(text: plantumlCode);
     _previousPlantumlCode = plantumlCode;

@@ -17,7 +17,7 @@ class DiagramPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -33,7 +33,8 @@ class DiagramPage extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
+                        icon: const Icon(Icons.arrow_back_ios,
+                            color: Colors.black87, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -62,7 +63,8 @@ class DiagramPage extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                      color: const Color.fromARGB(255, 0, 54, 218)
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
@@ -76,9 +78,9 @@ class DiagramPage extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-            
+
             // Main Content
             Expanded(
               child: Padding(
@@ -98,9 +100,11 @@ class DiagramPage extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                            color: const Color.fromARGB(255, 0, 54, 218)
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -114,9 +118,9 @@ class DiagramPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Diagram Display Card
                     Expanded(
                       child: Container(
@@ -165,9 +169,9 @@ class DiagramPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Action Buttons
                     Row(
                       children: [
@@ -181,54 +185,61 @@ class DiagramPage extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const ClassDiagramEditor(),
+                                      builder: (context) =>
+                                          const ClassDiagramEditor(),
                                     ),
                                   );
                                 } else if (diagramName == 'Use Case Diagram') {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const UseCaseValidation(),
+                                      builder: (context) =>
+                                          const UseCaseValidation(),
                                     ),
                                   );
                                 } else if (diagramName == 'Database Schema') {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const DatabaseSchemaEditor(),
+                                      builder: (context) =>
+                                          const DatabaseSchemaEditor(),
                                     ),
                                   );
                                 } else if (diagramName == 'Sequence Diagram') {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const SequenceDiagramScreen(),
+                                      builder: (context) =>
+                                          const SequenceDiagramScreen(),
                                     ),
                                   );
                                 } else if (diagramName == 'Context Diagram') {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const ContextDiagramEditorScreen(),
+                                      builder: (context) =>
+                                          const ContextDiagramEditorScreen(),
                                     ),
                                   );
                                 } else {
                                   // For other diagram types, show a placeholder message
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Editor for $diagramName not implemented yet')
-                                    ),
+                                        content: Text(
+                                            'Editor for $diagramName not implemented yet')),
                                   );
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(255, 0, 54, 218),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 0, 54, 218),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 elevation: 0,
-                                padding: const EdgeInsets.symmetric(vertical: 0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 0),
                               ),
                               child: Text(
                                 "Edit Diagram",
@@ -244,14 +255,16 @@ class DiagramPage extends StatelessWidget {
                         const SizedBox(width: 12),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                            color: const Color.fromARGB(255, 0, 54, 218)
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: IconButton(
                             onPressed: () {
                               // Download or share diagram functionality
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Downloading diagram...')),
+                                SnackBar(
+                                    content: Text('Downloading diagram...')),
                               );
                             },
                             icon: const Icon(

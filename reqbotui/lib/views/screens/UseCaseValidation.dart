@@ -31,6 +31,40 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
   //   }
   // }
 
+  void _extractActorsFromPuml() {
+    final RegExp actorRegex =
+        RegExp(r'actor\s+"([^"]+)"\s+as\s+(\w+)', multiLine: true);
+
+    final matches = actorRegex.allMatches(_plantUmlCode);
+    final extracted = matches
+        .map((m) => m.group(2)!)
+        .toList(); // Extract alias like "Student", "Admin"
+
+    setState(() {
+      _actors = extracted;
+      _selectedActor = _actors.isNotEmpty ? _actors[0] : '';
+      _actorToRemove = _actors.isNotEmpty ? _actors[0] : '';
+    });
+  }
+
+  void _extractUseCasesFromPuml() {
+    final RegExp useCaseRegex =
+        RegExp(r'usecase\s+"[^"]+"\s+as\s+(\w+)', multiLine: true);
+
+    final matches = useCaseRegex.allMatches(_plantUmlCode);
+    final useCases =
+        matches.map((m) => m.group(1)!).toList(); // e.g. UC001, FR002
+
+    setState(() {
+      _useCases
+        ..clear()
+        ..addAll(useCases);
+      _selectedUseCase = _useCases.isNotEmpty ? _useCases[0] : '';
+      _sourceUseCase = _useCases.isNotEmpty ? _useCases[0] : '';
+      _targetUseCase = _useCases.length > 1 ? _useCases[1] : '';
+    });
+  }
+
   Future<void> downloadFile(String fileName) async {
     // Future<void> downloadFile(String url, String fileName) async {
     try {
@@ -46,98 +80,29 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
       // setState(() async {
       //   _plantUmlCode = await file.readAsString();
       // });
-      print('found it');
-      // return contents;
-      // } else {
-      //   throw Exception("File not found at: $filePath");
-      // }
-      // // if web
-      // final response = await http.get(Uri.parse(url));
-      // if (response.statusCode == 200) {
-      //   setState(() {
-      //     _plantUmlCode = response.body; // This is your PUML code
-      //   });
-      //   print("wasal ");
-      //   print(_plantUmlCode);
-      // } else {
-      //   throw Exception('Failed to load file: ${response.statusCode}');
-      // }
 
       final contents =
           await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
       setState(() {
         _plantUmlCode = contents;
+        // _plantUmlCode = cleanedContents;
       });
       print("PUML Loaded:\n$_plantUmlCode");
+      _extractActorsFromPuml();
+      _extractUseCasesFromPuml();
+      _loadDiagram();
     } catch (e) {
       print("Download failed: $e");
     }
   }
 
-  String _plantUmlCode = """
-
-// """;
+  String _plantUmlCode = """""";
   bool _isLoading = true;
   String? _imageUrl;
   String? _errorMessage;
 
-  // Store the PlantUML code as a class variable so we can modify it
-//   String _plantUmlCode = '''@startuml
-// left to right direction
-// title Task Management System - Use Case Diagram
-
-// skinparam usecase {
-//     BackgroundColor LightBlue
-//     BorderColor DarkBlue
-//     ArrowColor DarkGray
-//     ActorBorderColor Navy
-// }
-
-// actor "User" as User
-// actor "Admin" as Admin
-
-// rectangle "Task Management System" {
-//     usecase "Create Task" as UC001
-//     usecase "Assign Task" as UC002
-//     usecase "Edit Task" as UC003
-//     usecase "Delete Task" as UC004
-//     usecase "View Task List" as UC005
-//     usecase "Filter Tasks" as UC006
-//     usecase "Receive Notifications" as UC007
-//     usecase "Set Notification Preferences" as UC008
-//     usecase "View Archived Notifications" as UC009
-//     usecase "Enable Dark Mode" as UC010
-//     usecase "Set Language Preferences" as UC011
-//     usecase "See Confirmation Prompt" as UC012
-//     usecase "Prevent Assignment to Deactivated Users" as UC013
-//     usecase "Deactivate User" as UC014
-
-//     UC004 ..> UC012 : <<include>>
-//     UC002 ..> UC013 : <<extend>>
-
-//     note right of UC004 : Confirmation required before deletion
-//     note right of UC002 : Cannot assign to deactivated users
-
-//     User --> UC001
-//     User --> UC002
-//     User --> UC003
-//     User --> UC004
-//     User --> UC005
-//     User --> UC006
-//     User --> UC007
-//     User --> UC008
-//     User --> UC009
-//     User --> UC010
-//     User --> UC011
-//     User --> UC012
-
-//     Admin --> UC013
-//     Admin --> UC014
-// }
-// @enduml''';
-
   // List of actors extracted from the PlantUML code
-  List<String> _actors = ['Librarian', 'Member', 'Admin'];
+  List<String> _actors = [];
   String _selectedActor = 'Librarian'; // Default selected actor
   String _actorToRemove = 'Librarian'; // Default actor to remove
   String _sourceUseCase = '';
@@ -156,14 +121,6 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
     super.initState();
     _loadDiagram();
     _extractExistingRelationships();
-    // final res = await loadPuml();
-    // if (res['StatCode'] == 200) {
-    //   setState(() {
-    //     _plantUmlCode = res['body'];
-    //   });
-    // } else {
-    //   print("Error loading PUML file: ${res['StatCode']}");
-    // }
     downloadFile('use_case_diagram_5.puml');
     if (_useCases.isNotEmpty) {
       _selectedUseCase = _useCases[0];

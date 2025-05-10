@@ -41,29 +41,13 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
       // setState(() async {
       //   _plantUmlCode = await file.readAsString();
       // });
-      print('found it');
-      // return contents;
-      // } else {
-      //   throw Exception("File not found at: $filePath");
-      // }
-      // // if web
-      // final response = await http.get(Uri.parse(url));
-      // if (response.statusCode == 200) {
-      //   setState(() {
-      //     _plantUmlCode = response.body; // This is your PUML code
-      //   });
-      //   print("wasal ");
-      //   print(_plantUmlCode);
-      // } else {
-      //   throw Exception('Failed to load file: ${response.statusCode}');
-      // }
 
       final contents =
-          await rootBundle.loadString('assets/umls/use_case_diagram_5.puml');
+          await rootBundle.loadString('assets/umls/class_diagram_5.puml');
+      final cleaned = contents.trim().replaceAll('\r\n', '\n');
       setState(() {
-        plantumlCode = contents;
+        plantumlCode = cleaned;
       });
-      print("PUML Loaded:\n$plantumlCode");
     } catch (e) {
       print("Download failed: $e");
     }
@@ -75,58 +59,34 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
 
 //   String plantumlCode = '''
 // @startuml
+// title School System Class Diagram
+// skinparam classAttributeIconSize 0
+// skinparam monochrome true
 // skinparam class {
-//   BackgroundColor PaleGreen
-//   BorderColor DarkGreen
-//   ArrowColor DarkGray
+//     BackgroundColor White
+//     BorderColor Black
+//     ArrowColor Black
 // }
-
 // class User {
-//   -String userId
-//   -String name
-//   -Boolean isActive
-//   +getName(): String
-//   +setName(name: String): void
-//   +isDeactivated(): Boolean
+//   - username: String
+//   - password: String
+//   + login(): Boolean
+//   + signup(): Boolean
 // }
-
-// class Task {
-//   -String taskId
-//   -String title
-//   -String description
-//   -DateTime deadline
-//   -Priority priority
-//   -Status status
-//   +assignUser(user: User): void
-//   +editTask(): void
-//   +deleteTask(): void
+// class Admin {
+//   - username: String
+//   - password: String
+//   + login(): Boolean
+//   + getAdminDashboard(): String
 // }
-
-// class Notification {
-//   -String notificationId
-//   -String content
-//   -Boolean isRead
-//   -DateTime timestamp
-//   +markAsRead(): void
+// class Product {
+//   - id: Integer
+//   - name: String
+//   + addProduct(): Boolean
+//   + editProduct(): Boolean
 // }
-
-// class Preferences {
-//   -Boolean pushEnabled
-//   -Boolean dailySummary
-//   -Boolean darkMode
-//   +updatePreferences(): void
-// }
-
-// class LanguageSetting {
-//   -String languageCode
-//   +apply(): void
-// }
-
-// User "1" --> "0..*" Task : creates
-// Task "1" --> "0..*" User : assigned to
-// User "1" --> "0..*" Notification : receives
-// User "1" --> "1" Preferences : has
-// User "1" --> "1" LanguageSetting : uses
+// Admin --> Product : manages
+// User <|-- Admin : is a type of
 // @enduml
 // ''';
 
@@ -134,16 +94,8 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
   late TextEditingController _plantumlController;
 
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
-    // final res = await loadPuml();
-    // if (res['StatCode'] == 200) {
-    //   setState(() {
-    //     plantumlCode = res['body'];
-    //   });
-    // } else {
-    //   print("Error loading PUML file: ${res['StatCode']}");
-    // }
     downloadFile('class_diagram_5.puml');
     _plantumlController = TextEditingController(text: plantumlCode);
     _previousPlantumlCode = plantumlCode;
@@ -255,6 +207,7 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
   }
 
   String _getDiagramUrl() {
+    // final cleanedCode = plantumlCode.trim().replaceAll('\r\n', '\n');
     final List<int> bytes = utf8.encode(plantumlCode);
     final List<int> compressed = ZLibEncoder().encode(bytes);
     final String base64Str = base64Url.encode(compressed);
