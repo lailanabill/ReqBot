@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/summary.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../widgets/requirement_item.dart';
 import '../widgets/custom_dialog.dart';
 
@@ -18,6 +20,19 @@ class TranscriptScreen extends StatefulWidget {
 class _TranscriptScreenState extends State<TranscriptScreen>
     with TickerProviderStateMixin {
   String Trasncription = "";
+
+  void getTranscript() async {
+    final response = await Supabase.instance.client
+        .from('projects')
+        .select('transcription')
+        .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
+        .eq('id', context.read<UserDataProvider>().SelectedProjectId);
+
+    setState(() {
+      Trasncription = response[0]['transcription'];
+    });
+  }
+
   final TextEditingController _editingController = TextEditingController();
   // String? _editingKey;
   late AnimationController _animationController;
@@ -27,7 +42,8 @@ class _TranscriptScreenState extends State<TranscriptScreen>
 
   @override
   void initState() {
-    Trasncription = context.read<DataProvider>().transcript;
+    // Trasncription = context.read<DataProvider>().transcript;
+    getTranscript();
     super.initState();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),

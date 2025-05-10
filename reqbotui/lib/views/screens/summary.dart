@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/transcript.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../widgets/requirement_item.dart';
 import '../widgets/custom_dialog.dart';
 
@@ -21,7 +23,21 @@ class _SummaryScreenState extends State<SummaryScreen>
   //   "Non-Functional Requirement 1": false,
   //   // "Non-Functional Requirement 2": false,
   // };
+
   String Summary = "";
+
+  void getSummary() async {
+    final response = await Supabase.instance.client
+        .from('projects')
+        .select('summary')
+        .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
+        .eq('id', context.read<UserDataProvider>().SelectedProjectId);
+
+    setState(() {
+      Summary = response[0]['summary'];
+    });
+  }
+
   final TextEditingController _editingController = TextEditingController();
   // String? _editingKey;
   late AnimationController _animationController;
@@ -31,7 +47,8 @@ class _SummaryScreenState extends State<SummaryScreen>
 
   @override
   void initState() {
-    Summary = context.read<DataProvider>().summary;
+    // Summary = context.read<DataProvider>().summary;
+    getSummary();
     super.initState();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
+import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/summary.dart';
 import 'package:reqbot/views/screens/transcript.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../widgets/requirement_item.dart';
 import '../widgets/custom_dialog.dart';
 
@@ -23,6 +25,18 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
   //   // "Non-Functional Requirement 2": false,
   // };
   String Requirements = "";
+  void getReqs() async {
+    final response = await Supabase.instance.client
+        .from('projects')
+        .select('status')
+        .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
+        .eq('id', context.read<UserDataProvider>().SelectedProjectId);
+
+    setState(() {
+      Requirements = response[0]['status'];
+    });
+  }
+
   final TextEditingController _editingController = TextEditingController();
   // String? _editingKey;
   late AnimationController _animationController;
@@ -33,7 +47,8 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
   @override
   void initState() {
     super.initState();
-    Requirements = context.read<DataProvider>().requirements;
+    // Requirements = context.read<DataProvider>().requirements;
+    getReqs();
     print(Requirements);
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
