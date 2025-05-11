@@ -8,6 +8,7 @@ import 'package:reqbot/views/screens/non_functional_requirements_screen.dart';
 import 'package:reqbot/views/screens/summary.dart';
 import 'package:reqbot/views/screens/reqsMark.dart';
 import 'package:reqbot/views/screens/transcript.dart';
+import 'package:reqbot/views/screens/srs_screen.dart'; // Add import
 
 class RequirementsMenuScreen extends StatefulWidget {
   final int projectID;
@@ -64,7 +65,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
       'title': 'Draft SRS',
       'subtitle': 'Software Requirements Specification',
       'icon': Icons.description_outlined,
-      'route': null, // Disabled for now
+      'route': const SRSScreen(), // Enable route
     },
   ];
 
@@ -206,9 +207,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
     final Animation<double> animation = CurvedAnimation(
       parent: _animationController,
       curve: Interval(
-        index * 0.1, // Stagger start times
-        (index * 0.1 + 0.5).clamp(0.0, 1.0), // Stagger end times
-        // 0.5 + index * 0.1, // Stagger end times
+        index * 0.1,
+        (index * 0.1 + 0.5).clamp(0.0, 1.0),
         curve: Curves.easeOut,
       ),
     );
@@ -216,9 +216,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
-        // Ensure opacity stays within valid range
         final double safeOpacity = animation.value.clamp(0.0, 1.0);
-
         return Transform.translate(
           offset: Offset(100 * (1 - animation.value), 0),
           child: Opacity(
@@ -286,7 +284,6 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // Animated Icon Container
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0.0, end: 1.0),
                   duration: const Duration(milliseconds: 500),

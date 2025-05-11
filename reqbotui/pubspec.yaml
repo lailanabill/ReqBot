@@ -37,7 +37,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.5
-  http: ^1.2.2
+  http: ^1.4.0
   supabase_flutter: ^2.8.4
   sqflite: ^2.0.0
   path: ^1.8.0
@@ -54,6 +54,7 @@ dependencies:
   dio: ^5.8.0+1
   flutter_markdown: ^0.7.7+1
   shared_preferences: ^2.5.3
+  universal_html: ^2.2.4
 
 dev_dependencies:
   flutter_test:
@@ -85,15 +86,12 @@ flutter:
     - assets/images/clock.png
     - assets/images/light-1.png
     - assets/images/light-2.png
-    - assets/images/Facebook.png
-    - assets/images/Google.png
-    - assets/images/Linkedin.png
-    # - assets/images/context_diagram.png
-   # - assets/images/class_diagram_4.png
-    # - assets/images/use_case_diagram.png
-    # - assets/images/database_diagram.png
-    # - assets/images/seq_diagram.png
-    - assets/umls/
+    - assets/images/class_diagram_153.png
+    - assets/images/context_diagram_153.png
+    - assets/images/database_diagram_153.png
+    - assets/images/sequence_diagram_153.png
+    - assets/images/usecase_diagram_153.png
+
     - .env
 
 
