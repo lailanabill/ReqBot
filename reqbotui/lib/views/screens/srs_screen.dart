@@ -30,4 +30,19 @@ class _SRSScreenState extends State<SRSScreen> {
     'usecase'
   ];
 
-}
+  Future<Map<String, dynamic>> _fetchProjectData(int projectId, int analyzerId) async {
+    print('Fetching project data for projectId: $projectId, analyzerId: $analyzerId');
+    final projectResponse = await _supabase
+        .from('projects')
+        .select('name, transcription, summary, status')
+        .eq('id', projectId)
+        .eq('analyzer_id', analyzerId)
+        .single();
+
+    return {
+      'project': projectResponse,
+    };
+  }
+
+
+  }
