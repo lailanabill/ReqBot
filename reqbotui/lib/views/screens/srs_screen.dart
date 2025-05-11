@@ -19,9 +19,8 @@ class _SRSScreenState extends State<SRSScreen> {
   final SupabaseClient _supabase = Supabase.instance.client;
   bool _isLoading = false;
   String _statusMessage = '';
-  List<String> _includedImages = []; // Track included images
+  List<String> _includedImages = [];
 
-  // List of diagram types to include
   final List<String> _diagramTypes = [
     'class',
     'context',
@@ -30,8 +29,10 @@ class _SRSScreenState extends State<SRSScreen> {
     'usecase'
   ];
 
-  Future<Map<String, dynamic>> _fetchProjectData(int projectId, int analyzerId) async {
-    print('Fetching project data for projectId: $projectId, analyzerId: $analyzerId');
+  Future<Map<String, dynamic>> _fetchProjectData(
+      int projectId, int analyzerId) async {
+    print(
+        'Fetching project data for projectId: $projectId, analyzerId: $analyzerId');
     final projectResponse = await _supabase
         .from('projects')
         .select('name, transcription, summary, status')
@@ -39,22 +40,21 @@ class _SRSScreenState extends State<SRSScreen> {
         .eq('analyzer_id', analyzerId)
         .single();
 
-    return {
-      'project': projectResponse,
-    };
+    return {'project': projectResponse};
   }
 
   String _generateLatex(Map<String, dynamic> data, int projectId) {
     final project = data['project'];
     final projectName = project['name'] ?? 'Untitled Project';
-    final transcription = project['transcription']?.replaceAll('\n', '\\\\') ?? 'No transcription available';
-    final summary = project['summary']?.replaceAll('\n', '\\\\') ?? 'No summary available';
-    final requirements = project['status']?.replaceAll('\n', '\\\\') ?? 'No requirements available';
+    final transcription = project['transcription']?.replaceAll('\n', '\\\\') ??
+        'No transcription available';
+    final summary =
+        project['summary']?.replaceAll('\n', '\\\\') ?? 'No summary available';
+    final requirements = project['status']?.replaceAll('\n', '\\\\') ??
+        'No requirements available';
 
-    // Generate diagram includes for each diagram type
     String diagramSection = '';
     for (var type in _diagramTypes) {
-      // Only include diagrams that were successfully added to the ZIP
       if (_includedImages.contains('${type}_diagram_$projectId.png')) {
         diagramSection += '''
 \\begin{figure}[h]
@@ -84,18 +84,15 @@ class _SRSScreenState extends State<SRSScreen> {
 
 \\begin{titlepage}
     \\centering
-    \\vspace*{1cm}
+    \\vspace*{2cm}
     \\Huge
-    \\textbf{Software Requirements Specification}
+    \\textbf{Software Requirements Specification} \\\\
     \\vspace{0.5cm}
     \\LARGE
-    for
-    \\vspace{0.5cm}
-    \\textbf{${projectName}}
-    \\vspace{1.5cm}
-    \\large
-    Prepared by: Your Name
-    \\vspace{0.5cm}
+    for \\\\
+    \\textbf{${projectName}} \\\\
+    \\vfill
+    Prepared by: Your Name \\\\
     \\today
 \\end{titlepage}
 
@@ -103,38 +100,61 @@ class _SRSScreenState extends State<SRSScreen> {
 \\newpage
 
 \\section{Introduction}
-This Software Requirements Specification (SRS) outlines the functional and non-functional requirements for the ${projectName} system, along with relevant diagrams and meeting details.
-
 \\subsection{Purpose}
-This document defines the requirements and system design for ${projectName}, ensuring all stakeholders have a clear understanding of the system's capabilities and constraints.
+This document outlines the software requirements for the system named "${projectName}".
 
-\\subsection{Scope}
-The ${projectName} system aims to provide a comprehensive solution as described in the project requirements.
+\\subsection{Document Conventions}
+This document follows the IEEE 830-1998 SRS standard. All diagrams are included as figures.
 
-\\section{Overall Description}
-\\subsection{Background}
-The project was initiated based on client-manager meetings, with details captured in transcriptions and summaries.
+\\subsection{Intended Audience and Reading Suggestions}
+This document is intended for developers, testers, project managers, and stakeholders.
 
-\\subsection{Transcription}
-The following is the transcription of relevant meetings:\\\\
-${transcription}
-
-\\subsection{Summary}
-The meeting summary is as follows:\\\\
+\\subsection{Project Scope}
+The system aims to provide the following functionalities: \\\\
 ${summary}
 
-\\section{Requirements}
-\\subsection{Functional and Non-Functional Requirements}
-The extracted requirements are listed below:\\\\
+\\subsection{References}
+References to meeting notes and diagrams are embedded throughout this document.
+
+\\section{Overall Description}
+\\subsection{Product Perspective}
+This project was derived from discussions and requirements gathered in client-manager meetings.
+
+\\subsection{Product Functions}
+The system performs the following high-level functions: \\\\
+${summary}
+
+\\subsection{User Characteristics}
+Users are expected to have a basic understanding of system operations and interfaces.
+
+\\subsection{Constraints}
+Project constraints include development time, technological stack, and user requirements.
+
+\\subsection{Assumptions and Dependencies}
+This system depends on proper deployment infrastructure and up-to-date client requirements.
+
+\\section{Specific Requirements}
+\\subsection{Functional Requirements}
 ${requirements}
 
-\\section{System Design}
-\\subsection{UML Diagrams}
-The following diagrams illustrate the system architecture and interactions:\\\\
+\\subsection{External Interface Requirements}
+Interfaces will be finalized based on further stakeholder meetings and are out of scope for this draft.
+
+\\subsection{Non-Functional Requirements}
+The system must be reliable, scalable, and secure.
+
+\\subsection{Other Requirements}
+None at this time.
+
+\\section{Supporting Information}
+\\subsection{Meeting Transcriptions}
+${transcription}
+
+\\subsection{System Diagrams}
 ${diagramSection}
 
-\\section{Conclusion}
-This SRS provides a complete specification for ${projectName}, to be used by developers, testers, and stakeholders.
+\\section*{Appendices}
+Appendices include references, acronyms, or additional supporting materials.
 
 \\end{document}
 ''';
@@ -144,7 +164,146 @@ This SRS provides a complete specification for ${projectName}, to be used by dev
     setState(() {
       _isLoading = true;
       _statusMessage = 'Generating SRS...';
-      _includedImages = []; // Reset included images
+      _includedImages = [];
     });
+
+    try {
+      final data = await _fetchProjectData(projectId, analyzerId);
+      final project = data['project'];
+      final archive = Archive();
+
+      for (var type in _diagramTypes) {
+        try {
+          final assetPath = 'assets/images/${type}_diagram_153.png';
+          print('Attempting to load: $assetPath');
+          final imageBytes =
+              await DefaultAssetBundle.of(context).load(assetPath);
+          final imageData = imageBytes.buffer.asUint8List();
+
+          final imageName = '${type}_diagram_$projectId.png';
+          archive.addFile(ArchiveFile(imageName, imageData.length, imageData));
+          _includedImages.add(imageName);
+          print('Added $imageName to ZIP');
+        } catch (e) {
+          print('Error loading asset for ${type}_diagram_$projectId.png: $e');
+          setState(() {
+            _statusMessage +=
+                '\nFailed to include ${type}_diagram_$projectId.png';
+          });
+        }
+      }
+
+      final latexContent = _generateLatex(data, projectId);
+      final latexBytes = utf8.encode(latexContent);
+      archive.addFile(ArchiveFile('srs.tex', latexBytes.length, latexBytes));
+      print('Added srs.tex to ZIP');
+
+      final zipEncoder = ZipEncoder();
+      final zipBytes = zipEncoder.encode(archive);
+
+      if (zipBytes == null) {
+        throw Exception('Failed to encode ZIP file');
+      }
+
+      final blob = html.Blob([zipBytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', 'srs_${project['name'] ?? 'project'}.zip')
+        ..click();
+      html.Url.revokeObjectUrl(url);
+
+      await launchUrl(Uri.parse('https://www.overleaf.com/login'));
+
+      setState(() {
+        _statusMessage =
+            'SRS generated and downloaded! Upload the ZIP to Overleaf.\nIncluded images: ${_includedImages.join(", ")}';
+      });
+    } catch (e) {
+      setState(() {
+        _statusMessage = 'Error generating SRS: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userDataProvider = context.read<UserDataProvider>();
+    final projectId = userDataProvider.SelectedProjectId;
+    final analyzerId = userDataProvider.AnalyzerID;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          'Draft SRS',
+          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Generate SRS Document',
+                style: GoogleFonts.inter(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Create a Software Requirements Specification based on project data.',
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.black54),
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: _isLoading
+                    ? CircularProgressIndicator(
+                        color: Color.fromARGB(255, 0, 54, 218))
+                    : ElevatedButton(
+                        onPressed: () => _generateSRSZip(projectId, analyzerId),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 0, 54, 218),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
+                        ),
+                        child: Text(
+                          'Generate SRS',
+                          style: GoogleFonts.inter(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 16),
+              if (_statusMessage.isNotEmpty)
+                Text(
+                  _statusMessage,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: _statusMessage.contains('Error') ||
+                            _statusMessage.contains('Failed')
+                        ? Colors.red
+                        : Colors.green,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
