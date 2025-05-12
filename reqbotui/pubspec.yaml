@@ -86,11 +86,11 @@ flutter:
     - assets/images/clock.png
     - assets/images/light-1.png
     - assets/images/light-2.png
-    - assets/images/class_diagram_153.png
-    - assets/images/context_diagram_153.png
-    - assets/images/database_diagram_153.png
-    - assets/images/sequence_diagram_153.png
-    - assets/images/usecase_diagram_153.png
+   # - assets/images/class_diagram_153.png
+   # - assets/images/context_diagram_153.png
+   # - assets/images/database_diagram_153.png
+   # - assets/images/sequence_diagram_153.png
+   # - assets/images/usecase_diagram_153.png
 
     - .env
 
