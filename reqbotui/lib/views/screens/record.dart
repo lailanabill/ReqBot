@@ -1,22 +1,15 @@
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart'; // For content type
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:reqbot/controllers/record_controller.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
-import 'package:reqbot/views/screens/RequirementsMenuScreen.Dart';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import 'package:reqbot/views/screens/home_screen.dart';
 import 'package:reqbot/views/screens/waiting.dart';
-
 import 'dart:convert';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import '../../services/providers/userProvider.dart';
+import 'package:reqbot/views/screens/upload_confirmation.dart';
 
 class Record extends StatefulWidget {
   const Record({super.key});
@@ -25,18 +18,37 @@ class Record extends StatefulWidget {
   _RecordState createState() => _RecordState();
 }
 
-class _RecordState extends State<Record> {
-  // final RecordController _controller = RecordController();
+class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
+  final Color primaryColor = Color.fromARGB(255, 0, 54, 218);
+  final Color secondaryColor = Color.fromARGB(255, 230, 234, 255);
+  final Color backgroundColor = Colors.white;
   String _transcription = '';
-  String req_sumURI =
-      "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
-  String sumURI =
-      "https://main-server-last-1016128810332.us-central1.run.app/summarize/";
-  String diagramsURI =
-      "https://main-server-last-1016128810332.us-central1.run.app/diagrams/";
+  String req_sumURI = "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
+  String sumURI = "https://main-server-last-1016128810332.us-central1.run.app/summarize/";
+  String diagramsURI = "https://main-server-last-1016128810332.us-central1.run.app/diagrams/";
   bool _uploaded = false;
+  bool _isLoading = false;
+  int? _selectedMeetingIndex;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
-  // bool _isListening = false;
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   void SaveToDb(String Column, int Pid, int AnalyzerId, String Data) async {
     await Supabase.instance.client
@@ -45,7 +57,6 @@ class _RecordState extends State<Record> {
         .eq('id', Pid)
         .eq('analyzer_id', AnalyzerId)
         .select();
-    print(context.read<UserDataProvider>().AnalyzerID);
   }
 
   void _updateTranscription(List<dynamic> transcription) {
@@ -60,33 +71,22 @@ class _RecordState extends State<Record> {
           context.read<UserDataProvider>().ProjectId,
           context.read<UserDataProvider>().AnalyzerID,
           context.read<DataProvider>().transcript);
+      
+      _isLoading = false;
+      _uploaded = true;
+      
+      // Navigate to confirmation screen after successful upload
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UploadConfirmationScreen()),
+      );
     });
   }
 
   Future<void> _handleUploadAudio() async {
-    // //mobile updload function
-    // try {
-    //   FilePickerResult? result =
-    //       await FilePicker.platform.pickFiles(type: FileType.audio);
-    //   if (result != null) {
-    //     File file = File(result.files.single.path!);
-    //     var request = http.MultipartRequest(
-    //         'POST', Uri.parse('https://main-server-last-1016128810332.us-central1.run.app/whisper/'));
-    //     request.files.add(await http.MultipartFile.fromPath('file', file.path));
-    //     var response = await request.send();
-    //     if (response.statusCode == 200) {
-    //       var responseData = await response.stream.bytesToString();
-    //       var transcription = jsonDecode(responseData)['transcription'];
-    //       _updateTranscription(transcription);
-    //     } else {
-    //       throw Exception(
-    //           "Failed to upload audio. Status code: ${response.statusCode}");
-    //     }
-    //   }
-    // } catch (e) {
-    //   ScaffoldMessenger.of(context)
-    //       .showSnackBar(SnackBar(content: Text(e.toString())));
-    // }
+    setState(() {
+      _isLoading = true;
+    });
     html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
     uploadInput.accept = 'audio/*';
     uploadInput.click();
@@ -108,59 +108,57 @@ class _RecordState extends State<Record> {
             filename: file.name,
             contentType: MediaType('audio', 'wav'),
           ));
-          // print('1');
+          
           var response = await request.send();
-          // print('2');
           var responseData = await http.Response.fromStream(response);
-          // print('3');
+          
           if (responseData.statusCode == 200) {
-            // print('4');
             var transcription = jsonDecode(responseData.body)['transcription'];
-            // print('5');
             _updateTranscription(transcription);
-            // print('6');
-            _uploaded = true;
-            // print('7');
-            print("success ya gello link");
-            // print('8');
-            // _getTransciptSummary(context.read<DataProvider>().transcript);
-            // print('9');
+            print("Upload successful");
           } else {
+            setState(() {
+              _isLoading = false;
+            });
+            _showErrorSnackBar("Upload failed: ${responseData.statusCode}");
             print("Upload failed: ${responseData.statusCode}");
             print("Error body: ${responseData.body}");
-            print("Error: ${responseData.reasonPhrase}");
-            print('error henaaa');
           }
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
         });
       }
     });
   }
 
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Future<void> _Diagrams(String Trans) async {
-    // const { data, error } = await supabase.from('projects').insert([{ some_column: 'someValue', other_column: 'otherValue' },]);
     var DiagramsURI = Uri.parse(diagramsURI);
 
-    //diagrams call
-    print("alo diagrams: ${Trans}");
     final diagramsBody = jsonEncode({
       'transcript': Trans,
       'pid': context.read<UserDataProvider>().ProjectId
     });
     var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
     if (DiagramsRequest.statusCode == 200) {
-      print('success ya gello');
-      print(DiagramsRequest.body);
       context.read<UserDataProvider>().setClickability(true);
     } else {
       print("Server error: ${DiagramsRequest.statusCode}");
-      print("Error body: ${DiagramsRequest.body}");
     }
   }
 
   Future<void> _getTransciptSummary(String WhisperTranscript) async {
-    //diagrams call
-
-    print("alo : ${WhisperTranscript}");
     var SumURI = Uri.parse(sumURI);
 
     final body = jsonEncode({
@@ -170,7 +168,6 @@ class _RecordState extends State<Record> {
       var SumRequest = await http.post(SumURI, body: body);
       if (SumRequest.statusCode == 200) {
         final responseData = jsonDecode(SumRequest.body);
-        // print("Summary: ${responseData['summary']}");
         context.read<DataProvider>().setSummary(responseData['summary']);
 
         SaveToDb(
@@ -178,20 +175,10 @@ class _RecordState extends State<Record> {
             context.read<UserDataProvider>().ProjectId,
             context.read<UserDataProvider>().AnalyzerID,
             context.read<DataProvider>().summary);
-        // call to reqs func
+        
         _getRrequirements(WhisperTranscript, responseData['summary']);
-        // call to diagrams
-        // final diagramsBody = {'transcription': responseData['summary']};
-        // var DiagramsRequest = await http.post(DiagramsURI, body: diagramsBody);
-        // if (DiagramsRequest.statusCode == 200) {
-        //   print('success');
-        // } else {
-        //   print("Server error: ${DiagramsRequest.statusCode}");
-        //   print("Error body: ${DiagramsRequest.body}");
-        // }
       } else {
         print("Server error: ${SumRequest.statusCode}");
-        print("Error body: ${SumRequest.body}");
       }
     } catch (e) {
       print("Error: $e");
@@ -201,7 +188,6 @@ class _RecordState extends State<Record> {
   Future<void> _getRrequirements(
       String WhisperTranscript, String SummaryText) async {
     var ReqSumURI = Uri.parse(req_sumURI);
-    print("alo reqq: ${WhisperTranscript}");
     final body = jsonEncode({
       "summ": SummaryText,
       "orig": WhisperTranscript,
@@ -210,7 +196,6 @@ class _RecordState extends State<Record> {
       var ReqSumRequest = await http.post(ReqSumURI, body: body);
       if (ReqSumRequest.statusCode == 200) {
         final responseData = jsonDecode(ReqSumRequest.body);
-        // print("Requirements: ${responseData['reqs']}");
         context.read<DataProvider>().setRequirements(responseData['reqs']);
         SaveToDb(
             'status',
@@ -220,7 +205,6 @@ class _RecordState extends State<Record> {
         _Diagrams(WhisperTranscript);
       } else {
         print("Server error: ${ReqSumRequest.statusCode}");
-        print("Error body: ${ReqSumRequest.body}");
       }
     } catch (e) {
       print("Error: $e");
@@ -231,17 +215,69 @@ class _RecordState extends State<Record> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('$title Transcription'),
-          content: Text(_transcription.isEmpty
-              ? 'No transcription available'
-              : _transcription),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Close'),
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$title Transcription',
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.grey),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                Divider(thickness: 1),
+                SizedBox(height: 10),
+                Container(
+                  height: 300,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: EdgeInsets.all(12),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      _transcription.isEmpty
+                          ? 'No transcription available'
+                          : _transcription,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: primaryColor,
+                    ),
+                    child: Text('Close', style: GoogleFonts.inter()),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -250,176 +286,344 @@ class _RecordState extends State<Record> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('Meetings & Audio Records'),
-        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        title: Text(
+          'Meetings & Audio Records',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: primaryColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                childAspectRatio: 1.4,
-                children: [
-                  _buildMeetingCard(
-                      'Project Kickoff', 'April 25, 2024', 'Pending'),
-                  _buildMeetingCard(
-                      'Design Review', 'April 20, 2024', 'Completed',
-                      showAudio: true),
-                  _buildMeetingCard(
-                      'Sprint Planning', 'April 15, 2024', 'In Progress'),
-                  _buildMeetingCard(
-                      'Retrospective', 'April 10, 2024', 'Completed'),
-                ],
+      body: Column(
+        children: [
+          _buildHeaderSection(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: _buildMeetingsGrid(),
+            ),
+          ),
+          _buildFooterSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: secondaryColor,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select a Meeting',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            'Choose a meeting to upload its audio recording',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMeetingsGrid() {
+    return GridView.builder(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.1,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        List<Map<String, dynamic>> meetings = [
+          {
+            'title': 'Project Kickoff',
+            'date': 'April 25, 2024',
+            'status': 'Pending',
+            'icon': Icons.bolt,
+          },
+          {
+            'title': 'Design Review',
+            'date': 'April 20, 2024',
+            'status': 'Completed',
+            'icon': Icons.palette,
+            'showAudio': true,
+          },
+          {
+            'title': 'Sprint Planning',
+            'date': 'April 15, 2024',
+            'status': 'In Progress',
+            'icon': Icons.calendar_today,
+          },
+          {
+            'title': 'Retrospective',
+            'date': 'April 10, 2024',
+            'status': 'Completed',
+            'icon': Icons.assessment,
+          },
+        ];
+
+        return _buildMeetingCard(
+          meetings[index]['title'],
+          meetings[index]['date'],
+          meetings[index]['status'],
+          icon: meetings[index]['icon'],
+          showAudio: meetings[index]['showAudio'] ?? false,
+          index: index,
+        );
+      },
+    );
+  }
+
+  Widget _buildMeetingCard(String title, String date, String status,
+      {IconData icon = Icons.meeting_room, bool showAudio = false, int index = 0}) {
+    Color statusColor;
+    switch (status) {
+      case 'Completed':
+        statusColor = Colors.green;
+        break;
+      case 'In Progress':
+        statusColor = Colors.amber;
+        break;
+      default:
+        statusColor = Colors.grey;
+    }
+
+    bool isSelected = _selectedMeetingIndex == index;
+
+    return GestureDetector(
+      onTapDown: (_) => _animationController.forward(),
+      onTapUp: (_) {
+        _animationController.reverse();
+        setState(() {
+          _selectedMeetingIndex = index;
+        });
+      },
+      onTapCancel: () => _animationController.reverse(),
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected ? primaryColor : Colors.transparent,
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                spreadRadius: 1,
               ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: secondaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: primaryColor,
+                        size: 20,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            date,
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                if (showAudio)
+                  Container(
+                    height: 28,
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.play_arrow, color: primaryColor, size: 18),
+                        SizedBox(width: 4),
+                        Expanded(
+                          child: Container(
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 70,
+                                  decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          "2:45",
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        status,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: statusColor,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.info_outline,
+                      color: Colors.grey,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _uploaded
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProcessingScreen(
-                                transcription: _transcription)),
-                      );
-                      _getTransciptSummary(_transcription);
-                    }
-                  : null,
-              child: Text('Next'),
-            ),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     // Navigator.push(
-            //     //   context,
-            //     //   MaterialPageRoute(
-            //     //       builder: (context) => RequirementsMenuScreen()),
-            //     // );
-            //     final sumprov = context.read<DataProvider>().summary;
-            //     final transprov = context.read<DataProvider>().transcript;
-            //     final reqprov = context.read<DataProvider>().requirements;
-            //     // _getTransciptSummary(_transcription);
-            //     print("provv  Summary: $sumprov");
-            //     print("provv  Transcript: $transprov");
-            //     print("provv  Requirements: $reqprov");
-            //   },
-            //   child: Text('Printer'),
-            // ),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     // // Navigator.push(
-            //     // //   context,
-            //     // //   MaterialPageRoute(
-            //     // //       builder: (context) => RequirementsMenuScreen()),
-            //     // // );
-            //     // final sumprov = context.read<DataProvider>().summary;
-            //     // final transprov = context.read<DataProvider>().transcript;
-            //     // final reqprov = context.read<DataProvider>().requirements;
-            //     // // _getTransciptSummary(_transcription);
-            //     // print("provv  Summary: $sumprov");
-            //     // print("provv  Transcript: $transprov");
-            //     // print("provv  Requirements: $reqprov");
-            //     print('1 from tran sum');
-            //     _getTransciptSummary(_transcription);
-            //     print('2 from tran sum');
-            //   },
-            //   child: Text('tarnscropy summary'),
-            // ),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     // // Navigator.push(
-            //     // //   context,
-            //     // //   MaterialPageRoute(
-            //     // //       builder: (context) => RequirementsMenuScreen()),
-            //     // // );
-            //     // final sumprov = context.read<DataProvider>().summary;
-            //     // final transprov = context.read<DataProvider>().transcript;
-            //     // final reqprov = context.read<DataProvider>().requirements;
-            //     // // _getTransciptSummary(_transcription);
-            //     // print("provv  Summary: $sumprov");
-            //     // print("provv  Transcript: $transprov");
-            //     // print("provv  Requirements: $reqprov");
-            //     _getRrequirements(
-            //         _transcription, context.read<DataProvider>().summary);
-            //   },
-            //   child: Text('requirements'),
-            // ),
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     var DiagramsURI = Uri.parse(diagramsURI);
-            // final pid = await Supabase.instance.client
-            //     .from('projects')
-            //     .select("id")
-            //     .eq('analyzer_id', context.read<UserDataProvider>().AnalyzerID)
-            //     .single();
-            // final diagramsBody =
-            //     jsonEncode({'transcription': _transcription, 'pid': 5});
-            // var DiagramsRequest =
-            //     await http.post(DiagramsURI, body: diagramsBody);
-            // if (DiagramsRequest.statusCode == 200) {
-            //   print('success ya gello');
-            // } else {
-            //   print("Server error: ${DiagramsRequest.statusCode}");
-            //   print("Error body: ${DiagramsRequest.body}");
-            // }
-            // // Navigator.push(
-            // //   context,
-            // //   MaterialPageRoute(
-            // //       builder: (context) => RequirementsMenuScreen()),
-            // // );
-            // final sumprov = context.read<DataProvider>().summary;
-            // final transprov = context.read<DataProvider>().transcript;
-            // final reqprov = context.read<DataProvider>().requirements;
-            // // _getTransciptSummary(_transcription);
-            // print("provv  Summary: $sumprov");
-            // print("provv  Transcript: $transprov");
-            // print("provv  Requirements: $reqprov");
-            //   },
-            //   child: Text('diagrams'),
-            // ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildMeetingCard(String title, String date, String status,
-      {bool showAudio = false}) {
-    return GestureDetector(
-      onTap: () => _showTranscriptionDialog(title),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              SizedBox(height: 5),
-              Text(date, style: TextStyle(color: Colors.grey, fontSize: 12)),
-              SizedBox(height: 10),
-              if (showAudio)
-                Row(
+  Widget _buildFooterSection() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+          onPressed: _selectedMeetingIndex != null && !_uploaded
+              ? _handleUploadAudio
+              : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.grey[300],
+            disabledForegroundColor: Colors.grey[500],
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: _isLoading
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.play_arrow, color: Colors.blue, size: 20),
-                    Expanded(child: LinearProgressIndicator()),
-                    Icon(Icons.stop, color: Colors.red, size: 20),
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Processing...',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.cloud_upload_outlined,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Upload Audio File',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
                 ),
-              Spacer(),
-              ElevatedButton(
-                onPressed: _handleUploadAudio,
-                style: ElevatedButton.styleFrom(
-                  textStyle: TextStyle(fontSize: 12),
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                ),
-                child: Text('Upload'),
-              ),
-            ],
-          ),
         ),
       ),
     );
