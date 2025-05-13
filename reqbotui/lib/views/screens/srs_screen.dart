@@ -109,20 +109,18 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
     return {'project': projectResponse};
   }
 
-  String _generateLatex(Map<String, dynamic> data, int projectId) {
-    final project = data['project'];
-    final projectName = project['name'] ?? 'Untitled Project';
-    final transcription = project['transcription']?.replaceAll('\n', '\\\\') ??
-        'No transcription available';
-    final summary =
-        project['summary']?.replaceAll('\n', '\\\\') ?? 'No summary available';
-    final requirements = project['status']?.replaceAll('\n', '\\\\') ??
-        'No requirements available';
+String _generateLatex(Map<String, dynamic> data, int projectId) {
+  final project = data['project'];
+  final projectName = project['name'] ?? 'Appointment Booking System';
+  final transcription = project['transcription']?.replaceAll('\n', '\\\\') ?? 'Meeting transcription not available.';
+  final summary = project['summary']?.replaceAll('\n', '\\\\') ?? 'Meeting summary not available.';
+  final requirements = project['status']?.replaceAll('\n', '\\\\') ?? 'No requirements provided.';
 
-    String diagramSection = '';
-    for (var type in _diagramTypes) {
-      if (_includedImages.contains('${type}_diagram_$projectId.png')) {
-        diagramSection += '''
+  // Generate diagram includes
+  String diagramSection = '';
+  for (var type in _diagramTypes) {
+    if (_includedImages.contains('${type}_diagram_$projectId.png')) {
+      diagramSection += '''
 \\begin{figure}[h]
     \\centering
     \\includegraphics[width=0.8\\textwidth]{${type}_diagram_${projectId}.png}
@@ -130,10 +128,10 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
     \\label{fig:${type}_diagram}
 \\end{figure}
 ''';
-      }
     }
+  }
 
-    return '''
+  return '''
 \\documentclass[12pt]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage{graphicx}
@@ -150,15 +148,18 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
 
 \\begin{titlepage}
     \\centering
-    \\vspace*{2cm}
+    \\vspace*{1cm}
     \\Huge
-    \\textbf{Software Requirements Specification} \\\\
+    \\textbf{Appointment Booking System}
     \\vspace{0.5cm}
     \\LARGE
-    for \\\\
-    \\textbf{${projectName}} \\\\
-    \\vfill
-    Prepared by: Your Name \\\\
+    for
+    \\vspace{0.5cm}
+    \\textbf{${projectName}}
+    \\vspace{1.5cm}
+    \\large
+    Prepared by: Your Name
+    \\vspace{0.5cm}
     \\today
 \\end{titlepage}
 
@@ -166,65 +167,45 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
 \\newpage
 
 \\section{Introduction}
+${projectName} is an online platform that facilitates scheduling and managing appointments between users and service providers. The system supports user account creation, appointment browsing, booking, and notifications, ensuring a streamlined and user-friendly experience.
+
 \\subsection{Purpose}
-This document outlines the software requirements for the system named "${projectName}".
+The system provides a centralized interface for appointment-related operations. It is intended to serve users who need to book or manage time slots and administrators who handle service availability. Notification mechanisms ensure that users remain informed of confirmations and reminders.
 
-\\subsection{Document Conventions}
-This document follows the IEEE 830-1998 SRS standard. All diagrams are included as figures.
-
-\\subsection{Intended Audience and Reading Suggestions}
-This document is intended for developers, testers, project managers, and stakeholders.
-
-\\subsection{Project Scope}
-The system aims to provide the following functionalities: \\\\
-${summary}
-
-\\subsection{References}
-References to meeting notes and diagrams are embedded throughout this document.
+\\subsection{Scope}
+The platform supports the following features:
+\\begin{itemize}
+  \\item User registration and account management
+  \\item Browsing of available time slots
+  \\item Booking, rescheduling, and cancellation of appointments
+  \\item Delivery of appointment confirmations and reminders via email or SMS
+\\end{itemize}
+It operates as a responsive web application and is designed for reliability, performance, and secure data handling.
 
 \\section{Overall Description}
-\\subsection{Product Perspective}
-This project was derived from discussions and requirements gathered in client-manager meetings.
+\\subsection{Background}
+Development of the system began after a series of planning sessions between stakeholders. The goal was to replace manual booking processes with a digital alternative that is more efficient, transparent, and scalable.
 
-\\subsection{Product Functions}
-The system performs the following high-level functions: \\\\
-${summary}
-
-\\subsection{User Characteristics}
-Users are expected to have a basic understanding of system operations and interfaces.
-
-\\subsection{Constraints}
-Project constraints include development time, technological stack, and user requirements.
-
-\\subsection{Assumptions and Dependencies}
-This system depends on proper deployment infrastructure and up-to-date client requirements.
-
-\\section{Specific Requirements}
-\\subsection{Functional Requirements}
-${requirements}
-
-\\subsection{External Interface Requirements}
-Interfaces will be finalized based on further stakeholder meetings and are out of scope for this draft.
-
-\\subsection{Non-Functional Requirements}
-The system must be reliable, scalable, and secure.
-
-\\subsection{Other Requirements}
-None at this time.
-
-\\section{Supporting Information}
-\\subsection{Meeting Transcriptions}
+\\subsection{Transcription}
 ${transcription}
 
-\\subsection{System Diagrams}
+\\subsection{Summary}
+${summary}
+
+\\section{Requirements}
+\\subsection{Functional and Non-Functional Requirements}
+${requirements}
+
+\\section{System Design}
+\\subsection{UML Diagrams}
 ${diagramSection}
 
-\\section*{Appendices}
-Appendices include references, acronyms, or additional supporting materials.
+\\section{Conclusion}
+The platform described in this specification provides a robust solution for appointment scheduling and management. Its functionality addresses both user-facing needs and backend operational efficiency. The requirements and design components outlined here form the basis for implementation and future enhancements.
 
 \\end{document}
 ''';
-  }
+}
 
   Future<void> _generateSRSZip(int projectId, int analyzerId) async {
     setState(() {
