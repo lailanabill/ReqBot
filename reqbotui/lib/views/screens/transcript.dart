@@ -250,7 +250,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              Icons.record_voice_over_rounded,
+              Icons.chat_bubble_outline_rounded,
               color: primaryColor,
               size: 24,
             ),
@@ -261,7 +261,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Meeting Transcript',
+                  'Meeting Conversation',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -270,7 +270,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'The conversation has been transcribed and processed for your review',
+                  'The meeting transcript is displayed in a chat-style interface',
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     height: 1.5,
@@ -432,9 +432,12 @@ class _TranscriptScreenState extends State<TranscriptScreen>
       );
     }
 
+    // Parse the transcript into individual messages
+    List<TranscriptMessage> messages = _parseTranscriptMessages(transcription);
+
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: Colors.grey.shade100, // Light background for chat
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -449,16 +452,6 @@ class _TranscriptScreenState extends State<TranscriptScreen>
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            // Subtle pattern background
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.04,
-                child: Image.network(
-                  'https://www.transparenttextures.com/patterns/notebook.png',
-                  repeat: ImageRepeat.repeat,
-                ),
-              ),
-            ),
             // Top decoration
             Positioned(
               top: 0,
@@ -479,180 +472,276 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               ),
             ),
             // Content
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-              child: Column(
-                children: [
-                  // Transcript header
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.grey.withOpacity(0.1),
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.format_quote_rounded,
-                          color: primaryColor,
-                          size: 22,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Meeting Transcript',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: textPrimaryColor,
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                          icon: Icon(
-                            Icons.copy_rounded,
-                            color: primaryColor.withOpacity(0.8),
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: transcription));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Transcript copied to clipboard',
-                                  style: GoogleFonts.inter(),
-                                ),
-                                backgroundColor: primaryColor,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            );
-                          },
-                          tooltip: 'Copy to clipboard',
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Transcript content
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      color: Colors.white,
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                        child: MarkdownBody(
-                          data: transcription,
-                          styleSheet: MarkdownStyleSheet(
-                            p: GoogleFonts.inter(
-                              fontSize: 15,
-                              height: 1.7,
-                              color: textPrimaryColor.withOpacity(0.9),
-                            ),
-                            h1: GoogleFonts.inter(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
-                              height: 1.3,
-                            ),
-                            h2: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
-                              height: 1.3,
-                            ),
-                            h3: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: textPrimaryColor,
-                              height: 1.3,
-                            ),
-                            blockquote: GoogleFonts.inter(
-                              fontSize: 15,
-                              fontStyle: FontStyle.italic,
-                              color: textSecondaryColor,
-                              height: 1.7,
-                            ),
-                            blockquoteDecoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: primaryColor.withOpacity(0.5),
-                                  width: 4,
-                                ),
-                              ),
-                            ),
-                            blockquotePadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                            listBullet: GoogleFonts.inter(
-                              fontSize: 15,
-                              color: primaryColor,
-                              height: 1.7,
-                            ),
-                            listBulletPadding: EdgeInsets.only(right: 8),
-                            strong: GoogleFonts.inter(
-                              fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
-                            ),
-                            em: GoogleFonts.inter(
-                              fontStyle: FontStyle.italic,
-                              color: textPrimaryColor.withOpacity(0.9),
-                            ),
-                            code: GoogleFonts.sourceCodePro(
-                              backgroundColor: primaryColor.withOpacity(0.05),
-                              color: primaryColor.withOpacity(0.9),
-                              fontSize: 14,
-                            ),
-                            codeblockDecoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: primaryColor.withOpacity(0.1),
-                                width: 1,
-                              ),
-                            ),
-                            codeblockPadding: EdgeInsets.all(16),
-                            horizontalRuleDecoration: BoxDecoration(
-                              border: Border(
-                                top: BorderSide(
-                                  width: 1,
-                                  color: Colors.grey.withOpacity(0.3),
-                                ),
-                              ),
-                            ),
-                            tableHead: GoogleFonts.inter(
-                              fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
-                            ),
-                            tableBody: GoogleFonts.inter(
-                              color: textPrimaryColor.withOpacity(0.9),
-                            ),
-                            tableBorder: TableBorder.all(
-                              color: Colors.grey.withOpacity(0.3),
-                              width: 1,
-                            ),
-                            tableCellsPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                          ),
-                        ),
+            Column(
+              children: [
+                // Transcript header
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.withOpacity(0.1),
+                        width: 1,
                       ),
                     ),
                   ),
-                ],
-              ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.chat_rounded,
+                        color: primaryColor,
+                        size: 22,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Meeting Conversation',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textPrimaryColor,
+                        ),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          Icons.copy_rounded,
+                          color: primaryColor.withOpacity(0.8),
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: transcription));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Transcript copied to clipboard',
+                                style: GoogleFonts.inter(),
+                              ),
+                              backgroundColor: primaryColor,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          );
+                        },
+                        tooltip: 'Copy to clipboard',
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Chat messages
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        return _buildMessageBubble(message);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildMessageBubble(TranscriptMessage message) {
+    // Determine if message is from system or a specific speaker
+    final bool isSystem = message.speaker.toUpperCase() == "SYSTEM";
+    
+    // Extract speaker number to determine bubble color
+    String speakerNumber = "0";
+    if (message.speaker.toUpperCase().startsWith("SPEAKER_")) {
+      final parts = message.speaker.split("_");
+      if (parts.length > 1) {
+        speakerNumber = parts[1].replaceAll(RegExp(r'^0+'), '');
+        if (speakerNumber.isEmpty) speakerNumber = "0";
+      }
+    }
+    
+    // Choose color based on speaker
+    Color avatarColor;
+    Color bubbleColor;
+    Color textColor;
+    
+    if (isSystem) {
+      avatarColor = Colors.grey.shade700;
+      bubbleColor = Colors.grey.shade200;
+      textColor = Colors.black87;
+    } else {
+      // Create different colors for different speakers
+      switch (int.parse(speakerNumber) % 5) {
+        case 0:
+          avatarColor = primaryColor;
+          bubbleColor = primaryColor.withOpacity(0.1);
+          textColor = Colors.black87;
+          break;
+        case 1:
+          avatarColor = Colors.green.shade600;
+          bubbleColor = Colors.green.shade50;
+          textColor = Colors.black87;
+          break;
+        case 2:
+          avatarColor = Colors.orange.shade700;
+          bubbleColor = Colors.orange.shade50;
+          textColor = Colors.black87;
+          break;
+        case 3:
+          avatarColor = Colors.purple.shade600;
+          bubbleColor = Colors.purple.shade50;
+          textColor = Colors.black87;
+          break;
+        case 4:
+          avatarColor = Colors.teal.shade600;
+          bubbleColor = Colors.teal.shade50;
+          textColor = Colors.black87;
+          break;
+        default:
+          avatarColor = primaryColor;
+          bubbleColor = Colors.white;
+          textColor = Colors.black87;
+      }
+    }
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Avatar/Icon for the speaker
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: avatarColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: avatarColor.withOpacity(0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Icon(
+                isSystem ? Icons.settings : Icons.person,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ),
+          SizedBox(width: 12),
+          // Message content
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Speaker name
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0, bottom: 6.0),
+                  child: Text(
+                    message.displayName,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: avatarColor,
+                    ),
+                  ),
+                ),
+                // Message bubble
+                Container(
+                  decoration: BoxDecoration(
+                    color: bubbleColor,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(18),
+                      bottomRight: Radius.circular(18),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 3,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    child: Text(
+                      message.text,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to parse the transcript text into a list of message objects
+  List<TranscriptMessage> _parseTranscriptMessages(String transcript) {
+    List<TranscriptMessage> messages = [];
+    
+    // Split the transcript by newlines
+    List<String> lines = transcript.split('\n');
+    
+    // Process each line
+    for (String line in lines) {
+      // Skip empty lines
+      if (line.trim().isEmpty) continue;
+      
+      // Check for speaker pattern like "SPEAKER_00:"
+      RegExp speakerRegex = RegExp(r'(SPEAKER_\d+):\s*(.+)');
+      var match = speakerRegex.firstMatch(line);
+      
+      if (match != null && match.groupCount >= 2) {
+        String speaker = match.group(1)!;
+        String text = match.group(2)!.trim();
+        
+        // Only add if there's actual text content
+        if (text.isNotEmpty) {
+          messages.add(TranscriptMessage(speaker: speaker, text: text));
+        }
+      } else {
+        // Try finding any colon that might separate speaker and text
+        int colonIndex = line.indexOf(':');
+        
+        if (colonIndex > 0) {
+          String speaker = line.substring(0, colonIndex).trim();
+          String text = line.substring(colonIndex + 1).trim();
+          
+          // Only add if there's actual text content
+          if (text.isNotEmpty) {
+            messages.add(TranscriptMessage(speaker: speaker, text: text));
+          }
+        } else {
+          // If line doesn't follow speaker:message format, add as system message
+          messages.add(TranscriptMessage(speaker: "SYSTEM", text: line.trim()));
+        }
+      }
+    }
+    
+    return messages;
   }
 
   Widget _buildFloatingActionButton() {
@@ -728,5 +817,37 @@ class _TranscriptScreenState extends State<TranscriptScreen>
         ),
       ),
     );
+  }
+}
+
+class TranscriptMessage {
+  final String speaker;
+  final String text;
+  
+  TranscriptMessage({required this.speaker, required this.text});
+  
+  // Format speaker name for display (e.g., "SPEAKER_00" -> "Speaker 0")
+  String get displayName {
+    if (speaker.toUpperCase().startsWith("SPEAKER_")) {
+      final parts = speaker.split("_");
+      if (parts.length > 1) {
+        String speakerNumber = parts[1];
+        
+        // Remove leading zeros
+        if (speakerNumber.startsWith('0') && speakerNumber.length > 1) {
+          speakerNumber = speakerNumber.replaceFirst(RegExp(r'^0+'), '');
+        }
+        
+        return "Speaker $speakerNumber";
+      }
+    }
+    
+    // If it's a system message
+    if (speaker.toUpperCase() == "SYSTEM") {
+      return "System";
+    }
+    
+    // Otherwise use the original speaker name
+    return speaker;
   }
 }
