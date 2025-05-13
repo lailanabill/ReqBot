@@ -7,7 +7,7 @@ class ScheduleMeetingScreen extends StatefulWidget {
   _ScheduleMeetingScreenState createState() => _ScheduleMeetingScreenState();
 }
 
-class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
+class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with TickerProviderStateMixin {
   final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
   final Color secondaryColor = const Color.fromARGB(255, 230, 234, 255);
   final List<TimeSlot> timeSlots = [];
@@ -21,12 +21,28 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
   TimeOfDay? _selectedStartTime;
   TimeOfDay? _selectedEndTime;
   bool _isLoading = false;
+  
+  // Animation controllers
+  late AnimationController _removeAnimationController;
+  int? _removingSlotIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Setup animation controllers
+    _removeAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+  }
 
   @override
   void dispose() {
     _dateController.dispose();
     _startTimeController.dispose();
     _endTimeController.dispose();
+    _removeAnimationController.dispose();
     super.dispose();
   }
 
@@ -150,7 +166,44 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
   
   void _removeTimeSlot(int index) {
     setState(() {
-      timeSlots.removeAt(index);
+      _removingSlotIndex = index;
+    });
+    
+    _removeAnimationController.reset();
+    _removeAnimationController.forward().then((_) {
+      setState(() {
+        timeSlots.removeAt(index);
+        _removingSlotIndex = null;
+      });
+    });
+  }
+  
+  void _editTimeSlot(int index) {
+    final slot = timeSlots[index];
+    
+    setState(() {
+      _selectedDate = slot.date;
+      _selectedStartTime = slot.startTime;
+      _selectedEndTime = slot.endTime;
+      
+      _dateController.text = "${slot.date.day}/${slot.date.month}/${slot.date.year}";
+      _startTimeController.text = slot.startTime.format(context);
+      _endTimeController.text = slot.endTime.format(context);
+    });
+    
+    // Remove the slot being edited
+    _removeTimeSlot(index);
+    
+    // Scroll to the top to show the form
+    // This assumes you have a ScrollController
+    Future.delayed(Duration(milliseconds: 300), () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Edit the time slot and click "Add Time Slot"'),
+          backgroundColor: primaryColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     });
   }
   
@@ -259,23 +312,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
                         controller: _dateController,
                         readOnly: true,
                         onTap: () => _selectDate(context),
-                        decoration: InputDecoration(
-                          hintText: 'Select Date',
-                          suffixIcon: Icon(Icons.calendar_today, color: primaryColor),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryColor),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        ),
+                        decoration: _getInputDecoration(hintText: 'Select Date', icon: Icons.calendar_today),
                       ),
                       SizedBox(height: 20),
 
@@ -299,23 +336,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
                                   controller: _startTimeController,
                                   readOnly: true,
                                   onTap: () => _selectTime(context, true),
-                                  decoration: InputDecoration(
-                                    hintText: 'Start',
-                                    suffixIcon: Icon(Icons.access_time, color: primaryColor),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey.shade300),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey.shade300),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: primaryColor),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                                  ),
+                                  decoration: _getInputDecoration(hintText: 'Start', icon: Icons.access_time),
                                 ),
                               ],
                             ),
@@ -338,23 +359,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
                                   controller: _endTimeController,
                                   readOnly: true,
                                   onTap: () => _selectTime(context, false),
-                                  decoration: InputDecoration(
-                                    hintText: 'End',
-                                    suffixIcon: Icon(Icons.access_time, color: primaryColor),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey.shade300),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey.shade300),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: primaryColor),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                                  ),
+                                  decoration: _getInputDecoration(hintText: 'End', icon: Icons.access_time),
                                 ),
                               ],
                             ),
@@ -394,72 +399,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
                           ),
                         ),
                         SizedBox(height: 16),
-                        ...timeSlots.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final slot = entry.value;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: Container(
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey.shade200),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.03),
-                                    blurRadius: 8,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: secondaryColor,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      Icons.calendar_month,
-                                      color: primaryColor,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "${slot.date.day}/${slot.date.month}/${slot.date.year}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          "${slot.startTime.format(context)} - ${slot.endTime.format(context)}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Colors.black54,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete_outline, color: Colors.red),
-                                    onPressed: () => _removeTimeSlot(index),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                        ..._buildTimeSlotsList(),
                       ],
                     ],
                   ),
@@ -519,6 +459,135 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> {
         ),
       ),
     );
+  }
+
+  InputDecoration _getInputDecoration({required String hintText, required IconData icon}) {
+    return InputDecoration(
+      hintText: hintText,
+      suffixIcon: Icon(icon, color: primaryColor),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: secondaryColor),
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+    );
+  }
+
+  // Time slots list widgets
+  List<Widget> _buildTimeSlotsList() {
+    return timeSlots.asMap().entries.map((entry) {
+      final index = entry.key;
+      final slot = entry.value;
+      
+      // Animate item removal
+      final bool isRemoving = _removingSlotIndex == index;
+      final Animation<double> removeAnimation = CurvedAnimation(
+        parent: _removeAnimationController,
+        curve: Curves.easeInOut,
+      );
+      
+      return AnimatedBuilder(
+        animation: isRemoving ? removeAnimation : const AlwaysStoppedAnimation(0),
+        builder: (context, child) {
+          if (isRemoving) {
+            return Opacity(
+              opacity: 1 - removeAnimation.value,
+              child: Transform.translate(
+                offset: Offset(300 * removeAnimation.value, 0),
+                child: Transform.scale(
+                  scale: 1 - (0.2 * removeAnimation.value),
+                  child: child,
+                ),
+              ),
+            );
+          }
+          return child!;
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: secondaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.calendar_month,
+                    color: primaryColor,
+                    size: 20,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${slot.date.day}/${slot.date.month}/${slot.date.year}",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "${slot.startTime.format(context)} - ${slot.endTime.format(context)}",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit, color: primaryColor),
+                      onPressed: () => _editTimeSlot(index),
+                      tooltip: 'Edit',
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () => _removeTimeSlot(index),
+                      tooltip: 'Delete',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }).toList();
   }
 }
 

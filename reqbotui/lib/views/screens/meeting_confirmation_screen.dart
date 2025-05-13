@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:reqbot/views/screens/home_screen.dart';
 
 class MeetingConfirmationScreen extends StatelessWidget {
   final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
@@ -75,7 +76,10 @@ class MeetingConfirmationScreen extends StatelessWidget {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        (route) => false
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
