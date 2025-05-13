@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/views/screens/summary.dart';
 import 'package:provider/provider.dart';
+import 'package:reqbot/views/screens/diagramsmenu.dart';
 
 class ReqsMarkScreen extends StatefulWidget {
   const ReqsMarkScreen({Key? key}) : super(key: key);
@@ -168,13 +169,16 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen> with SingleTickerProvid
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const SummaryScreen(),
+              builder: (context) => DiagramsMenu(),
             ),
           );
         },
-        icon: const Icon(Icons.summarize_outlined),
+        icon: Icon(
+          Icons.schema_outlined,
+          color: Colors.white,
+        ),
         label: Text(
-          'View Summary',
+          'Show Diagrams',
           style: GoogleFonts.inter(
             color: Colors.white,
             fontWeight: FontWeight.w600,
