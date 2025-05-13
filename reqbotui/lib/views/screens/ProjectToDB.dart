@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:math';
+import 'package:reqbot/views/screens/choose_action_screen.dart';
 
 class ProjectToDB extends StatefulWidget {
   const ProjectToDB({Key? key}) : super(key: key);
@@ -206,7 +207,7 @@ class _ProjectToDBState extends State<ProjectToDB>
               ),
               const SizedBox(height: 8),
               Text(
-                'Ready to start recording requirements',
+                'Ready to start working on your project',
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: Colors.black54,
@@ -219,11 +220,11 @@ class _ProjectToDBState extends State<ProjectToDB>
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context); // Close dialog
-                    // Navigate to Record screen
+                    // Navigate to Choose Action screen instead of Record
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const Record(),
+                        builder: (context) => ChooseActionScreen(),
                       ),
                     );
                   },
@@ -236,7 +237,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                     elevation: 0,
                   ),
                   child: Text(
-                    "Continue to Recording",
+                    "Continue",
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.w500,
                       fontSize: 16,
@@ -338,7 +339,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                       ),
                     ),
                     Text(
-                      'Step 1 of 2',
+                      'Step 1 of 3',
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: Colors.black54,

@@ -289,12 +289,23 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
       backgroundColor: backgroundColor,
       appBar: AppBar(
         elevation: 0,
-        title: Text(
-          'Meetings & Audio Records',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+        title: Column(
+          children: [
+            Text(
+              'Meetings & Audio Records',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'Step 3 of 3',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: Colors.white70,
+              ),
+            ),
+          ],
         ),
         backgroundColor: primaryColor,
       ),
