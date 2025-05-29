@@ -46,7 +46,7 @@ class _DatabaseSchemaEditorState extends State<DatabaseSchemaEditor> {
       // });
 
       final contents = await rootBundle.loadString(
-          'assets/umls/database_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
+          'umls/database_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       setState(() {
         plantumlCode = contents;
         _plantumlController = TextEditingController(text: plantumlCode);

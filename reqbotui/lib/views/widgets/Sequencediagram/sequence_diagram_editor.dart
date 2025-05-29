@@ -86,7 +86,8 @@ class _SequenceDiagramEditorState extends State<SequenceDiagramEditor> {
       // });
 
       final contents = await rootBundle.loadString(
-          'assets/umls/sequence_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
+          'umls/sequence_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
+      // 'assets/umls/sequence_diagram_5.puml');
       setState(() {
         _plantUmlCode = contents;
       });

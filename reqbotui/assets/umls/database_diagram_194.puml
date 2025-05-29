@@ -1,0 +1,46 @@
+@startuml
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+skinparam classAttributeIconSize 0
+title Appointment Booking System Class Diagram
+class User {
+.. Represents a user of the appointment booking system ..
+
++ userId: String {PK, NOT NULL}
+- username: String {NOT NULL}
+- email: String {NOT NULL}
+
++ createAccount(): boolean
+}
+class Event {
+.. Represents an event in the appointment booking system ..
+
++ eventId: String {PK, NOT NULL}
+- title: String {NOT NULL}
+- date: Date {NOT NULL}
+
++ createEventListing(): boolean
+}
+class Appointment {
+.. Represents an appointment booking in the system ..
+
++ appointmentId: String {PK, NOT NULL}
+- eventId: String {NOT NULL}
+- userId: String {NOT NULL}
+
++ bookAppointment(): boolean
++ cancelAppointment(): boolean
+}
+class Notification {
+.. Represents a notification sent to the user for an appointment ..
+
++ notificationId: String {PK, NOT NULL}
+- appointmentId: String {NOT NULL}
+
+}
+User "1" *-- "*" Appointment : A user can have multiple appointments
+Appointment "*" --* "1" Event : An appointment is associated with one event
+@enduml

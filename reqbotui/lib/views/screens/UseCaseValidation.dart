@@ -85,7 +85,8 @@ class _UseCaseValidationState extends State<UseCaseValidation> {
       // });
 
       final contents = await rootBundle.loadString(
-          'assets/umls/use_case_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
+          'umls/use_case_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
+      // 'assets/umls/use_case_diagram_5.puml');
       setState(() {
         _plantUmlCode = contents;
         // _plantUmlCode = cleanedContents;

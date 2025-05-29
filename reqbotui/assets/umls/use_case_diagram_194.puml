@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+title Appointment Booking System Requirements Diagram
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkGray
+    ActorBorderColor Navy
+}
+
+actor "User" as User
+actor "Event Organizer" as Event_Organizer
+
+rectangle "Appointment Booking System" {
+    usecase "Create Account" as FR001
+    User --> FR001
+    usecase "View Available Slots" as FR002
+    User --> FR002
+    usecase "Book Appointments" as FR003
+    usecase "Verify Availability" as FR004
+    FR003 ..> FR004 : <<include>>
+    User --> FR003
+    usecase "Cancel or Reschedule Appointments" as FR005
+    usecase "Send Cancellation Notification" as FR006
+    FR006 ..> FR005 : <<extend>>
+    note right of FR006 : Cancellation requested
+    usecase "Reschedule Appointment" as FR007
+    FR007 ..> FR005 : <<extend>>
+    note right of FR007 : New time slot available
+    User --> FR005
+    usecase "Manage Event Listings (Event Organizer)" as FR008
+    usecase "Create New Event" as FR009
+    FR008 ..> FR009 : <<include>>
+    usecase "Edit Existing Event" as FR010
+    FR008 ..> FR010 : <<include>>
+    Event_Organizer --> FR008
+    usecase "Browse and Search Events (User)" as FR011
+    User --> FR011
+}
+@enduml

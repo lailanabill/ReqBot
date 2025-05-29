@@ -74,6 +74,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
     super.initState();
     projectID = widget.projectID;
     context.read<UserDataProvider>().setSelectedProjectId(projectID);
+    context.read<UserDataProvider>().setProjectId(projectID);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -85,7 +86,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    // _animationController.dispose();
     super.dispose();
   }
 

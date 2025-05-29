@@ -142,6 +142,7 @@ class DiagramPage extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(
+                            // "https://storage.googleapis.com/diagrams-data/images/${dgrnam}_diagram_5.png",
                             "https://storage.googleapis.com/diagrams-data/images/${dgrnam}_diagram_${diagramIndex}.png",
                             width: screenWidth * 0.9,
                             height: screenHeight * 0.6,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:reqbot/views/screens/home_screen.dart';
 
 class UploadConfirmationScreen extends StatelessWidget {
   final Color primaryColor = Color.fromARGB(255, 0, 54, 218);
@@ -54,7 +55,13 @@ class UploadConfirmationScreen extends StatelessWidget {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              HomeScreen(), // Replace with your home screen widget
+                        ));
+                    // Navigator.of(context).popUntil((route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
@@ -79,4 +86,4 @@ class UploadConfirmationScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

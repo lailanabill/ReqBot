@@ -59,6 +59,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // print(context.read<UserDataProvider>().AnalyzerID);
 
     // Initialize remove animation controller
+    context.read<DataProvider>().setRequirements("""
+Here are the extracted requirements:
+
+Functional Requirements:
+F1) Users should be able to create an account.
+F2) Users should be able to view available slots.
+F3) Users should be able to book appointments.
+F4) Event organizers can create and manage event listings.
+F5) Users can browse events.
+F6) Users can search for specific events.
+F7) Users can book tickets for events.
+
+Non-Functional Requirements:
+NF1) The system should be reliable.
+NF2) The system should perform fast.
+NF3) The system should ensure security for handling personal data.
+NF4) Users will receive email or SMS notifications for confirmations and reminders.
+
+Note: Requirements F8-F10 cover both functional and non-functional aspects:
+
+F8) Users can cancel or reschedule appointments, with email or SMS notifications.
+NF5) The system should be reliable in handling appointment booking and cancellation/rescheduling operations.
+
+
+""");
     _removeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
@@ -67,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _removeAnimationController.dispose();
+    // _removeAnimationController.dispose();
     super.dispose();
   }
 
@@ -330,10 +355,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       const SizedBox(height: 16),
                                   itemBuilder: (context, index) {
                                     final project = _projects[index];
-                                    context
-                                        .read<UserDataProvider>()
-                                        .setProjectId(project.id);
-                                    print(project.id);
+                                    // context
+                                    //     .read<UserDataProvider>()
+                                    //     .setProjectId(project.id);
+
                                     return _buildProjectCard(
                                         project, index, project.id);
                                   },
@@ -480,9 +505,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         Text(
                           project.name,
                           style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.black),
                         ),
                         const SizedBox(height: 4),
                         Text(

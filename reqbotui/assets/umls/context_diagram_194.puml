@@ -1,0 +1,27 @@
+@startuml
+skinparam monochrome true
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+    FontSize 12
+}
+skinparam circle {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam ArrowThickness 1
+skinparam ArrowFontSize 10
+
+circle "Appointment Booking System" as SysName
+
+rectangle "User" as EE1
+rectangle "Event Organizer" as EE2
+
+EE1 --> SysName: Account Registration Data
+SysName --> EE1: Available Slots Information
+EE1 --> SysName: Appointment Booking Requests
+SysName --> EE1: Appointment Confirmations and Reminders
+EE2 --> SysName: Event Listings Data
+SysName --> EE2: Event Listing Updates
+@enduml

@@ -28,7 +28,7 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
   late AnimationController _mainAnimationController;
   late Animation<double> _fadeInAnimation;
   late Animation<double> _slideAnimation;
-  
+
   // Button animation
   late AnimationController _buttonAnimationController;
   late Animation<double> _buttonScaleAnimation;
@@ -45,19 +45,19 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
     'context',
     'database',
     'sequence',
-    'usecase'
+    'use_case'
   ];
 
   @override
   void initState() {
     super.initState();
-    
+
     // Main animations for content
     _mainAnimationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _mainAnimationController,
@@ -77,7 +77,7 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _buttonScaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
       CurvedAnimation(
         parent: _buttonAnimationController,
@@ -109,18 +109,21 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
     return {'project': projectResponse};
   }
 
-String _generateLatex(Map<String, dynamic> data, int projectId) {
-  final project = data['project'];
-  final projectName = project['name'] ?? 'Appointment Booking System';
-  final transcription = project['transcription']?.replaceAll('\n', '\\\\') ?? 'Meeting transcription not available.';
-  final summary = project['summary']?.replaceAll('\n', '\\\\') ?? 'Meeting summary not available.';
-  final requirements = project['status']?.replaceAll('\n', '\\\\') ?? 'No requirements provided.';
+  String _generateLatex(Map<String, dynamic> data, int projectId) {
+    final project = data['project'];
+    final projectName = project['name'] ?? 'Appointment Booking System';
+    final transcription = project['transcription']?.replaceAll('\n', '\\\\') ??
+        'Meeting transcription not available.';
+    final summary = project['summary']?.replaceAll('\n', '\\\\') ??
+        'Meeting summary not available.';
+    final requirements = project['status']?.replaceAll('\n', '\\\\') ??
+        'No requirements provided.';
 
-  // Generate diagram includes
-  String diagramSection = '';
-  for (var type in _diagramTypes) {
-    if (_includedImages.contains('${type}_diagram_$projectId.png')) {
-      diagramSection += '''
+    // Generate diagram includes
+    String diagramSection = '';
+    for (var type in _diagramTypes) {
+      if (_includedImages.contains('${type}_diagram_$projectId.png')) {
+        diagramSection += '''
 \\begin{figure}[h]
     \\centering
     \\includegraphics[width=0.8\\textwidth]{${type}_diagram_${projectId}.png}
@@ -128,10 +131,10 @@ String _generateLatex(Map<String, dynamic> data, int projectId) {
     \\label{fig:${type}_diagram}
 \\end{figure}
 ''';
+      }
     }
-  }
 
-  return '''
+    return '''
 \\documentclass[12pt]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage{graphicx}
@@ -205,7 +208,7 @@ The platform described in this specification provides a robust solution for appo
 
 \\end{document}
 ''';
-}
+  }
 
   Future<void> _generateSRSZip(int projectId, int analyzerId) async {
     setState(() {
@@ -223,7 +226,7 @@ The platform described in this specification provides a robust solution for appo
 
       for (var type in _diagramTypes) {
         try {
-          final assetPath = 'assets/images/${type}_diagram_153.png';
+          final assetPath = 'assets/images/${type}_diagram_194.png';
           print('Attempting to load: $assetPath');
           final imageBytes =
               await DefaultAssetBundle.of(context).load(assetPath);
@@ -328,7 +331,8 @@ The platform described in this specification provides a robust solution for appo
         },
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
             child: SingleChildScrollView(
               physics: BouncingScrollPhysics(),
               child: Column(
@@ -338,7 +342,9 @@ The platform described in this specification provides a robust solution for appo
                   const SizedBox(height: 32),
                   _buildInfoCard(),
                   const SizedBox(height: 40),
-                  _isLoading ? _buildLoadingState() : _buildGenerateButton(projectId, analyzerId),
+                  _isLoading
+                      ? _buildLoadingState()
+                      : _buildGenerateButton(projectId, analyzerId),
                   const SizedBox(height: 30),
                   if (_statusMessage.isNotEmpty && !_isLoading)
                     _buildStatusMessage(),
@@ -466,19 +472,22 @@ The platform described in this specification provides a robust solution for appo
                 _buildInfoItem(
                   icon: Icons.article_outlined,
                   title: 'IEEE 830-1998 Format',
-                  description: 'Professional document following industry standards',
+                  description:
+                      'Professional document following industry standards',
                 ),
                 SizedBox(height: 16),
                 _buildInfoItem(
                   icon: Icons.auto_awesome_motion,
                   title: 'Complete Package',
-                  description: 'Includes requirements, diagrams, and project details',
+                  description:
+                      'Includes requirements, diagrams, and project details',
                 ),
                 SizedBox(height: 16),
                 _buildInfoItem(
                   icon: Icons.open_in_new_rounded,
                   title: 'Editable in Overleaf',
-                  description: 'The ZIP file can be uploaded directly to Overleaf for editing',
+                  description:
+                      'The ZIP file can be uploaded directly to Overleaf for editing',
                 ),
                 SizedBox(height: 16),
                 Container(
@@ -520,7 +529,10 @@ The platform described in this specification provides a robust solution for appo
     );
   }
 
-  Widget _buildInfoItem({required IconData icon, required String title, required String description}) {
+  Widget _buildInfoItem(
+      {required IconData icon,
+      required String title,
+      required String description}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -692,10 +704,14 @@ The platform described in this specification provides a robust solution for appo
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: _isSuccess ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+          color: _isSuccess
+              ? Colors.green.withOpacity(0.1)
+              : Colors.red.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isSuccess ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+            color: _isSuccess
+                ? Colors.green.withOpacity(0.3)
+                : Colors.red.withOpacity(0.3),
             width: 1,
           ),
         ),
@@ -773,7 +789,8 @@ The platform described in this specification provides a robust solution for appo
                               runSpacing: 6,
                               children: _includedImages.map((image) {
                                 return Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: primaryColor.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(4),

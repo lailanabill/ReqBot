@@ -1,0 +1,42 @@
+@startuml
+title Appointment Booking System Class Diagram
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+class User {
+  - userId: String
+  - username: String
+  - password: String
+  + createAccount(): Boolean
+  + login(username: String, password: String): Boolean
+}
+class Event {
+  - eventId: String
+  - title: String
+  - description: String
+  + createListing(): Boolean
+  + updateListing(title: String, description: String): Boolean
+}
+class Appointment {
+  - appointmentId: String
+  - eventId: Event
+  - startTime: DateTime
+  - endTime: DateTime
+  + bookAppointment(eventId: String, startTime: DateTime, endTime: DateTime): Boolean
+  + cancelAppointment(appointmentId: String): Boolean
+}
+class Notification {
+  - notificationId: String
+  - appointmentId: Appointment
+  - message: String
+  + sendConfirmation(appointmentId: String, message: String): Boolean
+  + sendReminder(appointmentId: String, message: String): Boolean
+}
+User --> Appointment : books
+Event --> Appointment : has appointments
+User --> Notification : receives notifications
+@enduml

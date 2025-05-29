@@ -69,7 +69,7 @@ class _ContextDiagramEditorScreenState
       // });
 
       final contents = await rootBundle.loadString(
-          'assets/umls/context_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
+          'umls/context_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       final cleaned = contents.trim().replaceAll('\r\n', '\n');
 
       setState(() {

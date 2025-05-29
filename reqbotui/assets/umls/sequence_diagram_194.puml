@@ -1,0 +1,24 @@
+@startuml
+title Sequence Diagram
+skinparam sequence {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkGray
+    ActorBorderColor Navy
+}
+
+actor User as "User"
+participant System as "System"
+actor Event_Organizer as "Event Organizer"
+User -> System: Create Account
+System --> User: Display Registration Form
+User -> System: View Available Slots
+System --> User: Show Available Time Slots
+User -> System: Book Appointment
+System --> User: Confirm Booking
+Event_Organizer -> System: Create Event Listing
+System --> Event_Organizer: Display Event Calendar
+User -> System: Cancel or Reschedule Appointment
+System ->> User: Send Cancellation/Rescheduling Confirmation
+System ->> User: Send Reminder Notifications
+@enduml

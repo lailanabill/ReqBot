@@ -28,7 +28,7 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
   //   }
   // }
 
-  Future<void> downloadFile(String fileName) async {
+  Future<void> downloadFile() async {
     // Future<void> downloadFile(String url, String fileName) async {
     try {
       // // if mobile
@@ -45,11 +45,12 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
       // });
 
       final contents = await rootBundle.loadString(
-          'assets/umls/class_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
+          'umls/class_diagram_${context.read<UserDataProvider>().SelectedProjectId}.puml');
       final cleaned = contents.trim().replaceAll('\r\n', '\n');
       setState(() {
         plantumlCode = cleaned;
       });
+      print("PUML Loaded:\n$plantumlCode");
     } catch (e) {
       print("Download failed: $e");
     }
@@ -98,7 +99,7 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
   @override
   void initState() {
     super.initState();
-    downloadFile('class_diagram_5.puml');
+    downloadFile();
     _plantumlController = TextEditingController(text: plantumlCode);
     _previousPlantumlCode = plantumlCode;
   }

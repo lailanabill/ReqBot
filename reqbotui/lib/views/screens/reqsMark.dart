@@ -13,7 +13,8 @@ class ReqsMarkScreen extends StatefulWidget {
   State<ReqsMarkScreen> createState() => _ReqsMarkScreenState();
 }
 
-class _ReqsMarkScreenState extends State<ReqsMarkScreen> with SingleTickerProviderStateMixin {
+class _ReqsMarkScreenState extends State<ReqsMarkScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
   final TextEditingController _editingController = TextEditingController();
@@ -21,16 +22,17 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen> with SingleTickerProvid
   final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
 
   Future<void> getReqs() async {
-    final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    setState(() {
-      Requirements = dataProvider.requirements;
-    });
+    // final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    // setState(() {
+    //   Requirements = dataProvider.requirements;
+    // });
   }
 
   @override
   void initState() {
     super.initState();
-    getReqs();
+    // getReqs();
+    Requirements = context.read<DataProvider>().requirements;
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -66,7 +68,8 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen> with SingleTickerProvid
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
+                        icon: const Icon(Icons.arrow_back_ios,
+                            color: Colors.black87, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -131,7 +134,8 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen> with SingleTickerProvid
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
@@ -147,12 +151,12 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen> with SingleTickerProvid
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Requirements content
                     Expanded(
-                      child: Requirements.isEmpty 
+                      child: Requirements.isEmpty
                           ? _buildEmptyState()
                           : _buildRequirementsContent(),
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:reqbot/views/screens/choose_action_screen.dart';
 import 'package:reqbot/views/screens/home_screen.dart';
 
 class MeetingConfirmationScreen extends StatelessWidget {
@@ -32,7 +33,7 @@ class MeetingConfirmationScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 32),
-                
+
                 // Confirmation title
                 Text(
                   'Meeting Availability Submitted!',
@@ -44,32 +45,35 @@ class MeetingConfirmationScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 16),
-                
+
                 // Confirmation details
                 _buildInfoCard(
                   context,
                   title: 'Next Steps',
-                  content: 'You will receive a meeting link once a client selects one of your available slots.',
+                  content:
+                      'You will receive a meeting link once a client selects one of your available slots.',
                   icon: Icons.link,
                 ),
                 SizedBox(height: 16),
-                
+
                 _buildInfoCard(
                   context,
                   title: 'Automatic Recording',
-                  content: 'The meeting will be recorded automatically for transcription purposes.',
+                  content:
+                      'The meeting will be recorded automatically for transcription purposes.',
                   icon: Icons.mic,
                 ),
                 SizedBox(height: 16),
-                
+
                 _buildInfoCard(
                   context,
                   title: 'Transcription & Summary',
-                  content: 'You\'ll be notified when the transcription and summary of the meeting are available.',
+                  content:
+                      'You\'ll be notified when the transcription and summary of the meeting are available.',
                   icon: Icons.description,
                 ),
                 SizedBox(height: 40),
-                
+
                 // Return home button
                 SizedBox(
                   width: double.infinity,
@@ -77,9 +81,10 @@ class MeetingConfirmationScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                        (route) => false
-                      );
+                          MaterialPageRoute(
+                              builder: (context) => ChooseActionScreen()),
+                          // MaterialPageRoute(builder: (context) => HomeScreen()),
+                          (route) => false);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
@@ -105,7 +110,7 @@ class MeetingConfirmationScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildInfoCard(
     BuildContext context, {
     required String title,
@@ -171,4 +176,4 @@ class MeetingConfirmationScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

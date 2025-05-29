@@ -35,7 +35,7 @@ class _SummaryScreenState extends State<SummaryScreen>
   late AnimationController _refreshIconController;
 
   final TextEditingController _editingController = TextEditingController();
-  
+
   // Using the exact color specified
   final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
   final Color backgroundColor = Colors.white;
@@ -48,7 +48,7 @@ class _SummaryScreenState extends State<SummaryScreen>
       _isLoading = true;
       _hasError = false;
     });
-    
+
     try {
       final response = await Supabase.instance.client
           .from('projects')
@@ -57,8 +57,8 @@ class _SummaryScreenState extends State<SummaryScreen>
           .eq('id', context.read<UserDataProvider>().SelectedProjectId);
 
       setState(() {
-        summary = response.isNotEmpty && response[0]['summary'] != null 
-            ? response[0]['summary'] 
+        summary = response.isNotEmpty && response[0]['summary'] != null
+            ? response[0]['summary']
             : "";
         _isLoading = false;
       });
@@ -75,13 +75,13 @@ class _SummaryScreenState extends State<SummaryScreen>
   void initState() {
     super.initState();
     _getSummary();
-    
+
     // Main animations for content
     _mainAnimationController = AnimationController(
       duration: const Duration(milliseconds: 900),
       vsync: this,
     );
-    
+
     _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _mainAnimationController,
@@ -101,7 +101,7 @@ class _SummaryScreenState extends State<SummaryScreen>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
+
     _fabAnimation = CurvedAnimation(
       parent: _fabAnimationController,
       curve: Curves.elasticOut,
@@ -214,7 +214,8 @@ class _SummaryScreenState extends State<SummaryScreen>
         },
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -290,12 +291,20 @@ class _SummaryScreenState extends State<SummaryScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // SizedBox(
+            //   height: 120,
+            //   width: 120,
+            //   child: Lottie.network(
+            //     'https://assets9.lottiefiles.com/packages/lf20_i9mtrven.json', // Document analyzing animation
+            //     repeat: true,
+            //   ),
+            // ),
             SizedBox(
-              height: 120,
-              width: 120,
-              child: Lottie.network(
-                'https://assets9.lottiefiles.com/packages/lf20_i9mtrven.json', // Document analyzing animation
-                repeat: true,
+              height: 60,
+              width: 60,
+              child: CircularProgressIndicator(
+                color: primaryColor,
+                strokeWidth: 3,
               ),
             ),
             const SizedBox(height: 24),
@@ -362,7 +371,8 @@ class _SummaryScreenState extends State<SummaryScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 elevation: 2,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -420,7 +430,8 @@ class _SummaryScreenState extends State<SummaryScreen>
               style: OutlinedButton.styleFrom(
                 foregroundColor: primaryColor,
                 side: BorderSide(color: primaryColor),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -547,7 +558,8 @@ class _SummaryScreenState extends State<SummaryScreen>
                       color: Colors.white,
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 24),
                         child: MarkdownBody(
                           data: summary,
                           styleSheet: MarkdownStyleSheet(
@@ -588,7 +600,8 @@ class _SummaryScreenState extends State<SummaryScreen>
                                 ),
                               ),
                             ),
-                            blockquotePadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                            blockquotePadding:
+                                EdgeInsets.only(left: 16, top: 8, bottom: 8),
                             listBullet: GoogleFonts.inter(
                               fontSize: 15,
                               color: primaryColor,

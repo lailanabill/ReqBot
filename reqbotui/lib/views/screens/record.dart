@@ -23,9 +23,12 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
   final Color secondaryColor = Color.fromARGB(255, 230, 234, 255);
   final Color backgroundColor = Colors.white;
   String _transcription = '';
-  String req_sumURI = "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
-  String sumURI = "https://main-server-last-1016128810332.us-central1.run.app/summarize/";
-  String diagramsURI = "https://main-server-last-1016128810332.us-central1.run.app/diagrams/";
+  String req_sumURI =
+      "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
+  String sumURI =
+      "https://main-server-last-1016128810332.us-central1.run.app/summarize/";
+  String diagramsURI =
+      "https://main-server-last-1016128810332.us-central1.run.app/diagrams/";
   bool _uploaded = false;
   bool _isLoading = false;
   int? _selectedMeetingIndex;
@@ -46,7 +49,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    _animationController.dispose();
+    // _animationController.dispose();
     super.dispose();
   }
 
@@ -71,12 +74,12 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
           context.read<UserDataProvider>().ProjectId,
           context.read<UserDataProvider>().AnalyzerID,
           context.read<DataProvider>().transcript);
-      
+
       _isLoading = false;
       _uploaded = true;
-      
+
       // Navigate to confirmation screen after successful upload
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => UploadConfirmationScreen()),
       );
@@ -108,13 +111,17 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
             filename: file.name,
             contentType: MediaType('audio', 'wav'),
           ));
-          
+
           var response = await request.send();
           var responseData = await http.Response.fromStream(response);
-          
+
           if (responseData.statusCode == 200) {
             var transcription = jsonDecode(responseData.body)['transcription'];
+            // print("Transcription do we even get a trans");
             _updateTranscription(transcription);
+            // print("Transcription from update: ${_transcription}");
+            // print("Transcription source update: ${transcription}");
+            _getTransciptSummary(_transcription);
             print("Upload successful");
           } else {
             setState(() {
@@ -160,7 +167,6 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
 
   Future<void> _getTransciptSummary(String WhisperTranscript) async {
     var SumURI = Uri.parse(sumURI);
-
     final body = jsonEncode({
       "text": WhisperTranscript,
     });
@@ -175,7 +181,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
             context.read<UserDataProvider>().ProjectId,
             context.read<UserDataProvider>().AnalyzerID,
             context.read<DataProvider>().summary);
-        
+
         _getRrequirements(WhisperTranscript, responseData['summary']);
       } else {
         print("Server error: ${SumRequest.statusCode}");
@@ -411,7 +417,9 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildMeetingCard(String title, String date, String status,
-      {IconData icon = Icons.meeting_room, bool showAudio = false, int index = 0}) {
+      {IconData icon = Icons.meeting_room,
+      bool showAudio = false,
+      int index = 0}) {
     Color statusColor;
     switch (status) {
       case 'Completed':
