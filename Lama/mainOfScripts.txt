@@ -27,3 +27,21 @@ if __name__ == "__main__":
     """
     pid = 1  # Example process ID
     DbDiagramDriver(description, pid)
+
+
+    if __name__ == "__main__":
+    # Example usage
+    description = """"
+    Functional requirements : 
+    Users should be able to: Create an account ,View available slots, Book appointments.
+Event organizers can: Create and manage event listings.
+Notifications : Users will receive email or SMS notifications for Confirmations and Reminders (cancellation and rescheduling).
+UX : The system should allow users to Browse events ,Search for specific events and Book tickets for events.
+Sprint goals: Develop a functional appointment booking system ,Implement notification mechanisms for confirmations and reminders.
+Non-Funtional requirements : 
+Performance : System reliability , Fast performance and Security for handling personal data.
+Backend/Technical : No technical updates or refactoring discussed during the meeting.
+QA : testing will focus on ensuring the system meets non-functional requirements (reliability, speed, and security).
+    """
+    pid = 999  # Example process ID
+    ClassDiagramDriver(description, pid)

@@ -784,7 +784,7 @@ def DbDiagramDriver(desc,pid):
         generator.generate_diagram(plantuml_code,pid, output_dir="/images/")
 
 
-        bucket_name = "diagrams-data"  # replace with your bucket
+        bucket_name = "diagram-data"  # replace with your bucket
         json_url = upload_to_gcs(bucket_name, json_path, f"jsons/database_diagram_{pid}.json")
         puml_url = upload_to_gcs(bucket_name, puml_path, f"umls/database_diagram_{pid}.puml")
         png_url = upload_to_gcs(bucket_name, img_path, f"images/database_diagram_{pid}.png")

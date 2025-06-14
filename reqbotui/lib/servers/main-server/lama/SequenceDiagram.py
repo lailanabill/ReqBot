@@ -580,7 +580,7 @@ IMPORTANT:
             # png_file = f"{output_prefix}.png"
             png_success = self.generate_diagram_with_kroki(plantuml_code,pid , output_dir="/images/")
             
-            bucket_name = "diagrams-data"  # replace with your bucket
+            bucket_name = "diagram-data"  # replace with your bucket
             upload_to_gcs(bucket_name, json_path, f"jsons/sequence_diagram_{pid}.json")
             upload_to_gcs(bucket_name, puml_path, f"umls/sequence_diagram_{pid}.puml")
             upload_to_gcs(bucket_name, img_path, f"images/sequence_diagram_{pid}.png")

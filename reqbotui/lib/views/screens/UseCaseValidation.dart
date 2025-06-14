@@ -9,7 +9,7 @@ import 'package:archive/archive.dart'; // For zlib compression
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 import 'package:reqbot/services/providers/userProvider.dart';
 

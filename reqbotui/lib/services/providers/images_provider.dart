@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-class DataProvider with ChangeNotifier {
+class ImageDataProvider with ChangeNotifier {
   String _Image = "";
   String _Puml = "";
   // String _Requirements = "";

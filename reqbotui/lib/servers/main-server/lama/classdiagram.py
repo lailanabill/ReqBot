@@ -202,7 +202,7 @@ EXAMPLE OUTPUT:
 
 Now, analyze the following system description and extract class diagram elements:
 
-System Description:
+System Functional and Non-Functional Requirements:
 {description}
 
 IMPORTANT:
@@ -373,7 +373,7 @@ def ClassDiagramDriver(desc,pid):
         
         # Print results
         # Upload to GCS
-        bucket_name = "diagrams-data"  # replace with your bucket
+        bucket_name = "diagram-data"  # replace with your bucket
         json_url = upload_to_gcs(bucket_name, json_path, f"jsons/class_diagram_{pid}.json")
         puml_url = upload_to_gcs(bucket_name, puml_path, f"umls/class_diagram_{pid}.puml")
         png_url = upload_to_gcs(bucket_name, img_path, f"images/class_diagram_{pid}.png")
@@ -386,11 +386,6 @@ def ClassDiagramDriver(desc,pid):
             "image_png": png_url,
         }
     
-
-        # print("Extracted Class Diagram Elements:")
-        # print(json.dumps(class_diagram_json, indent=2, ensure_ascii=False))
-        # print("\nPlantUML Diagram Code:")
-        # print(plantuml_code)
     else:
         print("Failed to extract class diagram elements from description")
 

@@ -57,6 +57,7 @@ class SignInController {
         prefs.setInt('analyzer_id', analyid['analyzer_id']);
 
         context.read<UserDataProvider>().setAnalyzerId(analyid['analyzer_id']);
+        context.read<UserDataProvider>().setUsername(analyid['name']);
 
         Navigator.pushReplacementNamed(context, '/HomeScreen');
         _showSuccessMessage(context, "Login successful!");

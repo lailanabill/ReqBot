@@ -1,4 +1,4 @@
-import 'dart:html' as html;
+// import 'dart:html' as html;
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +10,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/upload_confirmation.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart'; // For contentType
+import 'dart:io';
 
 class Record extends StatefulWidget {
   const Record({super.key});
@@ -23,6 +27,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
   final Color secondaryColor = Color.fromARGB(255, 230, 234, 255);
   final Color backgroundColor = Colors.white;
   String _transcription = '';
+  late List<Map<String, dynamic>> tempRqq;
   String req_sumURI =
       "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
   String sumURI =
@@ -86,57 +91,104 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
     });
   }
 
+  // Future<void> _handleUploadAudio() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //   html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+  //   uploadInput.accept = 'audio/*';
+  //   uploadInput.click();
+
+  //   uploadInput.onChange.listen((e) {
+  //     final file = uploadInput.files?.first;
+  //     if (file != null) {
+  //       final reader = html.FileReader();
+  //       reader.readAsArrayBuffer(file);
+  //       reader.onLoadEnd.listen((e) async {
+  //         final bytes = reader.result as List<int>;
+
+  //         var uri = Uri.parse(
+  //             'https://main-server-last-1016128810332.us-central1.run.app/whisper/');
+  //         var request = http.MultipartRequest('POST', uri);
+  //         request.files.add(http.MultipartFile.fromBytes(
+  //           'file',
+  //           bytes,
+  //           filename: file.name,
+  //           contentType: MediaType('audio', 'wav'),
+  //         ));
+
+  //         var response = await request.send();
+  //         var responseData = await http.Response.fromStream(response);
+
+  //         if (responseData.statusCode == 200) {
+  //           var transcription = jsonDecode(responseData.body)['transcription'];
+  //           // print("Transcription do we even get a trans");
+  //           _updateTranscription(transcription);
+  //           // print("Transcription from update: ${_transcription}");
+  //           // print("Transcription source update: ${transcription}");
+  //           _getTransciptSummary(_transcription);
+  //           print("Upload successful");
+  //         } else {
+  //           setState(() {
+  //             _isLoading = false;
+  //           });
+  //           _showErrorSnackBar("Upload failed: ${responseData.statusCode}");
+  //           print("Upload failed: ${responseData.statusCode}");
+  //           print("Error body: ${responseData.body}");
+  //         }
+  //       });
+  //     } else {
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   });
+  // }
+
   Future<void> _handleUploadAudio() async {
     setState(() {
       _isLoading = true;
     });
-    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
-    uploadInput.accept = 'audio/*';
-    uploadInput.click();
 
-    uploadInput.onChange.listen((e) {
-      final file = uploadInput.files?.first;
-      if (file != null) {
-        final reader = html.FileReader();
-        reader.readAsArrayBuffer(file);
-        reader.onLoadEnd.listen((e) async {
-          final bytes = reader.result as List<int>;
+    try {
+      final result = await FilePicker.platform.pickFiles(type: FileType.audio);
 
-          var uri = Uri.parse(
-              'https://main-server-last-1016128810332.us-central1.run.app/whisper/');
-          var request = http.MultipartRequest('POST', uri);
-          request.files.add(http.MultipartFile.fromBytes(
-            'file',
-            bytes,
-            filename: file.name,
-            contentType: MediaType('audio', 'wav'),
-          ));
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final bytes = await file.readAsBytes();
+        final fileName = result.files.single.name;
 
-          var response = await request.send();
-          var responseData = await http.Response.fromStream(response);
+        final uri = Uri.parse(
+            'https://main-server-last-1016128810332.us-central1.run.app/whisper/');
+        final request = http.MultipartRequest('POST', uri);
+        request.files.add(http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: fileName,
+          contentType: MediaType('audio', 'wav'),
+        ));
 
-          if (responseData.statusCode == 200) {
-            var transcription = jsonDecode(responseData.body)['transcription'];
-            // print("Transcription do we even get a trans");
-            _updateTranscription(transcription);
-            // print("Transcription from update: ${_transcription}");
-            // print("Transcription source update: ${transcription}");
-            _getTransciptSummary(_transcription);
-            print("Upload successful");
-          } else {
-            setState(() {
-              _isLoading = false;
-            });
-            _showErrorSnackBar("Upload failed: ${responseData.statusCode}");
-            print("Upload failed: ${responseData.statusCode}");
-            print("Error body: ${responseData.body}");
-          }
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
+        final response = await request.send();
+        final responseData = await http.Response.fromStream(response);
+
+        if (responseData.statusCode == 200) {
+          final transcription = jsonDecode(responseData.body)['transcription'];
+          _updateTranscription(transcription);
+          _getTransciptSummary(_transcription);
+          print("Upload successful");
+        } else {
+          _showErrorSnackBar("Upload failed: ${responseData.statusCode}");
+          print("Upload failed: ${responseData.statusCode}");
+          print("Error body: ${responseData.body}");
+        }
       }
+    } catch (e) {
+      _showErrorSnackBar("Error: $e");
+      print("Upload error: $e");
+    }
+
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -202,12 +254,16 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
       var ReqSumRequest = await http.post(ReqSumURI, body: body);
       if (ReqSumRequest.statusCode == 200) {
         final responseData = jsonDecode(ReqSumRequest.body);
+        tempRqq = List<Map<String, dynamic>>.from(responseData['reqs']);
         context.read<DataProvider>().setRequirements(responseData['reqs']);
+        context.read<DataProvider>().setDetailedRequirements(tempRqq);
+
         SaveToDb(
             'status',
             context.read<UserDataProvider>().ProjectId,
             context.read<UserDataProvider>().AnalyzerID,
             context.read<DataProvider>().requirements);
+
         _Diagrams(WhisperTranscript);
       } else {
         print("Server error: ${ReqSumRequest.statusCode}");

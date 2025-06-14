@@ -1,0 +1,12 @@
+what we know so far, 
+t5 works best for extracting requirments , risks and actions from a summarized meeting 
+bert work best for summarizing 
+t5 can be used for summarization 
+we will try claude and llama 
+we amy be able to use claude or some paid ai tools free using google cloud 
+look how to use claude with google cloud or any better tool 
+
+ollama3 worked very fine on a 1000 word problem and almost extracted every thing
+
+
+ollama worked best when extracting (fr n nfr , risks , timely event) and summarizing الحمدلله
