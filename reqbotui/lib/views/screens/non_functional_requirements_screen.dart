@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../widgets/dark_mode_toggle.dart';
 
 class NonFunctionalRequirementsScreen extends StatefulWidget {
   const NonFunctionalRequirementsScreen({super.key});
@@ -32,9 +33,6 @@ class _NonFunctionalRequirementsScreenState
   late AnimationController _addButtonAnimationController;
   late AnimationController _removeAnimationController;
   late AnimationController _switchTypeController;
-  
-  // Main color scheme
-  final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
   
   // Track if a requirement is being removed
   String? _removingRequirement;
@@ -116,6 +114,7 @@ class _NonFunctionalRequirementsScreenState
           content: Text('Requirement removed'),
           action: SnackBarAction(
             label: 'Undo',
+            textColor: Theme.of(context).colorScheme.primary,
             onPressed: () {
               if (_lastRemovedRequirement != null && _lastRemovedValue != null) {
                 setState(() {
@@ -128,6 +127,7 @@ class _NonFunctionalRequirementsScreenState
               }
             },
           ),
+          backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -165,7 +165,7 @@ class _NonFunctionalRequirementsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +180,7 @@ class _NonFunctionalRequirementsScreenState
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
+                          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface, size: 20),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         const SizedBox(width: 8),
@@ -193,6 +193,7 @@ class _NonFunctionalRequirementsScreenState
                                 style: GoogleFonts.inter(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -200,7 +201,7 @@ class _NonFunctionalRequirementsScreenState
                                 'System qualities and constraints',
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
-                                  color: Colors.black54,
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -209,12 +210,18 @@ class _NonFunctionalRequirementsScreenState
                       ],
                     ),
                   ),
-                  _buildSwitchButton(),
+                  Row(
+                    children: [
+                      _buildSwitchButton(),
+                      const SizedBox(width: 8),
+                      CompactDarkModeToggle(),
+                    ],
+                  ),
                 ],
               ),
             ),
             
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+            Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
             
             // Main Content
             Expanded(
@@ -232,18 +239,19 @@ class _NonFunctionalRequirementsScreenState
                           style: GoogleFonts.inter(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             '${_requirements.length} Items',
                             style: GoogleFonts.inter(
-                              color: primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                             ),
@@ -290,10 +298,10 @@ class _NonFunctionalRequirementsScreenState
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             offset: const Offset(0, -2),
             blurRadius: 8,
           ),
@@ -314,7 +322,7 @@ class _NonFunctionalRequirementsScreenState
               SnackBar(
                 content: Row(
                   children: [
-                    Icon(Icons.check_circle_outline, color: Colors.white),
+                    Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onPrimary),
                     const SizedBox(width: 12),
                     Text('Changes saved successfully'),
                   ],
@@ -327,8 +335,8 @@ class _NonFunctionalRequirementsScreenState
             HapticFeedback.mediumImpact();
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-            foregroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -337,7 +345,7 @@ class _NonFunctionalRequirementsScreenState
           child: Text(
             'Save Changes',
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -369,14 +377,14 @@ class _NonFunctionalRequirementsScreenState
           _addButtonAnimationController.forward();
           _showAddDialog();
         },
-        splashColor: primaryColor.withOpacity(0.1),
+        splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                primaryColor,
-                primaryColor.withBlue(min(primaryColor.blue + 40, 255)),
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.primary.withBlue(min(Theme.of(context).colorScheme.primary.blue + 40, 255)),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -384,7 +392,7 @@ class _NonFunctionalRequirementsScreenState
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: primaryColor.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -477,13 +485,13 @@ class _NonFunctionalRequirementsScreenState
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor.withOpacity(0.05) : Colors.white,
+          color: isSelected ? Theme.of(context).colorScheme.primary.withOpacity(0.05) : Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: isSelected 
-                ? primaryColor.withOpacity(0.1)
-                : Colors.black.withOpacity(0.05),
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                : Theme.of(context).colorScheme.outline.withOpacity(0.05),
               blurRadius: isSelected ? 12 : 8,
               offset: const Offset(0, 2),
             ),
@@ -523,14 +531,14 @@ class _NonFunctionalRequirementsScreenState
                           decoration: BoxDecoration(
                             color: Color.lerp(
                               Colors.transparent,
-                              primaryColor.withOpacity(0.2),
+                              Theme.of(context).colorScheme.primary.withOpacity(0.2),
                               value,
                             ),
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Color.lerp(
-                                Colors.grey.shade300,
-                                primaryColor,
+                                Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                                Theme.of(context).colorScheme.primary,
                                 value,
                               )!,
                               width: 2,
@@ -540,7 +548,7 @@ class _NonFunctionalRequirementsScreenState
                             child: Icon(
                               Icons.check,
                               size: 16 * value,
-                              color: primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
@@ -559,7 +567,7 @@ class _NonFunctionalRequirementsScreenState
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: isSelected ? primaryColor : Colors.black87,
+                            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -567,7 +575,7 @@ class _NonFunctionalRequirementsScreenState
                           'Tap to edit',
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: Colors.black45,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -592,7 +600,7 @@ class _NonFunctionalRequirementsScreenState
                             padding: const EdgeInsets.all(8),
                             child: Icon(
                               Icons.edit_outlined,
-                              color: primaryColor.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                               size: 22,
                             ),
                           ),
@@ -648,13 +656,13 @@ class _NonFunctionalRequirementsScreenState
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.assignment_outlined,
                 size: 60,
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 24),
@@ -663,7 +671,7 @@ class _NonFunctionalRequirementsScreenState
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),
@@ -674,7 +682,7 @@ class _NonFunctionalRequirementsScreenState
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 15,
-                  color: Colors.black54,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   height: 1.4,
                 ),
               ),
@@ -716,12 +724,12 @@ class _NonFunctionalRequirementsScreenState
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: _switchTypeController.value < 0.5 
-                ? primaryColor.withOpacity(0.1)
-                : Colors.indigo.withOpacity(0.2),
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                : Theme.of(context).colorScheme.secondary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
               boxShadow: _switchTypeController.value > 0.2 ? [
                 BoxShadow(
-                  color: Colors.indigo.withOpacity(0.2 * _switchTypeController.value),
+                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.2 * _switchTypeController.value),
                   blurRadius: 10 * _switchTypeController.value,
                   offset: const Offset(0, 2),
                 )
@@ -735,8 +743,8 @@ class _NonFunctionalRequirementsScreenState
                     Icons.swap_horiz_outlined,
                     size: 18,
                     color: ColorTween(
-                      begin: primaryColor,
-                      end: Colors.indigo,
+                      begin: Theme.of(context).colorScheme.primary,
+                      end: Theme.of(context).colorScheme.secondary,
                     ).transform(_switchTypeController.value)!,
                   ),
                 ),
@@ -746,8 +754,8 @@ class _NonFunctionalRequirementsScreenState
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     color: ColorTween(
-                      begin: primaryColor,
-                      end: Colors.indigo,
+                      begin: Theme.of(context).colorScheme.primary,
+                      end: Theme.of(context).colorScheme.secondary,
                     ).transform(_switchTypeController.value)!,
                     fontWeight: FontWeight.w500,
                   ),
@@ -772,7 +780,7 @@ class _NonFunctionalRequirementsScreenState
           children: [
             Icon(
               Icons.delete_outline,
-              color: primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               size: 24,
             ),
             const SizedBox(width: 12),
@@ -780,7 +788,7 @@ class _NonFunctionalRequirementsScreenState
               'Delete Requirement',
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.bold,
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ],
@@ -789,7 +797,7 @@ class _NonFunctionalRequirementsScreenState
           'Are you sure you want to delete this requirement?',
           style: GoogleFonts.inter(
             fontSize: 15,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         actions: [
@@ -798,7 +806,7 @@ class _NonFunctionalRequirementsScreenState
             child: Text(
               'Cancel',
               style: GoogleFonts.inter(
-                color: Colors.grey.shade700,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -809,8 +817,8 @@ class _NonFunctionalRequirementsScreenState
               _removeRequirement(title);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -901,11 +909,11 @@ class _NonFunctionalRequirementsScreenState
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -919,7 +927,7 @@ class _NonFunctionalRequirementsScreenState
                 children: [
                   Icon(
                     title.contains("Edit") ? Icons.edit_note : Icons.add_task,
-                    color: primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
@@ -928,7 +936,7 @@ class _NonFunctionalRequirementsScreenState
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -940,18 +948,18 @@ class _NonFunctionalRequirementsScreenState
                 decoration: InputDecoration(
                   hintText: "Enter requirement description",
                   filled: true,
-                  fillColor: Colors.grey.shade50,
+                  fillColor: Theme.of(context).colorScheme.surfaceVariant,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: primaryColor, width: 2),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
                   ),
                   prefixIcon: Icon(
                     Icons.assignment_outlined,
-                    color: Colors.grey.shade500,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 style: GoogleFonts.inter(
@@ -966,7 +974,7 @@ class _NonFunctionalRequirementsScreenState
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey.shade700,
+                      foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                     child: Text(
@@ -980,8 +988,8 @@ class _NonFunctionalRequirementsScreenState
                   ElevatedButton(
                     onPressed: onAction,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),

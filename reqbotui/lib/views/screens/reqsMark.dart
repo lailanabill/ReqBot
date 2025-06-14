@@ -5,6 +5,7 @@ import 'package:reqbot/services/providers/data_providers.dart';
 import 'package:reqbot/views/screens/summary.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/views/screens/diagramsmenu.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class ReqsMarkScreen extends StatefulWidget {
   const ReqsMarkScreen({Key? key}) : super(key: key);
@@ -19,7 +20,6 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
   late Animation<double> _animation;
   final TextEditingController _editingController = TextEditingController();
   String Requirements = "";
-  final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
 
   Future<void> getReqs() async {
     // final dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -54,7 +54,7 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,8 +68,8 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios,
-                            color: Colors.black87, size: 20),
+                        icon: Icon(Icons.arrow_back_ios,
+                            color: Theme.of(context).colorScheme.onSurface, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -81,39 +81,46 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             'Project requirements overview',
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.description_outlined,
-                        color: Color.fromARGB(255, 0, 54, 218),
-                        size: 20,
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.description_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      CompactDarkModeToggle(),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+            Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
 
             // Main Content
             Expanded(
@@ -131,19 +138,20 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
                           style: GoogleFonts.inter(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             Requirements.isEmpty ? 'No Items' : '1 Item',
                             style: GoogleFonts.inter(
-                              color: primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                             ),
@@ -168,7 +176,7 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: primaryColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -179,12 +187,12 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
         },
         icon: Icon(
           Icons.schema_outlined,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
         label: Text(
           'Show Diagrams',
           style: GoogleFonts.inter(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -199,11 +207,11 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
       child: Container(
         key: ValueKey(Requirements),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -230,32 +238,32 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
                       p: GoogleFonts.inter(
                         fontSize: 16,
                         height: 1.6,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       h1: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       h2: GoogleFonts.inter(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       h3: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       blockquote: GoogleFonts.inter(
                         fontSize: 16,
                         fontStyle: FontStyle.italic,
-                        color: Colors.black54,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       code: GoogleFonts.jetBrainsMono(
                         fontSize: 14,
-                        backgroundColor: primaryColor.withOpacity(0.1),
-                        color: primaryColor,
+                        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -287,13 +295,13 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.description_outlined,
                 size: 60,
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 24),
@@ -302,7 +310,7 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),
@@ -313,7 +321,7 @@ class _ReqsMarkScreenState extends State<ReqsMarkScreen>
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 15,
-                  color: Colors.black54,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   height: 1.4,
                 ),
               ),

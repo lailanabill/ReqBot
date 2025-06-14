@@ -9,6 +9,7 @@ import 'package:reqbot/views/screens/summary.dart';
 import 'package:reqbot/views/screens/reqsMark.dart';
 import 'package:reqbot/views/screens/transcript.dart';
 import 'package:reqbot/views/screens/srs_screen.dart'; // Add import
+import '../widgets/dark_mode_toggle.dart';
 
 class RequirementsMenuScreen extends StatefulWidget {
   final int projectID;
@@ -93,7 +94,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,8 +108,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios,
-                            color: Colors.black87, size: 20),
+                        icon: Icon(Icons.arrow_back_ios,
+                            color: Theme.of(context).colorScheme.onSurface, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -120,40 +121,46 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             'Select a category',
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218)
-                          .withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.layers_outlined,
-                        color: Color.fromARGB(255, 0, 54, 218),
-                        size: 20,
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.layers_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      CompactDarkModeToggle(),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+            Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
 
             // Main Content
             Expanded(
@@ -167,6 +174,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                       style: GoogleFonts.inter(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -174,7 +182,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                       'Browse and manage your project requirements',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: Colors.black54,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -233,11 +241,11 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
   Widget _buildMenuItem(Map<String, dynamic> item, bool isDisabled) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -251,7 +259,10 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
           onTap: isDisabled
               ? () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Coming soon!')),
+                    SnackBar(
+                      content: Text('Coming soon!'),
+                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                    ),
                   );
                 }
               : () {
@@ -300,9 +311,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                     height: 50,
                     decoration: BoxDecoration(
                       color: isDisabled
-                          ? Colors.grey.withOpacity(0.1)
-                          : const Color.fromARGB(255, 0, 54, 218)
-                              .withOpacity(0.1),
+                          ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                          : Theme.of(context).colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -310,8 +320,8 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                         item['icon'],
                         size: 24,
                         color: isDisabled
-                            ? Colors.grey
-                            : const Color.fromARGB(255, 0, 54, 218),
+                            ? Theme.of(context).colorScheme.onSurfaceVariant
+                            : Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -326,7 +336,9 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: isDisabled ? Colors.grey : Colors.black87,
+                          color: isDisabled 
+                              ? Theme.of(context).colorScheme.onSurfaceVariant 
+                              : Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -334,9 +346,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                         item['subtitle'],
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: isDisabled
-                              ? Colors.grey.shade400
-                              : Colors.black54,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -344,7 +354,7 @@ class _RequirementsMenuScreenState extends State<RequirementsMenuScreen>
                 ),
                 Icon(
                   Icons.chevron_right,
-                  color: isDisabled ? Colors.grey.shade300 : Colors.black38,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   size: 20,
                 ),
               ],

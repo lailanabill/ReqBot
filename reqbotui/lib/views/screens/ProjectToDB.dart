@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:math';
 import 'package:reqbot/views/screens/choose_action_screen.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class ProjectToDB extends StatefulWidget {
   const ProjectToDB({Key? key}) : super(key: key);
@@ -20,7 +21,6 @@ class _ProjectToDBState extends State<ProjectToDB>
     with SingleTickerProviderStateMixin {
   bool _accepted = false;
   final projNameController = TextEditingController();
-  final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
   bool _isLoading = false;
 
   // Animation controllers
@@ -120,7 +120,7 @@ class _ProjectToDBState extends State<ProjectToDB>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error creating project: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -134,7 +134,7 @@ class _ProjectToDBState extends State<ProjectToDB>
       builder: (context) => WillPopScope(
         onWillPop: () async => false,
         child: Dialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -157,6 +157,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -164,7 +165,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                   'This will just take a moment',
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Colors.black54,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -180,7 +181,7 @@ class _ProjectToDBState extends State<ProjectToDB>
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -203,6 +204,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -210,7 +212,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                 'Ready to start working on your project',
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: Colors.black54,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 24),
@@ -229,8 +231,8 @@ class _ProjectToDBState extends State<ProjectToDB>
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -255,7 +257,7 @@ class _ProjectToDBState extends State<ProjectToDB>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,10 +314,10 @@ class _ProjectToDBState extends State<ProjectToDB>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Theme.of(context).colorScheme.shadow.withOpacity(0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -324,7 +326,11 @@ class _ProjectToDBState extends State<ProjectToDB>
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, size: 20),
+                  icon: Icon(
+                    Icons.arrow_back_ios, 
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(width: 8),
@@ -336,29 +342,32 @@ class _ProjectToDBState extends State<ProjectToDB>
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       'Step 1 of 3',
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: Colors.black54,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
                 const Spacer(),
+                const CompactDarkModeToggle(),
+                const SizedBox(width: 8),
                 Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
                     child: Icon(
                       Icons.rocket_launch_rounded,
-                      color: primaryColor,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 20,
                     ),
                   ),
@@ -391,7 +400,7 @@ class _ProjectToDBState extends State<ProjectToDB>
             style: GoogleFonts.inter(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 12),
@@ -399,7 +408,7 @@ class _ProjectToDBState extends State<ProjectToDB>
             'Give your project a meaningful name. This will help you and your team identify it easily.',
             style: GoogleFonts.inter(
               fontSize: 16,
-              color: Colors.black54,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               height: 1.5,
             ),
           ),
@@ -430,7 +439,7 @@ class _ProjectToDBState extends State<ProjectToDB>
             children: [
               Icon(
                 Icons.edit_note,
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -439,7 +448,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -447,11 +456,11 @@ class _ProjectToDBState extends State<ProjectToDB>
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withOpacity(0.08),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 5),
                 ),
@@ -462,20 +471,23 @@ class _ProjectToDBState extends State<ProjectToDB>
               autofocus: true,
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               decoration: InputDecoration(
                 hintText: 'e.g., Project Alpha',
                 hintStyle: GoogleFonts.inter(
-                  color: Colors.black38,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 prefixIcon: Icon(
                   Icons.folder_outlined,
-                  color: primaryColor,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 suffixIcon: projNameController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: Icon(
+                          Icons.clear,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                         onPressed: () {
                           projNameController.clear();
                           setState(() {});
@@ -490,7 +502,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                   horizontal: 16,
                   vertical: 16,
                 ),
-                fillColor: Colors.grey.shade50,
+                fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
                 filled: true,
               ),
               onChanged: (value) {
@@ -524,13 +536,14 @@ class _ProjectToDBState extends State<ProjectToDB>
         },
         child: Container(
           decoration: BoxDecoration(
-            color:
-                _accepted ? primaryColor.withOpacity(0.05) : Colors.transparent,
+            color: _accepted 
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.05) 
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: _accepted
-                  ? primaryColor.withOpacity(0.3)
-                  : Colors.grey.withOpacity(0.3),
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+                  : Theme.of(context).colorScheme.outline.withOpacity(0.3),
             ),
           ),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -545,12 +558,14 @@ class _ProjectToDBState extends State<ProjectToDB>
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        color: _accepted ? primaryColor : Colors.transparent,
+                        color: _accepted 
+                            ? Theme.of(context).colorScheme.primary 
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
                           color: _accepted
-                              ? primaryColor
-                              : Colors.grey.withOpacity(0.5),
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.outline.withOpacity(0.5),
                           width: 2,
                         ),
                       ),
@@ -558,7 +573,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                           ? Icon(
                               Icons.check,
                               size: 16,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             )
                           : null,
                     ),
@@ -571,7 +586,9 @@ class _ProjectToDBState extends State<ProjectToDB>
                   "I accept the Terms and Conditions",
                   style: GoogleFonts.inter(
                     fontSize: 15,
-                    color: _accepted ? primaryColor : Colors.black87,
+                    color: _accepted 
+                        ? Theme.of(context).colorScheme.primary 
+                        : Theme.of(context).colorScheme.onSurface,
                     fontWeight: _accepted ? FontWeight.w500 : FontWeight.normal,
                   ),
                 ),
@@ -630,7 +647,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                     'After creating your project, you\'ll be able to record requirements through audio transcription.',
                     style: GoogleFonts.inter(
                       fontSize: 14,
-                      color: Colors.black54,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       height: 1.5,
                     ),
                   ),
@@ -648,7 +665,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                           'Record your voice to capture requirements',
                           style: GoogleFonts.inter(
                             fontSize: 13,
-                            color: Colors.black54,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -668,7 +685,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                           'Transcription will be automatically generated',
                           style: GoogleFonts.inter(
                             fontSize: 13,
-                            color: Colors.black54,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -701,10 +718,10 @@ class _ProjectToDBState extends State<ProjectToDB>
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
               offset: const Offset(0, -4),
               blurRadius: 10,
             ),
@@ -715,9 +732,9 @@ class _ProjectToDBState extends State<ProjectToDB>
           child: ElevatedButton(
             onPressed: isValid && !_isLoading ? _handleContinue : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              disabledBackgroundColor: primaryColor.withOpacity(0.3),
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              disabledBackgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -731,7 +748,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                           strokeWidth: 2,
                         ),
                       ),
@@ -750,7 +767,7 @@ class _ProjectToDBState extends State<ProjectToDB>
                     children: [
                       Icon(
                         Icons.arrow_forward_rounded,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       const SizedBox(width: 12),
                       Text(

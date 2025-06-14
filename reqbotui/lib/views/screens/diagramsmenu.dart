@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'diagram_page.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class DiagramsMenu extends StatefulWidget {
   const DiagramsMenu({Key? key}) : super(key: key);
@@ -66,7 +67,7 @@ class _DiagramsMenuState extends State<DiagramsMenu>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,8 +81,8 @@ class _DiagramsMenuState extends State<DiagramsMenu>
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios,
-                            color: Colors.black87, size: 20),
+                        icon: Icon(Icons.arrow_back_ios,
+                            color: Theme.of(context).colorScheme.onSurface, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -93,40 +94,46 @@ class _DiagramsMenuState extends State<DiagramsMenu>
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             'Select a diagram type',
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218)
-                          .withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.auto_graph_rounded,
-                        color: Color.fromARGB(255, 0, 54, 218),
-                        size: 20,
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.auto_graph_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      CompactDarkModeToggle(),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+            Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
 
             // Main Content
             Expanded(
@@ -140,6 +147,7 @@ class _DiagramsMenuState extends State<DiagramsMenu>
                       style: GoogleFonts.inter(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -147,7 +155,7 @@ class _DiagramsMenuState extends State<DiagramsMenu>
                       'Select a diagram type to view and edit',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: Colors.black54,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -234,11 +242,11 @@ class _DiagramsMenuState extends State<DiagramsMenu>
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -278,14 +286,14 @@ class _DiagramsMenuState extends State<DiagramsMenu>
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Center(
             child: Icon(
               diagram['icon'],
               size: 32,
-              color: const Color.fromARGB(255, 0, 54, 218),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -296,6 +304,7 @@ class _DiagramsMenuState extends State<DiagramsMenu>
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w600,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 8),
@@ -305,7 +314,7 @@ class _DiagramsMenuState extends State<DiagramsMenu>
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: Colors.black54,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -322,14 +331,14 @@ class _DiagramsMenuState extends State<DiagramsMenu>
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
             child: Icon(
               diagram['icon'],
               size: 28,
-              color: const Color.fromARGB(255, 0, 54, 218),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -343,14 +352,14 @@ class _DiagramsMenuState extends State<DiagramsMenu>
                 style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87),
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 4),
               Text(
                 diagram['description'],
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: Colors.black54,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -358,9 +367,9 @@ class _DiagramsMenuState extends State<DiagramsMenu>
             ],
           ),
         ),
-        const Icon(
+        Icon(
           Icons.chevron_right,
-          color: Colors.black38,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
           size: 20,
         ),
       ],

@@ -17,6 +17,7 @@ import '../screens/record.dart';
 import 'package:reqbot/services/auth/auth_services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:reqbot/services/providers/favorites_provider.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -215,7 +216,7 @@ NF5) The system should be reliable in handling appointment booking and cancellat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,14 +233,13 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 0, 54, 218)
-                              .withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Icon(
                             Icons.rocket_launch_rounded,
-                            color: Color.fromARGB(255, 0, 54, 218),
+                            color: Theme.of(context).colorScheme.primary,
                             size: 20,
                           ),
                         ),
@@ -253,13 +253,14 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             'Project Dashboard',
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -269,9 +270,13 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.notifications_none_outlined),
+                        icon: Icon(
+                          Icons.notifications_none_outlined,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         onPressed: () {},
                       ),
+                      const CompactDarkModeToggle(),
                       const SizedBox(width: 8),
                       GestureDetector(
                         onTap: _logout,
@@ -279,14 +284,14 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
                             shape: BoxShape.circle,
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.logout_rounded,
                               size: 18,
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -297,7 +302,7 @@ NF5) The system should be reliable in handling appointment booking and cancellat
               ),
             ),
 
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+            Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
 
             // Main Content
             Expanded(
@@ -315,20 +320,20 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                           style: GoogleFonts.inter(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218)
-                                .withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             '${_projects.length} Projects',
                             style: GoogleFonts.inter(
-                              color: Color.fromARGB(255, 0, 54, 218),
+                              color: Theme.of(context).colorScheme.primary,
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                             ),
@@ -344,7 +349,7 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                       child: _isLoading
                           ? Center(
                               child: CircularProgressIndicator(
-                                color: Color.fromARGB(255, 0, 54, 218),
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             )
                           : _projects.isEmpty
@@ -383,15 +388,14 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                               child: Text(
                                 'Create Project',
                                 style: GoogleFonts.inter(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 0, 54, 218),
-                                foregroundColor: Colors.white,
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -405,16 +409,15 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                         const SizedBox(width: 12),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218)
-                                .withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: IconButton(
                             onPressed: () => Navigator.pushNamed(
                                 context, '/FavoritesScreen'),
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.favorite_outline,
-                              color: Color.fromARGB(255, 0, 54, 218),
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             tooltip: 'View Favorites',
                           ),
@@ -458,11 +461,11 @@ NF5) The system should be reliable in handling appointment booking and cancellat
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -486,14 +489,13 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218)
-                          .withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Icon(
                         Icons.description_outlined,
-                        color: Color.fromARGB(255, 0, 54, 218),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -507,13 +509,13 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                           style: GoogleFonts.inter(
                               fontWeight: FontWeight.w600,
                               fontSize: 16,
-                              color: Colors.black),
+                              color: Theme.of(context).colorScheme.onSurface),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Tap to open project',
                           style: GoogleFonts.inter(
-                            color: Colors.black54,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 13,
                           ),
                         ),
@@ -527,7 +529,7 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                       return IconButton(
                         icon: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_outline,
-                          color: isFavorite ? Colors.red : Colors.grey,
+                          color: isFavorite ? Colors.red : Theme.of(context).colorScheme.onSurfaceVariant,
                           size: 22,
                         ),
                         onPressed: () {
@@ -537,9 +539,9 @@ NF5) The system should be reliable in handling appointment booking and cancellat
                     },
                   ),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.delete_outline,
-                      color: Colors.red,
+                      color: Theme.of(context).colorScheme.error,
                       size: 22,
                     ),
                     onPressed: () => _removeProject(index),
@@ -562,13 +564,13 @@ NF5) The system should be reliable in handling appointment booking and cancellat
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.folder_open_outlined,
               size: 60,
-              color: Color.fromARGB(255, 0, 54, 218),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(height: 24),
@@ -577,7 +579,7 @@ NF5) The system should be reliable in handling appointment booking and cancellat
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 12),
@@ -588,7 +590,7 @@ NF5) The system should be reliable in handling appointment booking and cancellat
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 15,
-                color: Colors.black54,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 height: 1.4,
               ),
             ),

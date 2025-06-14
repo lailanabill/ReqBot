@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:reqbot/views/screens/meeting_confirmation_screen.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class ScheduleMeetingScreen extends StatefulWidget {
   @override
@@ -8,8 +9,6 @@ class ScheduleMeetingScreen extends StatefulWidget {
 }
 
 class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with TickerProviderStateMixin {
-  final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
-  final Color secondaryColor = const Color.fromARGB(255, 230, 234, 255);
   final List<TimeSlot> timeSlots = [];
   
   // Controllers
@@ -55,10 +54,10 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+              onPrimary: Theme.of(context).colorScheme.onPrimary,
+              onSurface: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           child: child!,
@@ -81,10 +80,10 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+              onPrimary: Theme.of(context).colorScheme.onPrimary,
+              onSurface: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           child: child!,
@@ -110,7 +109,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please select date and time'),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -138,7 +137,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('End time must be after start time'),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -200,7 +199,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Edit the time slot and click "Add Time Slot"'),
-          backgroundColor: primaryColor,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -212,7 +211,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please add at least one time slot'),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -240,10 +239,10 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: primaryColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Column(
           children: [
             Text(
@@ -251,23 +250,33 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
             Text(
               'Step 3 of 3',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: Colors.white70,
+                color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
               ),
             ),
           ],
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios, 
+            size: 20,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: CompactDarkModeToggle(),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -284,7 +293,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                         style: GoogleFonts.inter(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       SizedBox(height: 12),
@@ -292,7 +301,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                         'Add your available time slots for a meeting with your client.',
                         style: GoogleFonts.inter(
                           fontSize: 16,
-                          color: Colors.black54,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           height: 1.5,
                         ),
                       ),
@@ -304,7 +313,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -328,7 +337,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                                 SizedBox(height: 8),
@@ -351,7 +360,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                                 SizedBox(height: 8),
@@ -376,8 +385,8 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                           icon: Icon(Icons.add),
                           label: Text('Add Time Slot'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: secondaryColor,
-                            foregroundColor: primaryColor,
+                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            foregroundColor: Theme.of(context).colorScheme.primary,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -395,7 +404,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                           style: GoogleFonts.inter(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         SizedBox(height: 16),
@@ -412,10 +421,10 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
                     blurRadius: 10,
                     spreadRadius: 1,
                     offset: Offset(0, -4),
@@ -427,10 +436,10 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _submitAvailability,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.grey[300],
-                    disabledForegroundColor: Colors.grey[500],
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    disabledBackgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                    disabledForegroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -442,7 +451,9 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).colorScheme.onPrimary
+                            ),
                           ),
                         )
                       : Text(
@@ -464,22 +475,23 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
   InputDecoration _getInputDecoration({required String hintText, required IconData icon}) {
     return InputDecoration(
       hintText: hintText,
-      suffixIcon: Icon(icon, color: primaryColor),
+      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+      suffixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: secondaryColor),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
       ),
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       filled: true,
-      fillColor: Colors.grey.shade50,
+      fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
     );
   }
 
@@ -518,12 +530,12 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
           child: Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
                   blurRadius: 8,
                   spreadRadius: 1,
                 ),
@@ -534,12 +546,12 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: secondaryColor,
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.calendar_month,
-                    color: primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 20,
                   ),
                 ),
@@ -553,7 +565,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       SizedBox(height: 4),
@@ -561,7 +573,7 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                         "${slot.startTime.format(context)} - ${slot.endTime.format(context)}",
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          color: Colors.black54,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -571,12 +583,12 @@ class _ScheduleMeetingScreenState extends State<ScheduleMeetingScreen> with Tick
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.edit, color: primaryColor),
+                      icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
                       onPressed: () => _editTimeSlot(index),
                       tooltip: 'Edit',
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete_outline, color: Colors.red),
+                      icon: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
                       onPressed: () => _removeTimeSlot(index),
                       tooltip: 'Delete',
                     ),

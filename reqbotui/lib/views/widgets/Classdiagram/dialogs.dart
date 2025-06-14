@@ -16,9 +16,19 @@ class ClassManagement extends StatelessWidget {
       children: [
         TextField(
           controller: classNameController,
-          decoration: const InputDecoration(
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          decoration: InputDecoration(
             labelText: 'Class Name',
-            border: OutlineInputBorder(),
+            labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -26,7 +36,8 @@ class ClassManagement extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
+              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onPrimary),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
             ),
             onPressed: () => _addClassDialog(context),
@@ -38,7 +49,8 @@ class ClassManagement extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
+              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary),
+              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSecondary),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
             ),
             onPressed: () => _renameClassDialog(context),
@@ -50,7 +62,8 @@ class ClassManagement extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.red),
+              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.error),
+              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onError),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
             ),
             onPressed: () => _deleteClassDialog(context),
@@ -71,13 +84,18 @@ class ClassManagement extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Add Class'),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text(
+                'Add Class',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: classNameController,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         setState(() {
                           if (value.trim().isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(value.trim())) {
@@ -87,22 +105,60 @@ class ClassManagement extends StatelessWidget {
                           }
                         });
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Class Name',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       value: classType,
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      decoration: InputDecoration(
                         labelText: 'Class Type',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
-                      items: const [
-                        DropdownMenuItem(value: 'class', child: Text('Class')),
-                        DropdownMenuItem(value: 'abstract class', child: Text('Abstract Class')),
-                        DropdownMenuItem(value: 'interface', child: Text('Interface')),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'class',
+                          child: Text(
+                            'Class',
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'abstract class',
+                          child: Text(
+                            'Abstract Class',
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'interface',
+                          child: Text(
+                            'Interface',
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                        ),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -115,7 +171,7 @@ class ClassManagement extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           errorMessage!,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                   ],
@@ -134,6 +190,9 @@ class ClassManagement extends StatelessWidget {
                           ));
                           classNameController.clear();
                         },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                  ),
                   child: const Text('Add'),
                 ),
               ],
@@ -155,23 +214,38 @@ class ClassManagement extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Rename Class'),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text(
+                'Rename Class',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         oldName = value.trim();
                         setState(() {});
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Old Class Name',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         newName = value.trim();
                         if (newName.isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(newName)) {
@@ -181,9 +255,18 @@ class ClassManagement extends StatelessWidget {
                         }
                         setState(() {});
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'New Class Name',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     if (errorMessage != null)
@@ -191,7 +274,7 @@ class ClassManagement extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           errorMessage!,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                   ],
@@ -226,6 +309,9 @@ class ClassManagement extends StatelessWidget {
                             );
                           }
                         },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                  ),
                   child: const Text('Rename'),
                 ),
               ],
@@ -245,7 +331,11 @@ class ClassManagement extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Delete Class'),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text(
+                'Delete Class',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -255,9 +345,18 @@ class ClassManagement extends StatelessWidget {
                         className = value.trim();
                         setState(() {});
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Class Name',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                   ],
@@ -287,6 +386,9 @@ class ClassManagement extends StatelessWidget {
                             );
                           }
                         },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                  ),
                   child: const Text('Delete'),
                 ),
               ],
@@ -313,9 +415,19 @@ class AttributeManagement extends StatelessWidget {
       children: [
         TextField(
           controller: attributeController,
-          decoration: const InputDecoration(
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          decoration: InputDecoration(
             labelText: 'Attribute (e.g., -String name)',
-            border: OutlineInputBorder(),
+            labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -323,7 +435,8 @@ class AttributeManagement extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
+              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onPrimary),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
             ),
             onPressed: () => _addAttributeDialog(context),
@@ -335,7 +448,8 @@ class AttributeManagement extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
+              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary),
+              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSecondary),
               padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
             ),
             onPressed: () => _editAttributeDialog(context),
@@ -356,24 +470,39 @@ class AttributeManagement extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Add Attribute'),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text(
+                'Add Attribute',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         className = value.trim();
                         setState(() {});
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Class Name',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: attributeController,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         setState(() {
                           if (value.trim().isEmpty) {
@@ -383,9 +512,18 @@ class AttributeManagement extends StatelessWidget {
                           }
                         });
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Attribute',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     if (errorMessage != null)
@@ -393,7 +531,7 @@ class AttributeManagement extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           errorMessage!,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                   ],
@@ -427,6 +565,9 @@ class AttributeManagement extends StatelessWidget {
                           }
                           attributeController.clear();
                         },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                  ),
                   child: const Text('Add'),
                 ),
               ],
@@ -449,34 +590,59 @@ class AttributeManagement extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Edit Attribute'),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text(
+                'Edit Attribute',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         className = value.trim();
                         setState(() {});
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Class Name',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         oldAttribute = value.trim();
                         setState(() {});
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Old Attribute',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       onChanged: (value) {
                         newAttribute = value.trim();
                         if (newAttribute.isEmpty) {
@@ -486,9 +652,18 @@ class AttributeManagement extends StatelessWidget {
                         }
                         setState(() {});
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'New Attribute',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        ),
                       ),
                     ),
                     if (errorMessage != null)
@@ -496,7 +671,7 @@ class AttributeManagement extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           errorMessage!,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                   ],

@@ -9,6 +9,7 @@ import 'package:reqbot/services/providers/userProvider.dart';
 import 'dart:async'; // For debouncing
 import 'package:reqbot/views/widgets/Contextdiagram/context_diagram_widgets.dart';
 import 'package:http/http.dart' as http;
+import '../widgets/dark_mode_toggle.dart';
 
 void main() {
   runApp(const ContextDiagramEditorApp());
@@ -243,89 +244,137 @@ class _ContextDiagramEditorScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Context Diagram Editor')),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(
+          'Context Diagram Editor',
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: CompactDarkModeToggle(),
+          ),
+        ],
+      ),
       body: Row(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EntityEditor(
-                    entityController: entityController,
-                    isSystemEntity: _isSystemEntity,
-                    onSystemEntityChanged: (value) {
-                      setState(() {
-                        _isSystemEntity = value ?? false;
-                      });
-                    },
-                    onAddEntity: _addEntity,
-                  ),
-                  InteractionEditor(
-                    interactionController: interactionController,
-                    onAddInteraction: _addInteraction,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'PlantUML Code:',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4.0),
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EntityEditor(
+                      entityController: entityController,
+                      isSystemEntity: _isSystemEntity,
+                      onSystemEntityChanged: (value) {
+                        setState(() {
+                          _isSystemEntity = value ?? false;
+                        });
+                      },
+                      onAddEntity: _addEntity,
                     ),
-                    child: TextField(
-                      controller: plantumlController,
-                      maxLines: 10,
-                      style: const TextStyle(fontFamily: 'monospace'),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Edit your PlantUML code here...',
+                    InteractionEditor(
+                      interactionController: interactionController,
+                      onAddInteraction: _addInteraction,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'PlantUML Code:',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _updateDiagram();
-                          _loadDiagram();
-                        },
-                        child: const Text('Update Diagram'),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: _copyCode,
-                        child: const Text('Copy Code'),
+                      child: TextField(
+                        controller: plantumlController,
+                        maxLines: 10,
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Edit your PlantUML code here...',
+                          hintStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            _updateDiagram();
+                            _loadDiagram();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          child: const Text('Update Diagram'),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: _copyCode,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.secondary,
+                            foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                          ),
+                          child: const Text('Copy Code'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
+          Container(
+            width: 1,
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Current Diagram:',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  Expanded(
-                    child: DiagramContent(
-                      isLoading: _isLoading,
-                      errorMessage: _errorMessage,
-                      imageUrl: _imageUrl,
-                      onRetry: _loadDiagram,
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Diagram:',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: DiagramContent(
+                        isLoading: _isLoading,
+                        errorMessage: _errorMessage,
+                        imageUrl: _imageUrl,
+                        onRetry: _loadDiagram,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

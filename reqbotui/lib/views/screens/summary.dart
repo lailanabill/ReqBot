@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import '../widgets/requirement_item.dart';
 import '../widgets/custom_dialog.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
@@ -139,7 +140,7 @@ class _SummaryScreenState extends State<SummaryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: _buildBody(),
       floatingActionButton: _buildFloatingActionButton(),
@@ -149,9 +150,9 @@ class _SummaryScreenState extends State<SummaryScreen>
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
-      backgroundColor: primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white),
+        icon: Icon(Icons.arrow_back_ios, size: 20, color: Theme.of(context).colorScheme.onPrimary),
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -181,7 +182,7 @@ class _SummaryScreenState extends State<SummaryScreen>
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
       ),
@@ -189,10 +190,14 @@ class _SummaryScreenState extends State<SummaryScreen>
         RotationTransition(
           turns: Tween(begin: 0.0, end: 1.0).animate(_refreshIconController),
           child: IconButton(
-            icon: Icon(Icons.refresh_rounded, color: Colors.white),
+            icon: Icon(Icons.refresh_rounded, color: Theme.of(context).colorScheme.onPrimary),
             onPressed: _refreshSummary,
             tooltip: 'Refresh Summary',
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: CompactDarkModeToggle(),
         ),
       ],
     );
@@ -200,7 +205,7 @@ class _SummaryScreenState extends State<SummaryScreen>
 
   Widget _buildBody() {
     return Container(
-      color: backgroundColor,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: AnimatedBuilder(
         animation: _mainAnimationController,
         builder: (context, child) {
@@ -234,10 +239,10 @@ class _SummaryScreenState extends State<SummaryScreen>
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.08),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -246,12 +251,12 @@ class _SummaryScreenState extends State<SummaryScreen>
           Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.summarize_rounded,
-              color: primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               size: 24,
             ),
           ),
@@ -265,7 +270,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -274,7 +279,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     height: 1.5,
-                    color: textSecondaryColor,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -291,19 +296,11 @@ class _SummaryScreenState extends State<SummaryScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // SizedBox(
-            //   height: 120,
-            //   width: 120,
-            //   child: Lottie.network(
-            //     'https://assets9.lottiefiles.com/packages/lf20_i9mtrven.json', // Document analyzing animation
-            //     repeat: true,
-            //   ),
-            // ),
             SizedBox(
               height: 60,
               width: 60,
               child: CircularProgressIndicator(
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 strokeWidth: 3,
               ),
             ),
@@ -313,7 +310,7 @@ class _SummaryScreenState extends State<SummaryScreen>
               style: GoogleFonts.inter(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 12),
@@ -321,7 +318,7 @@ class _SummaryScreenState extends State<SummaryScreen>
               'Preparing your project overview',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: textSecondaryColor,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -337,7 +334,7 @@ class _SummaryScreenState extends State<SummaryScreen>
             Icon(
               Icons.error_outline_rounded,
               size: 80,
-              color: Colors.red.shade300,
+              color: Theme.of(context).colorScheme.error,
             ),
             const SizedBox(height: 24),
             Text(
@@ -345,7 +342,7 @@ class _SummaryScreenState extends State<SummaryScreen>
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -354,7 +351,7 @@ class _SummaryScreenState extends State<SummaryScreen>
               _errorMessage,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: textSecondaryColor,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -369,8 +366,8 @@ class _SummaryScreenState extends State<SummaryScreen>
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 elevation: 2,
@@ -392,7 +389,7 @@ class _SummaryScreenState extends State<SummaryScreen>
             Icon(
               Icons.document_scanner_outlined,
               size: 80,
-              color: primaryColor.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
             ),
             const SizedBox(height: 32),
             Text(
@@ -400,7 +397,7 @@ class _SummaryScreenState extends State<SummaryScreen>
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -412,7 +409,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   height: 1.5,
-                  color: textSecondaryColor,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -428,8 +425,8 @@ class _SummaryScreenState extends State<SummaryScreen>
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: primaryColor,
-                side: BorderSide(color: primaryColor),
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -444,11 +441,11 @@ class _SummaryScreenState extends State<SummaryScreen>
 
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             blurRadius: 20,
             spreadRadius: 0,
             offset: const Offset(0, 6),
@@ -459,16 +456,6 @@ class _SummaryScreenState extends State<SummaryScreen>
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            // Subtle pattern background
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.04,
-                child: Image.network(
-                  'https://www.transparenttextures.com/patterns/notebook.png',
-                  repeat: ImageRepeat.repeat,
-                ),
-              ),
-            ),
             // Top decoration
             Positioned(
               top: 0,
@@ -479,8 +466,8 @@ class _SummaryScreenState extends State<SummaryScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      primaryColor.withOpacity(0.7),
-                      primaryColor,
+                      Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                      Theme.of(context).colorScheme.primary,
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -497,10 +484,10 @@ class _SummaryScreenState extends State<SummaryScreen>
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       border: Border(
                         bottom: BorderSide(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                           width: 1,
                         ),
                       ),
@@ -509,7 +496,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                       children: [
                         Icon(
                           Icons.auto_awesome,
-                          color: primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                           size: 22,
                         ),
                         SizedBox(width: 10),
@@ -518,14 +505,14 @@ class _SummaryScreenState extends State<SummaryScreen>
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: textPrimaryColor,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Spacer(),
                         IconButton(
                           icon: Icon(
                             Icons.copy_rounded,
-                            color: primaryColor.withOpacity(0.8),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                             size: 20,
                           ),
                           onPressed: () {
@@ -536,7 +523,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                                   'Summary copied to clipboard',
                                   style: GoogleFonts.inter(),
                                 ),
-                                backgroundColor: primaryColor,
+                                backgroundColor: Theme.of(context).colorScheme.primary,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -555,7 +542,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                   Expanded(
                     child: Container(
                       width: double.infinity,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
                         padding: const EdgeInsets.symmetric(
@@ -566,36 +553,36 @@ class _SummaryScreenState extends State<SummaryScreen>
                             p: GoogleFonts.inter(
                               fontSize: 15,
                               height: 1.7,
-                              color: textPrimaryColor.withOpacity(0.9),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             h1: GoogleFonts.inter(
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.3,
                             ),
                             h2: GoogleFonts.inter(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.3,
                             ),
                             h3: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: textPrimaryColor,
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.3,
                             ),
                             blockquote: GoogleFonts.inter(
                               fontSize: 15,
                               fontStyle: FontStyle.italic,
-                              color: textSecondaryColor,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               height: 1.7,
                             ),
                             blockquoteDecoration: BoxDecoration(
                               border: Border(
                                 left: BorderSide(
-                                  color: primaryColor.withOpacity(0.5),
+                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
                                   width: 4,
                                 ),
                               ),
@@ -604,28 +591,28 @@ class _SummaryScreenState extends State<SummaryScreen>
                                 EdgeInsets.only(left: 16, top: 8, bottom: 8),
                             listBullet: GoogleFonts.inter(
                               fontSize: 15,
-                              color: primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                               height: 1.7,
                             ),
                             listBulletPadding: EdgeInsets.only(right: 8),
                             strong: GoogleFonts.inter(
                               fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             em: GoogleFonts.inter(
                               fontStyle: FontStyle.italic,
-                              color: textPrimaryColor.withOpacity(0.9),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             code: GoogleFonts.sourceCodePro(
-                              backgroundColor: primaryColor.withOpacity(0.05),
-                              color: primaryColor.withOpacity(0.9),
+                              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                              color: Theme.of(context).colorScheme.primary,
                               fontSize: 14,
                             ),
                             codeblockDecoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.05),
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: primaryColor.withOpacity(0.1),
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                                 width: 1,
                               ),
                             ),
@@ -634,19 +621,19 @@ class _SummaryScreenState extends State<SummaryScreen>
                               border: Border(
                                 top: BorderSide(
                                   width: 1,
-                                  color: Colors.grey.withOpacity(0.3),
+                                  color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
                                 ),
                               ),
                             ),
                             tableHead: GoogleFonts.inter(
                               fontWeight: FontWeight.w700,
-                              color: textPrimaryColor,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             tableBody: GoogleFonts.inter(
-                              color: textPrimaryColor.withOpacity(0.9),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             tableBorder: TableBorder.all(
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
                               width: 1,
                             ),
                             tableCellsPadding: EdgeInsets.symmetric(
@@ -676,14 +663,14 @@ class _SummaryScreenState extends State<SummaryScreen>
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(0.4),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
               offset: Offset(0, 4),
               blurRadius: 12,
             ),
           ],
         ),
         child: Material(
-          color: primaryColor,
+          color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(28),
           child: InkWell(
             borderRadius: BorderRadius.circular(28),
@@ -721,14 +708,14 @@ class _SummaryScreenState extends State<SummaryScreen>
                 children: [
                   Icon(
                     Icons.record_voice_over_rounded,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     size: 22,
                   ),
                   SizedBox(width: 10),
                   Text(
                     'View Transcript',
                     style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                     ),

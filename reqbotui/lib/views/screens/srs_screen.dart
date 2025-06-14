@@ -9,6 +9,7 @@ import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:lottie/lottie.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class SRSScreen extends StatefulWidget {
   const SRSScreen({super.key});
@@ -32,13 +33,6 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
   // Button animation
   late AnimationController _buttonAnimationController;
   late Animation<double> _buttonScaleAnimation;
-
-  // Using the exact color specified
-  final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
-  final Color backgroundColor = Colors.white;
-  final Color textPrimaryColor = Color(0xFF333333);
-  final Color textSecondaryColor = Color(0xFF737373);
-  final Color cardColor = Color(0xFFF5F9FF);
 
   final List<String> _diagramTypes = [
     'class',
@@ -289,7 +283,7 @@ The platform described in this specification provides a robust solution for appo
     final analyzerId = userDataProvider.AnalyzerID;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: _buildBody(projectId, analyzerId),
     );
@@ -298,9 +292,9 @@ The platform described in this specification provides a robust solution for appo
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
-      backgroundColor: primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white),
+        icon: Icon(Icons.arrow_back_ios, size: 20, color: Theme.of(context).colorScheme.onPrimary),
         onPressed: () => Navigator.of(context).pop(),
       ),
       centerTitle: true,
@@ -309,15 +303,21 @@ The platform described in this specification provides a robust solution for appo
         style: GoogleFonts.inter(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: CompactDarkModeToggle(),
+        ),
+      ],
     );
   }
 
   Widget _buildBody(int projectId, int analyzerId) {
     return Container(
-      color: backgroundColor,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: AnimatedBuilder(
         animation: _mainAnimationController,
         builder: (context, child) {
@@ -361,10 +361,10 @@ The platform described in this specification provides a robust solution for appo
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.08),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -373,12 +373,12 @@ The platform described in this specification provides a robust solution for appo
           Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.description_outlined,
-              color: primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               size: 24,
             ),
           ),
@@ -392,7 +392,7 @@ The platform described in this specification provides a robust solution for appo
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -401,7 +401,7 @@ The platform described in this specification provides a robust solution for appo
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     height: 1.5,
-                    color: textSecondaryColor,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -415,11 +415,11 @@ The platform described in this specification provides a robust solution for appo
   Widget _buildInfoCard() {
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             blurRadius: 20,
             spreadRadius: 0,
             offset: const Offset(0, 6),
@@ -432,14 +432,14 @@ The platform described in this specification provides a robust solution for appo
           Container(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                   width: 1,
                 ),
               ),
@@ -448,7 +448,7 @@ The platform described in this specification provides a robust solution for appo
               children: [
                 Icon(
                   Icons.auto_awesome,
-                  color: primaryColor,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 22,
                 ),
                 SizedBox(width: 10),
@@ -457,7 +457,7 @@ The platform described in this specification provides a robust solution for appo
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: textPrimaryColor,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -493,10 +493,10 @@ The platform described in this specification provides a robust solution for appo
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.08),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: primaryColor.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                       width: 1,
                     ),
                   ),
@@ -505,7 +505,7 @@ The platform described in this specification provides a robust solution for appo
                       Icon(
                         Icons.info_outline,
                         size: 20,
-                        color: primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       SizedBox(width: 12),
                       Expanded(
@@ -514,7 +514,7 @@ The platform described in this specification provides a robust solution for appo
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             height: 1.5,
-                            color: textSecondaryColor,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -539,12 +539,12 @@ The platform described in this specification provides a robust solution for appo
         Container(
           padding: EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
             icon,
-            color: primaryColor,
+            color: Theme.of(context).colorScheme.primary,
             size: 18,
           ),
         ),
@@ -558,7 +558,7 @@ The platform described in this specification provides a robust solution for appo
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: textPrimaryColor,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 2),
@@ -566,7 +566,7 @@ The platform described in this specification provides a robust solution for appo
                 description,
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: textSecondaryColor,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   height: 1.4,
                 ),
               ),
@@ -595,7 +595,7 @@ The platform described in this specification provides a robust solution for appo
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -604,7 +604,7 @@ The platform described in this specification provides a robust solution for appo
             'This may take a moment...',
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: textSecondaryColor,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -636,15 +636,15 @@ The platform described in this specification provides a robust solution for appo
                       borderRadius: BorderRadius.circular(28),
                       gradient: LinearGradient(
                         colors: [
-                          primaryColor,
-                          Color.fromARGB(255, 39, 90, 240),
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
                         ],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: primaryColor.withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
                           offset: Offset(0, 4),
                           blurRadius: 12,
                         ),
@@ -661,14 +661,14 @@ The platform described in this specification provides a robust solution for appo
                             children: [
                               Icon(
                                 Icons.download_rounded,
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 size: 22,
                               ),
                               SizedBox(width: 12),
                               Text(
                                 'Generate SRS Document',
                                 style: GoogleFonts.inter(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
                                 ),
@@ -688,7 +688,7 @@ The platform described in this specification provides a robust solution for appo
             'Generate a complete SRS document with diagrams',
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: textSecondaryColor,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -706,12 +706,12 @@ The platform described in this specification provides a robust solution for appo
         decoration: BoxDecoration(
           color: _isSuccess
               ? Colors.green.withOpacity(0.1)
-              : Colors.red.withOpacity(0.1),
+              : Theme.of(context).colorScheme.error.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _isSuccess
                 ? Colors.green.withOpacity(0.3)
-                : Colors.red.withOpacity(0.3),
+                : Theme.of(context).colorScheme.error.withOpacity(0.3),
             width: 1,
           ),
         ),
@@ -719,7 +719,7 @@ The platform described in this specification provides a robust solution for appo
           children: [
             Icon(
               _isSuccess ? Icons.check_circle_outline : Icons.error_outline,
-              color: _isSuccess ? Colors.green : Colors.red,
+              color: _isSuccess ? Colors.green : Theme.of(context).colorScheme.error,
               size: 24,
             ),
             SizedBox(width: 12),
@@ -732,7 +732,7 @@ The platform described in this specification provides a robust solution for appo
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: _isSuccess ? Colors.green : Colors.red,
+                      color: _isSuccess ? Colors.green : Theme.of(context).colorScheme.error,
                     ),
                   ),
                   SizedBox(height: 4),
@@ -740,7 +740,7 @@ The platform described in this specification provides a robust solution for appo
                     _statusMessage,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: textPrimaryColor,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   if (_isSuccess) ...[
@@ -750,7 +750,7 @@ The platform described in this specification provides a robust solution for appo
                         Icon(
                           Icons.info_outline,
                           size: 16,
-                          color: primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         SizedBox(width: 8),
                         Expanded(
@@ -758,7 +758,7 @@ The platform described in this specification provides a robust solution for appo
                             'You will be redirected to Overleaf where you can upload the generated ZIP file.',
                             style: GoogleFonts.inter(
                               fontSize: 12,
-                              color: textSecondaryColor,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -769,7 +769,7 @@ The platform described in this specification provides a robust solution for appo
                       Container(
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
@@ -780,7 +780,7 @@ The platform described in this specification provides a robust solution for appo
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: textPrimaryColor,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             SizedBox(height: 4),
@@ -792,14 +792,14 @@ The platform described in this specification provides a robust solution for appo
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: primaryColor.withOpacity(0.1),
+                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
                                     image.split('_')[0],
                                     style: GoogleFonts.inter(
                                       fontSize: 11,
-                                      color: primaryColor,
+                                      color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

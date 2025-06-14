@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/upload_confirmation.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class Record extends StatefulWidget {
   const Record({super.key});
@@ -19,9 +20,6 @@ class Record extends StatefulWidget {
 }
 
 class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
-  final Color primaryColor = Color.fromARGB(255, 0, 54, 218);
-  final Color secondaryColor = Color.fromARGB(255, 230, 234, 255);
-  final Color backgroundColor = Colors.white;
   String _transcription = '';
   String req_sumURI =
       "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
@@ -144,7 +142,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: Theme.of(context).colorScheme.error,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -222,6 +220,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
       context: context,
       builder: (context) {
         return Dialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -240,21 +239,27 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.close, color: Colors.grey),
+                      icon: Icon(
+                        Icons.close, 
+                        color: Theme.of(context).colorScheme.onSurfaceVariant
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
-                Divider(thickness: 1),
+                Divider(
+                  thickness: 1,
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                ),
                 SizedBox(height: 10),
                 Container(
                   height: 300,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: EdgeInsets.all(12),
@@ -266,6 +271,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         height: 1.5,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -276,7 +282,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      foregroundColor: primaryColor,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
                     ),
                     child: Text('Close', style: GoogleFonts.inter()),
                   ),
@@ -292,7 +298,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         title: Column(
@@ -301,19 +307,32 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
               'Meetings & Audio Records',
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
             Text(
               'Step 3 of 3',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: Colors.white70,
+                color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
               ),
             ),
           ],
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: CompactDarkModeToggle(),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -335,7 +354,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: secondaryColor,
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),
@@ -349,7 +368,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           SizedBox(height: 6),
@@ -357,7 +376,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
             'Choose a meeting to upload its audio recording',
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -429,7 +448,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
         statusColor = Colors.amber;
         break;
       default:
-        statusColor = Colors.grey;
+        statusColor = Theme.of(context).colorScheme.onSurfaceVariant;
     }
 
     bool isSelected = _selectedMeetingIndex == index;
@@ -448,15 +467,17 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? primaryColor : Colors.transparent,
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.primary 
+                  : Colors.transparent,
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
                 blurRadius: 10,
                 spreadRadius: 1,
               ),
@@ -472,12 +493,12 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                     Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: secondaryColor,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
                         icon,
-                        color: primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 20,
                       ),
                     ),
@@ -491,6 +512,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -499,7 +521,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                             date,
                             style: GoogleFonts.inter(
                               fontSize: 10,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -514,13 +536,17 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                     padding: EdgeInsets.symmetric(horizontal: 4),
                     child: Row(
                       children: [
-                        Icon(Icons.play_arrow, color: primaryColor, size: 18),
+                        Icon(
+                          Icons.play_arrow, 
+                          color: Theme.of(context).colorScheme.primary, 
+                          size: 18
+                        ),
                         SizedBox(width: 4),
                         Expanded(
                           child: Container(
                             height: 4,
                             decoration: BoxDecoration(
-                              color: Colors.grey[300],
+                              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(2),
                             ),
                             child: Row(
@@ -528,7 +554,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                                 Container(
                                   width: 70,
                                   decoration: BoxDecoration(
-                                    color: primaryColor,
+                                    color: Theme.of(context).colorScheme.primary,
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
@@ -541,7 +567,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                           "2:45",
                           style: GoogleFonts.inter(
                             fontSize: 10,
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -568,7 +594,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                     ),
                     Icon(
                       Icons.info_outline,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       size: 16,
                     ),
                   ],
@@ -592,10 +618,10 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
               ? _handleUploadAudio
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: Colors.grey[300],
-            disabledForegroundColor: Colors.grey[500],
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            disabledBackgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+            disabledForegroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -610,7 +636,9 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.onPrimary
+                        ),
                       ),
                     ),
                     SizedBox(width: 12),
@@ -619,7 +647,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ],
@@ -629,7 +657,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                   children: [
                     Icon(
                       Icons.cloud_upload_outlined,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       size: 24,
                     ),
                     SizedBox(width: 12),
@@ -638,7 +666,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ],

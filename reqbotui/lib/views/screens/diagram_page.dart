@@ -7,6 +7,7 @@ import 'package:reqbot/views/screens/database_schema_editor.dart';
 import 'package:reqbot/views/screens/sequence_diagram_screen.dart';
 import 'class_diagram_editor.dart';
 import 'UseCaseValidation.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class DiagramPage extends StatelessWidget {
   final String diagramName;
@@ -22,7 +23,7 @@ class DiagramPage extends StatelessWidget {
     final int diagramIndex = context.read<UserDataProvider>().SelectedProjectId;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,8 +37,8 @@ class DiagramPage extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios,
-                            color: Colors.black87, size: 20),
+                        icon: Icon(Icons.arrow_back_ios,
+                            color: Theme.of(context).colorScheme.onSurface, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -49,40 +50,46 @@ class DiagramPage extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             'Preview & Edit Mode',
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 54, 218)
-                          .withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.auto_graph_rounded,
-                        color: Color.fromARGB(255, 0, 54, 218),
-                        size: 20,
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.auto_graph_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      CompactDarkModeToggle(),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+            Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.outline.withOpacity(0.2)),
 
             // Main Content
             Expanded(
@@ -100,20 +107,20 @@ class DiagramPage extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218)
-                                .withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             diagramName,
                             style: GoogleFonts.inter(
-                              color: Color.fromARGB(255, 0, 54, 218),
+                              color: Theme.of(context).colorScheme.primary,
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                             ),
@@ -129,11 +136,11 @@ class DiagramPage extends StatelessWidget {
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -155,14 +162,14 @@ class DiagramPage extends StatelessWidget {
                                     Icon(
                                       Icons.broken_image_outlined,
                                       size: 60,
-                                      color: Colors.grey,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
                                       "Image failed to load",
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
-                                        color: Colors.grey,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -235,9 +242,8 @@ class DiagramPage extends StatelessWidget {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 0, 54, 218),
-                                foregroundColor: Colors.white,
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -248,7 +254,7 @@ class DiagramPage extends StatelessWidget {
                               child: Text(
                                 "Edit Diagram",
                                 style: GoogleFonts.inter(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -259,8 +265,7 @@ class DiagramPage extends StatelessWidget {
                         const SizedBox(width: 12),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 0, 54, 218)
-                                .withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: IconButton(
@@ -271,9 +276,9 @@ class DiagramPage extends StatelessWidget {
                                     content: Text('Downloading diagram...')),
                               );
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.download_outlined,
-                              color: Color.fromARGB(255, 0, 54, 218),
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             tooltip: 'Download Diagram',
                           ),

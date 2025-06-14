@@ -1,20 +1,33 @@
 import 'package:flutter/material.dart';
 
 ThemeData buildLightTheme() {
+  // Use the original blue color as the primary color
+  const primaryColor = Color.fromARGB(255, 0, 54, 218);
+  
   var kColorScheme = ColorScheme.fromSeed(
     brightness: Brightness.light,
-    seedColor: const Color.fromARGB(255, 96, 59, 181),
+    seedColor: primaryColor,
+  ).copyWith(
+    primary: primaryColor,
+    onPrimary: Colors.white,
+    surface: Colors.white,
+    onSurface: Colors.black,
+    onSurfaceVariant: Colors.black54,
+    surfaceVariant: Colors.grey,
+    outline: const Color(0xFFEEEEEE),
+    shadow: Colors.black,
+    error: Colors.red,
   );
 
   return ThemeData(
     useMaterial3: true,
     colorScheme: kColorScheme,
+    scaffoldBackgroundColor: Colors.white,
     appBarTheme: AppBarTheme(
       backgroundColor: kColorScheme.primaryContainer,
       foregroundColor: kColorScheme.onPrimaryContainer,
     ),
     cardTheme: CardTheme(
-      // ✅ FIXED
       color: kColorScheme.secondaryContainer,
       margin: const EdgeInsets.all(16),
     ),
@@ -23,11 +36,10 @@ ThemeData buildLightTheme() {
       bodyMedium: TextStyle(color: Colors.black87),
       titleLarge: TextStyle(color: Colors.black),
     ),
-    scaffoldBackgroundColor: Colors.white,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: kColorScheme.primary,
-        foregroundColor: kColorScheme.onPrimary,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -39,7 +51,7 @@ ThemeData buildLightTheme() {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: kColorScheme.primary),
+        borderSide: BorderSide(color: primaryColor),
       ),
     ),
   );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/favorites_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -12,28 +13,37 @@ class FavoritesScreen extends StatelessWidget {
     final favoriteProjects = favoritesProvider.favoriteProjects.toList();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios, 
+            color: Theme.of(context).colorScheme.onSurface, 
+            size: 20
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Favorite Projects',
           style: GoogleFonts.inter(
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_outlined, color: Colors.black87),
+            icon: Icon(
+              Icons.notifications_none_outlined, 
+              color: Theme.of(context).colorScheme.onSurface
+            ),
             onPressed: () {},
           ),
+          const CompactDarkModeToggle(),
+          const SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
@@ -51,14 +61,14 @@ class FavoritesScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   Text(
                     '${favoriteProjects.length} projects',
                     style: GoogleFonts.inter(
                       fontSize: 14,
-                      color: Colors.black54,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -101,11 +111,11 @@ class FavoriteProjectCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -126,13 +136,13 @@ class FavoriteProjectCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.folder_outlined,
-                      color: Color.fromARGB(255, 0, 54, 218),
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ),
@@ -146,13 +156,14 @@ class FavoriteProjectCard extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
                        Text(
                         'Tap to view details',
                         style: GoogleFonts.inter(
-                          color: Colors.black54,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       ),
@@ -168,9 +179,9 @@ class FavoriteProjectCard extends StatelessWidget {
                   onPressed: onDelete,
                 ),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.chevron_right,
-                    color: Colors.black54,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     size: 22,
                   ),
                   onPressed: () {
@@ -201,13 +212,13 @@ class NoFavoritesMessage extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 0, 54, 218).withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.favorite_border,
                 size: 60,
-                color: Color.fromARGB(255, 0, 54, 218),
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 24),
@@ -216,7 +227,7 @@ class NoFavoritesMessage extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),
@@ -225,7 +236,7 @@ class NoFavoritesMessage extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 15,
-                color: Colors.black54,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 height: 1.4,
               ),
             ),
@@ -235,8 +246,8 @@ class NoFavoritesMessage extends StatelessWidget {
                 Navigator.of(context).pop(); // Navigate back to browse projects
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 0, 54, 218),
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 minimumSize: const Size(220, 48),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -245,7 +256,6 @@ class NoFavoritesMessage extends StatelessWidget {
               ),
               child:  Text(
                 'Browse Projects',
-
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w500,
                   fontSize: 15,

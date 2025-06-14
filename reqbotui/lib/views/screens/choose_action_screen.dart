@@ -4,18 +4,17 @@ import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/screens/record.dart';
 import 'package:reqbot/views/screens/schedule_meeting_screen.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class ChooseActionScreen extends StatelessWidget {
-  final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
-  final Color secondaryColor = const Color.fromARGB(255, 230, 234, 255);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: primaryColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Column(
           children: [
             Text(
@@ -23,23 +22,33 @@ class ChooseActionScreen extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
             Text(
               'Step 2 of 3',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: Colors.white70,
+                color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
               ),
             ),
           ],
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios, 
+            size: 20,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: CompactDarkModeToggle(),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -52,7 +61,7 @@ class ChooseActionScreen extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 12),
@@ -60,7 +69,7 @@ class ChooseActionScreen extends StatelessWidget {
                 'Choose one of the following options to proceed with your project.',
                 style: GoogleFonts.inter(
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   height: 1.5,
                 ),
               ),
@@ -110,28 +119,30 @@ class ChooseActionScreen extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
               blurRadius: 10,
               spreadRadius: 1,
             ),
           ],
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          ),
         ),
         child: Row(
           children: [
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: secondaryColor,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 size: 24,
               ),
             ),
@@ -145,7 +156,7 @@ class ChooseActionScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   SizedBox(height: 4),
@@ -153,7 +164,7 @@ class ChooseActionScreen extends StatelessWidget {
                     description,
                     style: GoogleFonts.inter(
                       fontSize: 14,
-                      color: Colors.black54,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -161,7 +172,7 @@ class ChooseActionScreen extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               size: 16,
             ),
           ],

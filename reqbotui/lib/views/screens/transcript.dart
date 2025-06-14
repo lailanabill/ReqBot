@@ -12,6 +12,7 @@ import 'package:reqbot/views/screens/summary.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../widgets/requirement_item.dart';
 import '../widgets/custom_dialog.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 class TranscriptScreen extends StatefulWidget {
   const TranscriptScreen({super.key});
@@ -150,9 +151,9 @@ class _TranscriptScreenState extends State<TranscriptScreen>
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
-      backgroundColor: primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.white),
+        icon: Icon(Icons.arrow_back_ios, size: 20, color: Theme.of(context).colorScheme.onPrimary),
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -182,7 +183,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
       ),
@@ -190,10 +191,14 @@ class _TranscriptScreenState extends State<TranscriptScreen>
         RotationTransition(
           turns: Tween(begin: 0.0, end: 1.0).animate(_refreshIconController),
           child: IconButton(
-            icon: Icon(Icons.refresh_rounded, color: Colors.white),
+            icon: Icon(Icons.refresh_rounded, color: Theme.of(context).colorScheme.onPrimary),
             onPressed: _refreshTranscript,
             tooltip: 'Refresh Transcription',
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: CompactDarkModeToggle(),
         ),
       ],
     );
@@ -201,7 +206,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
 
   Widget _buildBody() {
     return Container(
-      color: backgroundColor,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: AnimatedBuilder(
         animation: _mainAnimationController,
         builder: (context, child) {
@@ -234,10 +239,10 @@ class _TranscriptScreenState extends State<TranscriptScreen>
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.08),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -246,12 +251,12 @@ class _TranscriptScreenState extends State<TranscriptScreen>
           Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.chat_bubble_outline_rounded,
-              color: primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               size: 24,
             ),
           ),
@@ -265,7 +270,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -274,7 +279,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     height: 1.5,
-                    color: textSecondaryColor,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -305,7 +310,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               style: GoogleFonts.inter(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
-                color: primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 12),
@@ -313,7 +318,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               'Preparing your meeting notes',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: textSecondaryColor,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -329,7 +334,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
             Icon(
               Icons.error_outline_rounded,
               size: 80,
-              color: Colors.red.shade300,
+              color: Theme.of(context).colorScheme.error,
             ),
             const SizedBox(height: 24),
             Text(
@@ -337,7 +342,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -346,7 +351,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               _errorMessage,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: textSecondaryColor,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -361,8 +366,8 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -383,7 +388,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
             Icon(
               Icons.description_outlined,
               size: 80,
-              color: primaryColor.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
             ),
             const SizedBox(height: 32),
             Text(
@@ -391,7 +396,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -403,7 +408,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   height: 1.5,
-                  color: textSecondaryColor,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -419,8 +424,8 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: primaryColor,
-                side: BorderSide(color: primaryColor),
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -437,11 +442,11 @@ class _TranscriptScreenState extends State<TranscriptScreen>
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100, // Light background for chat
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             blurRadius: 20,
             spreadRadius: 0,
             offset: const Offset(0, 6),
@@ -462,8 +467,8 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      primaryColor.withOpacity(0.7),
-                      primaryColor,
+                      Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                      Theme.of(context).colorScheme.primary,
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -478,10 +483,10 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     border: Border(
                       bottom: BorderSide(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
                         width: 1,
                       ),
                     ),
@@ -490,7 +495,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                     children: [
                       Icon(
                         Icons.chat_rounded,
-                        color: primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 22,
                       ),
                       SizedBox(width: 10),
@@ -499,14 +504,14 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: textPrimaryColor,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Spacer(),
                       IconButton(
                         icon: Icon(
                           Icons.copy_rounded,
-                          color: primaryColor.withOpacity(0.8),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                           size: 20,
                         ),
                         onPressed: () {
@@ -517,7 +522,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                                 'Transcript copied to clipboard',
                                 style: GoogleFonts.inter(),
                               ),
-                              backgroundColor: primaryColor,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -569,47 +574,47 @@ class _TranscriptScreenState extends State<TranscriptScreen>
       }
     }
     
-    // Choose color based on speaker
+    // Choose color based on speaker with theme awareness
     Color avatarColor;
     Color bubbleColor;
     Color textColor;
     
     if (isSystem) {
-      avatarColor = Colors.grey.shade700;
-      bubbleColor = Colors.grey.shade200;
-      textColor = Colors.black87;
+      avatarColor = Theme.of(context).colorScheme.outline;
+      bubbleColor = Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5);
+      textColor = Theme.of(context).colorScheme.onSurfaceVariant;
     } else {
       // Create different colors for different speakers
       switch (int.parse(speakerNumber) % 5) {
         case 0:
-          avatarColor = primaryColor;
-          bubbleColor = primaryColor.withOpacity(0.1);
-          textColor = Colors.black87;
+          avatarColor = Theme.of(context).colorScheme.primary;
+          bubbleColor = Theme.of(context).colorScheme.primary.withOpacity(0.1);
+          textColor = Theme.of(context).colorScheme.onSurface;
           break;
         case 1:
           avatarColor = Colors.green.shade600;
-          bubbleColor = Colors.green.shade50;
-          textColor = Colors.black87;
+          bubbleColor = Colors.green.withOpacity(0.1);
+          textColor = Theme.of(context).colorScheme.onSurface;
           break;
         case 2:
           avatarColor = Colors.orange.shade700;
-          bubbleColor = Colors.orange.shade50;
-          textColor = Colors.black87;
+          bubbleColor = Colors.orange.withOpacity(0.1);
+          textColor = Theme.of(context).colorScheme.onSurface;
           break;
         case 3:
           avatarColor = Colors.purple.shade600;
-          bubbleColor = Colors.purple.shade50;
-          textColor = Colors.black87;
+          bubbleColor = Colors.purple.withOpacity(0.1);
+          textColor = Theme.of(context).colorScheme.onSurface;
           break;
         case 4:
           avatarColor = Colors.teal.shade600;
-          bubbleColor = Colors.teal.shade50;
-          textColor = Colors.black87;
+          bubbleColor = Colors.teal.withOpacity(0.1);
+          textColor = Theme.of(context).colorScheme.onSurface;
           break;
         default:
-          avatarColor = primaryColor;
-          bubbleColor = Colors.white;
-          textColor = Colors.black87;
+          avatarColor = Theme.of(context).colorScheme.primary;
+          bubbleColor = Theme.of(context).colorScheme.surface;
+          textColor = Theme.of(context).colorScheme.onSurface;
       }
     }
     
@@ -671,7 +676,7 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
                         blurRadius: 3,
                         spreadRadius: 0,
                         offset: const Offset(0, 1),
@@ -753,14 +758,14 @@ class _TranscriptScreenState extends State<TranscriptScreen>
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(0.4),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
               offset: Offset(0, 4),
               blurRadius: 12,
             ),
           ],
         ),
         child: Material(
-          color: primaryColor,
+          color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(28),
           child: InkWell(
             borderRadius: BorderRadius.circular(28),
@@ -798,14 +803,14 @@ class _TranscriptScreenState extends State<TranscriptScreen>
                 children: [
                   Icon(
                     Icons.summarize_rounded,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     size: 22,
                   ),
                   SizedBox(width: 10),
                   Text(
                     'View Summary',
                     style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                     ),
