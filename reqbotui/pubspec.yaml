@@ -44,7 +44,8 @@ dependencies:
   path_provider: ^2.0.0
   flutter_slidable: ^3.1.2
   archive: ^3.3.0
-  lottie: ^3.1.0
+  lottie: ^2.3.2
+  # lottie: ^3.1.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -55,6 +56,9 @@ dependencies:
   flutter_markdown: ^0.7.7+1
   shared_preferences: ^2.5.3
   universal_html: ^2.2.4
+  hms_room_kit: ^1.0.8
+  app_links: ^3.4.1
+  webview_flutter: ^4.13.0
 
 dev_dependencies:
   flutter_test:

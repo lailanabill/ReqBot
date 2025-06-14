@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/userProvider.dart';
+import 'package:reqbot/views/screens/ImmeadiateMeeting.dart';
 import 'package:reqbot/views/screens/record.dart';
 import 'package:reqbot/views/screens/schedule_meeting_screen.dart';
 
@@ -44,53 +45,71 @@ class ChooseActionScreen extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'What would you like to do next?',
-                style: GoogleFonts.inter(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'What would you like to do next?',
+                  style: GoogleFonts.inter(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Choose one of the following options to proceed with your project.',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  color: Colors.black54,
-                  height: 1.5,
+                SizedBox(height: 12),
+                Text(
+                  'Choose one of the following options to proceed with your project.',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: Colors.black54,
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              SizedBox(height: 40),
-              _buildOptionCard(
-                context,
-                title: 'Upload Meeting Audio',
-                description: 'Upload an existing audio recording of a meeting',
-                icon: Icons.cloud_upload_outlined,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Record()),
-                  );
-                },
-              ),
-              SizedBox(height: 20),
-              _buildOptionCard(
-                context,
-                title: 'Schedule a Meeting with Client',
-                description: 'Set your availability for a client meeting',
-                icon: Icons.calendar_month_outlined,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ScheduleMeetingScreen()),
-                  );
-                },
-              ),
-            ],
+                SizedBox(height: 40),
+                _buildOptionCard(
+                  context,
+                  title: 'Upload Meeting Audio',
+                  description:
+                      'Upload an existing audio recording of a meeting',
+                  icon: Icons.cloud_upload_outlined,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Record()),
+                    );
+                  },
+                ),
+                SizedBox(height: 20),
+                _buildOptionCard(
+                  context,
+                  title: 'Start Meeting',
+                  description: 'Request an immediate meeting',
+                  icon: Icons.cloud_upload_outlined,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const QuickMeeting()),
+                    );
+                  },
+                ),
+                SizedBox(height: 20),
+                _buildOptionCard(
+                  context,
+                  title: 'Schedule a Meeting with Client',
+                  description: 'Set your availability for a client meeting',
+                  icon: Icons.calendar_month_outlined,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ScheduleMeetingScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -169,4 +188,4 @@ class ChooseActionScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

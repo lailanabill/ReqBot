@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:reqbot/services/providers/images_provider.dart';
 import 'package:reqbot/views/screens/functional_requirements_screen.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:reqbot/services/providers/data_providers.dart';
 
 class NonFunctionalRequirementsScreen extends StatefulWidget {
   const NonFunctionalRequirementsScreen({super.key});
@@ -15,73 +18,81 @@ class NonFunctionalRequirementsScreen extends StatefulWidget {
 }
 
 class _NonFunctionalRequirementsScreenState
-    extends State<NonFunctionalRequirementsScreen> with TickerProviderStateMixin {
+    extends State<NonFunctionalRequirementsScreen>
+    with TickerProviderStateMixin {
   // Use a map for requirements and persistence
-  Map<String, bool> _requirements = {
-    "Performance": false,
-    "Security": false,
-  };
-  
+  // Map<String, bool> _requirements = {
+  //   "Performance": false,
+  //   "Security": false,
+  // };
+
+  late List<Map<String, dynamic>> allRequirements, _requirements;
+
   final TextEditingController _editingController = TextEditingController();
   String? _editingKey;
   bool _isDirty = false; // Track if changes have been made
-  
+
   // Animation controllers
   late AnimationController _listAnimationController;
   late AnimationController _fabAnimationController;
   late AnimationController _addButtonAnimationController;
   late AnimationController _removeAnimationController;
   late AnimationController _switchTypeController;
-  
+
   // Main color scheme
   final Color primaryColor = const Color.fromARGB(255, 0, 54, 218);
-  
+
   // Track if a requirement is being removed
   String? _removingRequirement;
   String? _lastRemovedRequirement;
   bool? _lastRemovedValue;
-  
+
+  bool get _hasSelectedItems =>
+      _requirements.any((item) => item['selected'] == true);
   @override
   void initState() {
     super.initState();
-    
+    allRequirements = context.read<DataProvider>().detailedRequirements;
+    _requirements = allRequirements
+        .where((req) => req['Type']?.toLowerCase() == 'non functional')
+        .toList();
     // List item animations
     _listAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
+
     // FAB animations
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    
+
     // Add button animation
     _addButtonAnimationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     // Remove animation
     _removeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
+
     // Switch type animation
     _switchTypeController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    
+
     // Start animations
     _listAnimationController.forward();
     _fabAnimationController.forward();
     _addButtonAnimationController.forward();
 
     // Load saved requirements
-    _loadRequirements();
+    // _loadRequirements();
   }
 
   @override
@@ -97,66 +108,25 @@ class _NonFunctionalRequirementsScreenState
 
   void _removeRequirement(String title) {
     setState(() {
-      _removingRequirement = title;
-      _lastRemovedRequirement = title;
-      _lastRemovedValue = _requirements[title];
-    });
-    
-    _removeAnimationController.reset();
-    _removeAnimationController.forward().then((_) {
-      setState(() {
-        _requirements.remove(title);
-        _removingRequirement = null;
+      final index = _requirements.indexWhere((r) => r['Requirement'] == title);
+      if (index != -1) {
+        _removingRequirement = title;
+        _lastRemovedRequirement = title;
+        _lastRemovedValue = _requirements[index]['selected'] ?? false;
+        _requirements.removeAt(index);
         _isDirty = true;
-      });
-
-      // Show snackbar with undo option
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Requirement removed'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              if (_lastRemovedRequirement != null && _lastRemovedValue != null) {
-                setState(() {
-                  _requirements[_lastRemovedRequirement!] = _lastRemovedValue!;
-                  _isDirty = true;
-                });
-                // Reset list animations
-                _listAnimationController.reset();
-                _listAnimationController.forward();
-              }
-            },
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    });
-  }
-
-  // Method to load requirements from persistent storage
-  Future<void> _loadRequirements() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? requirementsJson = prefs.getString('non_functional_requirements');
-      
-      if (requirementsJson != null) {
-        final Map<String, dynamic> decodedMap = json.decode(requirementsJson);
-        setState(() {
-          _requirements = Map<String, bool>.from(decodedMap);
-        });
       }
-    } catch (e) {
-      print('Error loading requirements: $e');
-    }
+    });
   }
 
   // Method to save requirements to persistent storage
   Future<void> _saveRequirements() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final String requirementsJson = json.encode(_requirements);
-      await prefs.setString('non_functional_requirements', requirementsJson);
+      // final String requirementsJson = json.encode(_requirements);
+      // await prefs.setString('non_functional_requirements', requirementsJson);
+      await prefs.setString(
+          'non_functional_requirements', json.encode(_requirements));
     } catch (e) {
       print('Error saving requirements: $e');
     }
@@ -180,7 +150,8 @@ class _NonFunctionalRequirementsScreenState
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
+                          icon: const Icon(Icons.arrow_back_ios,
+                              color: Colors.black87, size: 20),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         const SizedBox(width: 8),
@@ -213,9 +184,9 @@ class _NonFunctionalRequirementsScreenState
                 ],
               ),
             ),
-            
+
             const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-            
+
             // Main Content
             Expanded(
               child: Padding(
@@ -235,7 +206,8 @@ class _NonFunctionalRequirementsScreenState
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
@@ -251,22 +223,28 @@ class _NonFunctionalRequirementsScreenState
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Requirements list with Add button at the bottom
                     Expanded(
                       child: Column(
                         children: [
                           Expanded(
-                            child: _requirements.isEmpty 
-                                ? _buildEmptyState() 
+                            child: _requirements.isEmpty
+                                ? _buildEmptyState()
                                 : _buildRequirementsList(),
                           ),
                           const SizedBox(height: 16),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: _buildAnimatedAddButton(),
+                          Column(
+                            children: [
+                              if (_hasSelectedItems) _buildConvertButton(),
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: _buildAnimatedAddButton(),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -275,7 +253,7 @@ class _NonFunctionalRequirementsScreenState
                 ),
               ),
             ),
-            
+
             // Save button always visible
             _buildSaveButton(),
           ],
@@ -307,9 +285,9 @@ class _NonFunctionalRequirementsScreenState
             setState(() {
               _isDirty = false;
             });
-            
+
             _saveRequirements();
-            
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
@@ -353,7 +331,7 @@ class _NonFunctionalRequirementsScreenState
       parent: _addButtonAnimationController,
       curve: Curves.elasticOut,
     );
-    
+
     return AnimatedBuilder(
       animation: scaleAnimation,
       builder: (context, child) {
@@ -421,9 +399,10 @@ class _NonFunctionalRequirementsScreenState
       padding: const EdgeInsets.only(bottom: 16),
       itemCount: _requirements.length,
       itemBuilder: (context, index) {
-        final String key = _requirements.keys.elementAt(index);
-        final bool isSelected = _requirements[key]!;
-        
+        final req = _requirements[index];
+        final String title = req['Requirement'];
+        final bool isSelected = req['selected'] ?? false;
+
         // Create staggered animation for each item
         final Animation<double> animation = CurvedAnimation(
           parent: _listAnimationController,
@@ -433,14 +412,15 @@ class _NonFunctionalRequirementsScreenState
             curve: Curves.easeOutQuart,
           ),
         );
-        
+
         // Animate item removal
-        final bool isRemoving = _removingRequirement == key;
+        // final bool isRemoving = _removingRequirement == key;
+        final bool isRemoving = _removingRequirement == title;
         final Animation<double> removeAnimation = CurvedAnimation(
           parent: _removeAnimationController,
           curve: Curves.easeInOut,
         );
-        
+
         return AnimatedBuilder(
           animation: isRemoving ? removeAnimation : animation,
           builder: (context, child) {
@@ -456,7 +436,7 @@ class _NonFunctionalRequirementsScreenState
                 ),
               );
             }
-            
+
             return Transform.translate(
               offset: Offset(0, 50 * (1 - animation.value)),
               child: Opacity(
@@ -465,7 +445,7 @@ class _NonFunctionalRequirementsScreenState
               ),
             );
           },
-          child: _buildRequirementItem(key, isSelected, index),
+          child: _buildRequirementItem(title, isSelected, index),
         );
       },
     );
@@ -481,9 +461,9 @@ class _NonFunctionalRequirementsScreenState
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: isSelected 
-                ? primaryColor.withOpacity(0.1)
-                : Colors.black.withOpacity(0.05),
+              color: isSelected
+                  ? primaryColor.withOpacity(0.1)
+                  : Colors.black.withOpacity(0.05),
               blurRadius: isSelected ? 12 : 8,
               offset: const Offset(0, 2),
             ),
@@ -505,13 +485,19 @@ class _NonFunctionalRequirementsScreenState
                 children: [
                   // Animated Checkbox
                   TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0.0, end: isSelected ? 1.0 : 0.0),
+                    tween:
+                        Tween<double>(begin: 0.0, end: isSelected ? 1.0 : 0.0),
                     duration: const Duration(milliseconds: 300),
                     builder: (context, value, child) {
                       return InkWell(
                         onTap: () {
+                          // setState(() {
+                          //   _requirements[title] = !isSelected;
+                          //   _isDirty = true;
+                          // });
                           setState(() {
-                            _requirements[title] = !isSelected;
+                            _requirements[index]['selected'] =
+                                !_requirements[index]['selected'];
                             _isDirty = true;
                           });
                           HapticFeedback.selectionClick();
@@ -548,7 +534,7 @@ class _NonFunctionalRequirementsScreenState
                     },
                   ),
                   const SizedBox(width: 16),
-                  
+
                   // Requirement Text
                   Expanded(
                     child: Column(
@@ -573,7 +559,7 @@ class _NonFunctionalRequirementsScreenState
                       ],
                     ),
                   ),
-                  
+
                   // Button Row
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -598,9 +584,9 @@ class _NonFunctionalRequirementsScreenState
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(width: 8),
-                      
+
                       // Delete Icon
                       Material(
                         color: Colors.transparent,
@@ -696,7 +682,8 @@ class _NonFunctionalRequirementsScreenState
           Navigator.push(
             context,
             PageRouteBuilder(
-              pageBuilder: (_, animation, __) => const FunctionalRequirementsScreen(),
+              pageBuilder: (_, animation, __) =>
+                  const FunctionalRequirementsScreen(),
               transitionsBuilder: (_, animation, __, child) {
                 return FadeTransition(
                   opacity: animation,
@@ -706,7 +693,7 @@ class _NonFunctionalRequirementsScreenState
             ),
           );
         });
-        
+
         HapticFeedback.mediumImpact();
       },
       child: AnimatedBuilder(
@@ -715,17 +702,20 @@ class _NonFunctionalRequirementsScreenState
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: _switchTypeController.value < 0.5 
-                ? primaryColor.withOpacity(0.1)
-                : Colors.indigo.withOpacity(0.2),
+              color: _switchTypeController.value < 0.5
+                  ? primaryColor.withOpacity(0.1)
+                  : Colors.indigo.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
-              boxShadow: _switchTypeController.value > 0.2 ? [
-                BoxShadow(
-                  color: Colors.indigo.withOpacity(0.2 * _switchTypeController.value),
-                  blurRadius: 10 * _switchTypeController.value,
-                  offset: const Offset(0, 2),
-                )
-              ] : null,
+              boxShadow: _switchTypeController.value > 0.2
+                  ? [
+                      BoxShadow(
+                        color: Colors.indigo
+                            .withOpacity(0.2 * _switchTypeController.value),
+                        blurRadius: 10 * _switchTypeController.value,
+                        offset: const Offset(0, 2),
+                      )
+                    ]
+                  : null,
             ),
             child: Row(
               children: [
@@ -828,7 +818,6 @@ class _NonFunctionalRequirementsScreenState
     );
   }
 
-  // Custom Dialog Methods
   void _showEditDialog() {
     showDialog(
       context: context,
@@ -838,15 +827,17 @@ class _NonFunctionalRequirementsScreenState
         onAction: () {
           setState(() {
             if (_editingKey != null && _editingController.text.isNotEmpty) {
-              bool value = _requirements[_editingKey!] ?? false;
-              _requirements.remove(_editingKey);
-              _requirements[_editingController.text] = value;
-              _editingKey = null;
-              _isDirty = true;
-              
-              // Reset list animations to play again
-              _listAnimationController.reset();
-              _listAnimationController.forward();
+              final index = _requirements.indexWhere(
+                  (element) => element['Requirement'] == _editingKey);
+              if (index != -1) {
+                _requirements[index]['Requirement'] = _editingController.text;
+                _editingKey = null;
+                _isDirty = true;
+
+                // Reset list animations to play again
+                _listAnimationController.reset();
+                _listAnimationController.forward();
+              }
             }
           });
           Navigator.pop(context);
@@ -865,9 +856,13 @@ class _NonFunctionalRequirementsScreenState
         onAction: () {
           setState(() {
             if (_editingController.text.isNotEmpty) {
-              _requirements[_editingController.text] = false;
+              // _requirements[_editingController.text] = false;
+              _requirements.add({
+                "Requirement": _editingController.text,
+                "Type": "Non Functional",
+              });
               _isDirty = true;
-              
+
               // Reset list animations to play again
               _listAnimationController.reset();
               _listAnimationController.forward();
@@ -967,7 +962,8 @@ class _NonFunctionalRequirementsScreenState
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.grey.shade700,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                     child: Text(
                       "Cancel",
@@ -982,7 +978,8 @@ class _NonFunctionalRequirementsScreenState
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1001,6 +998,42 @@ class _NonFunctionalRequirementsScreenState
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildConvertButton() {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.sync_alt),
+      label: const Text("Convert to Functional"),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green.shade600,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      onPressed: () {
+        setState(() {
+          for (var item in _requirements) {
+            if (item['selected'] == true) {
+              item['Type'] = 'Functional';
+              item['selected'] = false; // Optional: deselect after conversion
+            }
+          }
+          // Remove them from the local _requirements list since their type changed
+          _requirements.removeWhere((item) => item['Type'] == 'Functional');
+          _isDirty = true;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                const Text("Selected requirements converted to functional."),
+            backgroundColor: Colors.green.shade600,
+          ),
+        );
+      },
     );
   }
 }
