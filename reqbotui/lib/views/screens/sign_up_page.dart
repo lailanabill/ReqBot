@@ -113,7 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   _buildFormField(
                     controller: controller.emailController,
                     validator: controller.validateEmail,
-                    hintText: "Enter your email address",
+                    hintText: "Enter your email",
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icons.email_outlined,
                   ),
