@@ -24,9 +24,9 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
   String req_sumURI =
       "https://main-server-last-1016128810332.us-central1.run.app/reqsneww/";
   String sumURI =
-      "https://main-server-last-1016128810332.us-central1.run.app/summarize/";
+      "https://transcriptsumamry-761462343691.europe-west1.run.app/summarize/";
   String diagramsURI =
-      "https://main-server-last-1016128810332.us-central1.run.app/diagrams/";
+      "https://diagramserver-761462343691.europe-west1.run.app/diagrams/";
   bool _uploaded = false;
   bool _isLoading = false;
   int? _selectedMeetingIndex;
@@ -101,7 +101,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
           final bytes = reader.result as List<int>;
 
           var uri = Uri.parse(
-              'https://main-server-last-1016128810332.us-central1.run.app/whisper/');
+              'https://transcriptsumamry-761462343691.europe-west1.run.app/whisper/');
           var request = http.MultipartRequest('POST', uri);
           request.files.add(http.MultipartFile.fromBytes(
             'file',
@@ -243,10 +243,9 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(
-                        Icons.close, 
-                        color: Theme.of(context).colorScheme.onSurfaceVariant
-                      ),
+                      icon: Icon(Icons.close,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -259,7 +258,10 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                 Container(
                   height: 300,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceVariant
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: EdgeInsets.all(12),
@@ -470,8 +472,8 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected 
-                  ? Theme.of(context).colorScheme.primary 
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
                   : Colors.transparent,
               width: 2,
             ),
@@ -493,7 +495,10 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                     Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
@@ -521,7 +526,9 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                             date,
                             style: GoogleFonts.inter(
                               fontSize: 10,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -536,17 +543,18 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                     padding: EdgeInsets.symmetric(horizontal: 4),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.play_arrow, 
-                          color: Theme.of(context).colorScheme.primary, 
-                          size: 18
-                        ),
+                        Icon(Icons.play_arrow,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18),
                         SizedBox(width: 4),
                         Expanded(
                           child: Container(
                             height: 4,
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .outline
+                                  .withOpacity(0.3),
                               borderRadius: BorderRadius.circular(2),
                             ),
                             child: Row(
@@ -554,7 +562,8 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                                 Container(
                                   width: 70,
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
@@ -567,7 +576,8 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                           "2:45",
                           style: GoogleFonts.inter(
                             fontSize: 10,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -620,8 +630,10 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
           style: ElevatedButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            disabledBackgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-            disabledForegroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            disabledBackgroundColor:
+                Theme.of(context).colorScheme.surfaceVariant,
+            disabledForegroundColor:
+                Theme.of(context).colorScheme.onSurfaceVariant,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -637,8 +649,7 @@ class _RecordState extends State<Record> with SingleTickerProviderStateMixin {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).colorScheme.onPrimary
-                        ),
+                            Theme.of(context).colorScheme.onPrimary),
                       ),
                     ),
                     SizedBox(width: 12),
