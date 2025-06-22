@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 ThemeData buildLightTheme() {
   // Use the original blue color as the primary color
   const primaryColor = Color.fromARGB(255, 0, 54, 218);
-  
+
   var kColorScheme = ColorScheme.fromSeed(
     brightness: Brightness.light,
     seedColor: primaryColor,
@@ -27,7 +27,7 @@ ThemeData buildLightTheme() {
       backgroundColor: kColorScheme.primaryContainer,
       foregroundColor: kColorScheme.onPrimaryContainer,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: kColorScheme.secondaryContainer,
       margin: const EdgeInsets.all(16),
     ),

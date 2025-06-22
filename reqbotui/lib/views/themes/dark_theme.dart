@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 ThemeData buildDarkTheme() {
   // Use a complementary dark blue for dark theme
   const primaryColor = Color.fromARGB(255, 0, 54, 218);
-  const darkPrimaryColor = Color.fromARGB(255, 100, 150, 255); // Lighter blue for dark mode
-  
+  const darkPrimaryColor =
+      Color.fromARGB(255, 100, 150, 255); // Lighter blue for dark mode
+
   var kDarkColorScheme = ColorScheme.fromSeed(
     brightness: Brightness.dark,
     seedColor: primaryColor,
@@ -28,7 +29,7 @@ ThemeData buildDarkTheme() {
       backgroundColor: kDarkColorScheme.primaryContainer,
       foregroundColor: kDarkColorScheme.onPrimaryContainer,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: kDarkColorScheme.secondaryContainer,
       margin: const EdgeInsets.all(16),
     ),
