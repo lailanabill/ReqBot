@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:lottie/lottie.dart';
 import '../widgets/dark_mode_toggle.dart';
+import 'package:http/http.dart' as http;
 
 class SRSScreen extends StatefulWidget {
   const SRSScreen({super.key});
@@ -103,7 +104,51 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
     return {'project': projectResponse};
   }
 
-  String _generateLatex(Map<String, dynamic> data, int projectId) {
+  Future<Map<String, String>> _generateSRSSectionsWithLlama({
+    required String transcription,
+    required String summary,
+    required String requirements,
+  }) async {
+    final url =
+        Uri.parse('https://srserver-761462343691.europe-west1.run.app/srs/');
+    final body = {
+      'transcript': transcription,
+      'summary': summary,
+      'requirements': requirements,
+    };
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // Llama should return all SRS static sections
+        return {
+          'purpose': data['purpose'] ?? '',
+          'scope': data['scope'] ?? '',
+          'background': data['background'] ?? '',
+          'conclusion': data['conclusion'] ?? '',
+        };
+      } else {
+        throw Exception('Llama API error: \\${response.statusCode}');
+      }
+    } catch (e) {
+      print('Llama API call failed: $e');
+      // If Llama fails, do not use static text. Instead, throw error to be handled by caller.
+      throw Exception('Failed to generate SRS sections with Llama: $e');
+    }
+  }
+
+  String _generateLatex(
+    Map<String, dynamic> data,
+    int projectId, {
+    required String purpose,
+    required String scope,
+    required String background,
+    required String conclusion,
+  }) {
     final project = data['project'];
     final projectName = project['name'] ?? 'Appointment Booking System';
     final transcription = project['transcription']?.replaceAll('\n', '\\\\') ??
@@ -164,24 +209,17 @@ class _SRSScreenState extends State<SRSScreen> with TickerProviderStateMixin {
 \\newpage
 
 \\section{Introduction}
-${projectName} is an online platform that facilitates scheduling and managing appointments between users and service providers. The system supports user account creation, appointment browsing, booking, and notifications, ensuring a streamlined and user-friendly experience.
+${background}
 
 \\subsection{Purpose}
-The system provides a centralized interface for appointment-related operations. It is intended to serve users who need to book or manage time slots and administrators who handle service availability. Notification mechanisms ensure that users remain informed of confirmations and reminders.
+${purpose}
 
 \\subsection{Scope}
-The platform supports the following features:
-\\begin{itemize}
-  \\item User registration and account management
-  \\item Browsing of available time slots
-  \\item Booking, rescheduling, and cancellation of appointments
-  \\item Delivery of appointment confirmations and reminders via email or SMS
-\\end{itemize}
-It operates as a responsive web application and is designed for reliability, performance, and secure data handling.
+${scope}
 
 \\section{Overall Description}
 \\subsection{Background}
-Development of the system began after a series of planning sessions between stakeholders. The goal was to replace manual booking processes with a digital alternative that is more efficient, transparent, and scalable.
+${background}
 
 \\subsection{Transcription}
 ${transcription}
@@ -198,7 +236,7 @@ ${requirements}
 ${diagramSection}
 
 \\section{Conclusion}
-The platform described in this specification provides a robust solution for appointment scheduling and management. Its functionality addresses both user-facing needs and backend operational efficiency. The requirements and design components outlined here form the basis for implementation and future enhancements.
+${conclusion}
 
 \\end{document}
 ''';
@@ -239,7 +277,31 @@ The platform described in this specification provides a robust solution for appo
         }
       }
 
-      final latexContent = _generateLatex(data, projectId);
+      // Call Llama API to generate SRS sections
+      Map<String, String> llamaSections;
+      try {
+        llamaSections = await _generateSRSSectionsWithLlama(
+          transcription: project['transcription'] ?? '',
+          summary: project['summary'] ?? '',
+          requirements: project['status'] ?? '',
+        );
+      } catch (e) {
+        setState(() {
+          _isSuccess = false;
+          _statusMessage =
+              'Error: Could not generate SRS sections with Llama. $e';
+        });
+        return;
+      }
+
+      final latexContent = _generateLatex(
+        data,
+        projectId,
+        purpose: llamaSections['purpose'] ?? '',
+        scope: llamaSections['scope'] ?? '',
+        background: llamaSections['background'] ?? '',
+        conclusion: llamaSections['conclusion'] ?? '',
+      );
       final latexBytes = utf8.encode(latexContent);
       archive.addFile(ArchiveFile('srs.tex', latexBytes.length, latexBytes));
       print('Added srs.tex to ZIP');
@@ -278,7 +340,9 @@ The platform described in this specification provides a robust solution for appo
 
   @override
   Widget build(BuildContext context) {
-    final userDataProvider = context.read<UserDataProvider>();
+    // Always use the latest selected project and analyzer from the provider.
+    // This ensures SRS is generated for the currently selected project.
+    final userDataProvider = context.watch<UserDataProvider>();
     final projectId = userDataProvider.SelectedProjectId;
     final analyzerId = userDataProvider.AnalyzerID;
 
@@ -294,7 +358,8 @@ The platform described in this specification provides a robust solution for appo
       elevation: 0,
       backgroundColor: Theme.of(context).colorScheme.primary,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios, size: 20, color: Theme.of(context).colorScheme.onPrimary),
+        icon: Icon(Icons.arrow_back_ios,
+            size: 20, color: Theme.of(context).colorScheme.onPrimary),
         onPressed: () => Navigator.of(context).pop(),
       ),
       centerTitle: true,
@@ -493,10 +558,14 @@ The platform described in this specification provides a robust solution for appo
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+                    color:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.1),
                       width: 1,
                     ),
                   ),
@@ -514,7 +583,8 @@ The platform described in this specification provides a robust solution for appo
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             height: 1.5,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -637,14 +707,20 @@ The platform described in this specification provides a robust solution for appo
                       gradient: LinearGradient(
                         colors: [
                           Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                          Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.8),
                         ],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.4),
                           offset: Offset(0, 4),
                           blurRadius: 12,
                         ),
@@ -668,7 +744,8 @@ The platform described in this specification provides a robust solution for appo
                               Text(
                                 'Generate SRS Document',
                                 style: GoogleFonts.inter(
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
                                 ),
@@ -719,7 +796,9 @@ The platform described in this specification provides a robust solution for appo
           children: [
             Icon(
               _isSuccess ? Icons.check_circle_outline : Icons.error_outline,
-              color: _isSuccess ? Colors.green : Theme.of(context).colorScheme.error,
+              color: _isSuccess
+                  ? Colors.green
+                  : Theme.of(context).colorScheme.error,
               size: 24,
             ),
             SizedBox(width: 12),
@@ -732,7 +811,9 @@ The platform described in this specification provides a robust solution for appo
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: _isSuccess ? Colors.green : Theme.of(context).colorScheme.error,
+                      color: _isSuccess
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.error,
                     ),
                   ),
                   SizedBox(height: 4),
@@ -758,7 +839,9 @@ The platform described in this specification provides a robust solution for appo
                             'You will be redirected to Overleaf where you can upload the generated ZIP file.',
                             style: GoogleFonts.inter(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -792,14 +875,18 @@ The platform described in this specification provides a robust solution for appo
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
                                     image.split('_')[0],
                                     style: GoogleFonts.inter(
                                       fontSize: 11,
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
