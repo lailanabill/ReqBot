@@ -55,6 +55,8 @@ dependencies:
   flutter_markdown: ^0.7.7+1
   shared_preferences: ^2.5.3
   universal_html: ^2.2.4
+  hmssdk_flutter: ^1.10.6
+  dart_dev: ^4.2.3
 
 dev_dependencies:
   flutter_test:
