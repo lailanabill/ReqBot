@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:reqbot/services/providers/userProvider.dart';
 import 'package:reqbot/views/widgets/Classdiagram/editor_tools.dart'; // Adjust path as needed
 import '../widgets/dark_mode_toggle.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ClassDiagramEditor extends StatefulWidget {
   const ClassDiagramEditor({super.key});
@@ -113,17 +114,24 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        elevation: 0,
         title: Text(
           'Class Diagram Editor',
-          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
+        backgroundColor: primaryColor,
+        iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -133,123 +141,244 @@ class _ClassDiagramEditorState extends State<ClassDiagramEditor> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Text(
-              'Edit Your Class Diagram',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Modify classes, attributes, methods, and relationships in your UML class diagram.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Diagram Section (Upper)
-            Expanded(
-              flex: 2, // Takes more space at the top
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+      body: Column(
+        children: [
+          // Header Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.08),
+              border: Border(
+                bottom: BorderSide(
+                  color: primaryColor.withOpacity(0.1),
+                  width: 1,
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: InteractiveViewer(
-                    boundaryMargin: const EdgeInsets.all(20),
-                    minScale: 0.5,
-                    maxScale: 3.0,
-                    child: Image.network(
-                      _getDiagramUrl(),
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.account_tree_outlined,
+                    color: primaryColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Class Diagram Editor',
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Design and modify your UML class diagrams with advanced editing tools',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          height: 1.4,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Diagram Section (Upper)
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: primaryColor.withOpacity(0.1),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primaryColor.withOpacity(0.1),
+                            blurRadius: 20,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 6),
                           ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        print('Image load error: $error');
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Stack(
                           children: [
-                            Icon(
-                              Icons.broken_image,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Failed to load image: $error',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            // Top decoration
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              height: 6,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      primaryColor.withOpacity(0.7),
+                                      primaryColor,
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _updateDiagram,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            // Content
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: InteractiveViewer(
+                                boundaryMargin: const EdgeInsets.all(20),
+                                minScale: 0.5,
+                                maxScale: 3.0,
+                                child: Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: Image.network(
+                                    _getDiagramUrl(),
+                                    fit: BoxFit.contain,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            CircularProgressIndicator(
+                                              color: primaryColor,
+                                              strokeWidth: 3,
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'Generating diagram...',
+                                              style: GoogleFonts.inter(
+                                                fontSize: 14,
+                                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      print('Image load error: $error');
+                                      return Container(
+                                        padding: const EdgeInsets.all(32),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 80,
+                                              height: 80,
+                                              decoration: BoxDecoration(
+                                                color: primaryColor.withOpacity(0.1),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.broken_image_outlined,
+                                                size: 40,
+                                                color: primaryColor,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Text(
+                                              'Failed to Load Diagram',
+                                              style: GoogleFonts.inter(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: primaryColor,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Please check your PlantUML code and try again',
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 13,
+                                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            ElevatedButton(
+                                              onPressed: _updateDiagram,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: primaryColor,
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                              ),
+                                              child: Text(
+                                                'Retry',
+                                                style: GoogleFonts.inter(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
                               ),
-                              child: const Text('Retry'),
                             ),
                           ],
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  // Editor Tools Section (Lower)
+                  Expanded(
+                    flex: 1,
+                    child: SingleChildScrollView(
+                      child: EditorTools(
+                        plantumlCode: plantumlCode,
+                        plantumlController: _plantumlController,
+                        onUpdate: (newCode) {
+                          print('Updating PlantUML code: $newCode');
+                          setState(() {
+                            _previousPlantumlCode = plantumlCode;
+                            plantumlCode = newCode;
+                            _plantumlController.text = plantumlCode;
+                          });
+                          _updateDiagram();
+                        },
+                        onCopy: _copyCode,
+                        onRevert: _revertToLastVersion,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            // Editor Tools Section (Lower)
-            Expanded(
-              flex: 1, // Takes less space below
-              child: SingleChildScrollView(
-                child: EditorTools(
-                  plantumlCode: plantumlCode,
-                  plantumlController: _plantumlController,
-                  onUpdate: (newCode) {
-                    print('Updating PlantUML code: $newCode');
-                    setState(() {
-                      _previousPlantumlCode = plantumlCode;
-                      plantumlCode = newCode;
-                      _plantumlController.text = plantumlCode;
-                    });
-                    _updateDiagram();
-                  },
-                  onCopy: _copyCode,
-                  onRevert: _revertToLastVersion,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

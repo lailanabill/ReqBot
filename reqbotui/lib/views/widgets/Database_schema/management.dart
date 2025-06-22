@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TableManagement extends StatelessWidget {
   final String plantumlCode;
@@ -10,57 +11,194 @@ class TableManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: tableNameController,
-          decoration: const InputDecoration(
-            labelText: 'Table Name',
-            border: OutlineInputBorder(),
+        // Table Name Input
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: primaryColor.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: TextField(
+            controller: tableNameController,
+            style: GoogleFonts.inter(fontSize: 14),
+            decoration: InputDecoration(
+              labelText: 'Table Name',
+              labelStyle: GoogleFonts.inter(
+                color: primaryColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: primaryColor,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.all(16),
+            ),
           ),
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _addTableDialog(context),
-            child: const Text('Add Table'),
-          ),
+        
+        // Action Buttons
+        _buildGradientButton(
+          context: context,
+          text: 'Add Table',
+          icon: Icons.add_outlined,
+          onPressed: () => _addTableDialog(context),
+          color: primaryColor,
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _renameTableDialog(context),
-            child: const Text('Rename Table'),
-          ),
+        const SizedBox(height: 12),
+        _buildSecondaryButton(
+          context: context,
+          text: 'Rename Table',
+          icon: Icons.edit_outlined,
+          onPressed: () => _renameTableDialog(context),
+          color: primaryColor,
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.red),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _deleteTableDialog(context),
-            child: const Text('Delete Table'),
-          ),
+        const SizedBox(height: 12),
+        _buildSecondaryButton(
+          context: context,
+          text: 'Delete Table',
+          icon: Icons.delete_outline,
+          onPressed: () => _deleteTableDialog(context),
+          color: Colors.red,
+          isDestructive: true,
         ),
       ],
     );
   }
 
+  Widget _buildGradientButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  color,
+                  color.withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+    bool isDestructive = false,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDestructive ? Colors.red.withOpacity(0.1) : color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDestructive ? Colors.red.withOpacity(0.3) : color.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: isDestructive ? Colors.red : color,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: isDestructive ? Colors.red : color,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _addTableDialog(BuildContext context) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
     String tableName = '';
     String? errorMessage;
 
@@ -69,55 +207,243 @@ class TableManagement extends StatelessWidget {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Add Table'),
-              content: SingleChildScrollView(
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 500),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withOpacity(0.1),
+                      blurRadius: 20,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
-                      controller: tableNameController,
-                      onChanged: (value) {
-                        tableName = value.trim();
-                        print('Table name input: $tableName');
-                        if (tableName.isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(tableName)) {
-                          errorMessage = 'Table name must be a valid identifier (letters, numbers, underscores only)';
-                        } else {
-                          errorMessage = null;
-                        }
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Table Name',
-                        border: const OutlineInputBorder(),
-                        errorText: errorMessage,
+                    // Header
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            primaryColor.withOpacity(0.1),
+                            primaryColor.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.table_chart_outlined,
+                              color: primaryColor,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            'Add New Table',
+                            style: GoogleFonts.inter(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Content
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enter table details',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: errorMessage != null 
+                                    ? Colors.red.withOpacity(0.3)
+                                    : primaryColor.withOpacity(0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: TextField(
+                              controller: tableNameController,
+                              style: GoogleFonts.inter(fontSize: 14),
+                              onChanged: (value) {
+                                tableName = value.trim();
+                                print('Table name input: $tableName');
+                                if (tableName.isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(tableName)) {
+                                  errorMessage = 'Table name must be a valid identifier (letters, numbers, underscores only)';
+                                } else {
+                                  errorMessage = null;
+                                }
+                                setState(() {});
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Table Name',
+                                labelStyle: GoogleFonts.inter(
+                                  color: primaryColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: primaryColor,
+                                    width: 2,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.all(16),
+                              ),
+                            ),
+                          ),
+                          if (errorMessage != null) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.red.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.error_outline, color: Colors.red, size: 16),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      errorMessage!,
+                                      style: GoogleFonts.inter(
+                                        color: Colors.red,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    
+                    // Buttons
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                'Cancel',
+                                style: GoogleFonts.inter(
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Material(
+                              borderRadius: BorderRadius.circular(10),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: (tableName.isEmpty || errorMessage != null) ? null : () {
+                                  print('Adding table: $tableName');
+                                  Navigator.pop(context);
+                                  String newCode = plantumlCode;
+                                  if (!newCode.contains('@startuml')) {
+                                    newCode = '@startuml\n$newCode';
+                                  }
+                                  if (!newCode.contains('@enduml')) {
+                                    newCode = '$newCode\n@enduml';
+                                  }
+                                  newCode = newCode.replaceFirst('@enduml', 'entity "$tableName" {\n}\n@enduml');
+                                  onUpdate(newCode);
+                                  tableNameController.clear();
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: (tableName.isEmpty || errorMessage != null) 
+                                          ? [Colors.grey.shade300, Colors.grey.shade400]
+                                          : [primaryColor, primaryColor.withOpacity(0.8)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  child: Center(
+                                    child: Text(
+                                      'Add Table',
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    if (tableName.isEmpty) {
-                      print('Add Table button disabled: Table name is empty');
-                      return;
-                    }
-                    if (errorMessage != null) {
-                      print('Add Table button disabled: $errorMessage');
-                      return;
-                    }
-                    print('Adding table: $tableName');
-                    Navigator.pop(context);
-                    onUpdate(plantumlCode.replaceFirst(
-                      '@enduml',
-                      'entity "$tableName" {\n}\n@enduml',
-                    ));
-                    tableNameController.clear();
-                  },
-                  child: const Text('Add'),
-                ),
-              ],
             );
           },
         );
@@ -126,8 +452,8 @@ class TableManagement extends StatelessWidget {
   }
 
   void _renameTableDialog(BuildContext context) {
-    String oldName = '';
-    String newName = '';
+    String oldTableName = '';
+    String newTableName = '';
     String? errorMessage;
 
     showDialog(
@@ -143,8 +469,8 @@ class TableManagement extends StatelessWidget {
                   children: [
                     TextField(
                       onChanged: (value) {
-                        oldName = value.trim();
-                        print('Old table name input: $oldName');
+                        oldTableName = value.trim();
+                        print('Old table name input: $oldTableName');
                         setState(() {});
                       },
                       decoration: const InputDecoration(
@@ -155,9 +481,9 @@ class TableManagement extends StatelessWidget {
                     const SizedBox(height: 16),
                     TextField(
                       onChanged: (value) {
-                        newName = value.trim();
-                        print('New table name input: $newName');
-                        if (newName.isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(newName)) {
+                        newTableName = value.trim();
+                        print('New table name input: $newTableName');
+                        if (newTableName.isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(newTableName)) {
                           errorMessage = 'New table name must be a valid identifier';
                         } else {
                           errorMessage = null;
@@ -175,37 +501,39 @@ class TableManagement extends StatelessWidget {
               ),
               actions: [
                 TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
                   onPressed: () {
-                    if (oldName.isEmpty || newName.isEmpty) {
-                      print('Rename Table button disabled: Old or new name is empty');
+                    if (oldTableName.isEmpty || newTableName.isEmpty) {
+                      print('Rename Table button disabled: Old or new table name is empty');
                       return;
                     }
                     if (errorMessage != null) {
                       print('Rename Table button disabled: $errorMessage');
                       return;
                     }
-                    print('Renaming table from $oldName to $newName');
+                    print('Renaming table: $oldTableName -> $newTableName');
                     Navigator.pop(context);
                     final tableRegex = RegExp(
-                      r'entity\s*"' + RegExp.escape(oldName) + r'"\s*\{[^}]*\}',
+                      r'entity\s*"' + RegExp.escape(oldTableName) + r'"\s*\{[^}]*\}',
                       multiLine: true,
                     );
-                    final match = tableRegex.firstMatch(plantumlCode);
-                    if (match != null) {
-                      String newCode = plantumlCode.replaceFirst(
-                        tableRegex,
-                        'entity "$newName" {\n${match.group(0)!.split('{')[1]}',
+                    String newCode = plantumlCode.replaceAllMapped(tableRegex, (match) {
+                      return match.group(0)!.replaceFirst(
+                        RegExp(r'"' + RegExp.escape(oldTableName) + r'"'),
+                        '"$newTableName"',
                       );
-                      newCode = newCode.replaceAll(
-                        RegExp(r'\b' + RegExp.escape(oldName) + r'\b(?=.*(-->|o-->|\*-->))'),
-                        newName,
-                      );
+                    });
+                    if (newCode != plantumlCode) {
                       onUpdate(newCode);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Table "$oldName" not found')),
+                        SnackBar(content: Text('Table "$oldTableName" not found')),
                       );
                     }
+                    tableNameController.clear();
                   },
                   child: const Text('Rename'),
                 ),
@@ -231,6 +559,11 @@ class TableManagement extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    const Text(
+                      'Warning: This will permanently delete the table and all its relationships.',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    const SizedBox(height: 16),
                     TextField(
                       onChanged: (value) {
                         tableName = value.trim();
@@ -238,7 +571,7 @@ class TableManagement extends StatelessWidget {
                         setState(() {});
                       },
                       decoration: const InputDecoration(
-                        labelText: 'Table Name',
+                        labelText: 'Table Name to Delete',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -246,6 +579,10 @@ class TableManagement extends StatelessWidget {
                 ),
               ),
               actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
                 TextButton(
                   onPressed: () {
                     if (tableName.isEmpty) {
@@ -293,41 +630,179 @@ class ColumnManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: columnController,
-          decoration: const InputDecoration(
-            labelText: 'Column (e.g., id : INT <<PK>>)',
-            border: OutlineInputBorder(),
+        // Column Input
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: primaryColor.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: TextField(
+            controller: columnController,
+            style: GoogleFonts.inter(fontSize: 14),
+            decoration: InputDecoration(
+              labelText: 'Column (e.g., id : INT <<PK>>)',
+              labelStyle: GoogleFonts.inter(
+                color: primaryColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: primaryColor,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.all(16),
+            ),
           ),
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _addColumnDialog(context),
-            child: const Text('Add Column'),
-          ),
+        
+        // Action Buttons
+        _buildGradientButton(
+          context: context,
+          text: 'Add Column',
+          icon: Icons.add_outlined,
+          onPressed: () => _addColumnDialog(context),
+          color: primaryColor,
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _editColumnDialog(context),
-            child: const Text('Edit Column'),
-          ),
+        const SizedBox(height: 12),
+        _buildSecondaryButton(
+          context: context,
+          text: 'Edit Column',
+          icon: Icons.edit_outlined,
+          onPressed: () => _editColumnDialog(context),
+          color: primaryColor,
         ),
       ],
+    );
+  }
+
+  Widget _buildGradientButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  color,
+                  color.withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: color.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: color,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -640,33 +1115,137 @@ class RelationshipManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.green),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _addRelationshipDialog(context),
-            child: const Text('Add Relationship'),
-          ),
+        _buildGradientButton(
+          context: context,
+          text: 'Add Relationship',
+          icon: Icons.link_outlined,
+          onPressed: () => _addRelationshipDialog(context),
+          color: Colors.green,
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.red),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _removeRelationshipDialog(context),
-            child: const Text('Remove Relationship'),
-          ),
+        const SizedBox(height: 12),
+        _buildSecondaryButton(
+          context: context,
+          text: 'Remove Relationship',
+          icon: Icons.link_off_outlined,
+          onPressed: () => _removeRelationshipDialog(context),
+          color: Colors.red,
+          isDestructive: true,
         ),
       ],
+    );
+  }
+
+  Widget _buildGradientButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  color,
+                  color.withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+    bool isDestructive = false,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDestructive ? Colors.red.withOpacity(0.1) : color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDestructive ? Colors.red.withOpacity(0.3) : color.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: isDestructive ? Colors.red : color,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: isDestructive ? Colors.red : color,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 

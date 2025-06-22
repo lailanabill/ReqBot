@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ClassManagement extends StatelessWidget {
   final String plantumlCode;
@@ -11,66 +12,194 @@ class ClassManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: classNameController,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-          decoration: InputDecoration(
-            labelText: 'Class Name',
-            labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: primaryColor.withOpacity(0.2),
+              width: 1,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          ),
+          child: TextField(
+            controller: classNameController,
+            style: GoogleFonts.inter(
+              color: Colors.black87,
+              fontSize: 14,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+            decoration: InputDecoration(
+              labelText: 'Class Name',
+              labelStyle: GoogleFonts.inter(
+                color: primaryColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: primaryColor, width: 2),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.all(16),
             ),
           ),
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
-              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onPrimary),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _addClassDialog(context),
-            child: const Text('Add Class'),
-          ),
+        _buildGradientButton(
+          context: context,
+          text: 'Add Class',
+          icon: Icons.add_circle_outline,
+          onPressed: () => _addClassDialog(context),
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary),
-              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSecondary),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildSecondaryButton(
+                context: context,
+                text: 'Rename',
+                icon: Icons.edit_outlined,
+                onPressed: () => _renameClassDialog(context),
+              ),
             ),
-            onPressed: () => _renameClassDialog(context),
-            child: const Text('Rename Class'),
-          ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.error),
-              foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onError),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildSecondaryButton(
+                context: context,
+                text: 'Delete',
+                icon: Icons.delete_outline,
+                onPressed: () => _deleteClassDialog(context),
+                isDestructive: true,
+              ),
             ),
-            onPressed: () => _deleteClassDialog(context),
-            child: const Text('Delete Class'),
-          ),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildGradientButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  primaryColor,
+                  primaryColor.withBlue((primaryColor.blue + 40).clamp(0, 255)),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    bool isDestructive = false,
+  }) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    final color = isDestructive ? Colors.red : primaryColor;
+    
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: color.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: color,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -83,119 +212,279 @@ class ClassManagement extends StatelessWidget {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              title: Text(
-                'Add Class',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-              ),
-              content: SingleChildScrollView(
+            const primaryColor = Color.fromARGB(255, 0, 54, 218);
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
-                      controller: classNameController,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                      onChanged: (value) {
-                        setState(() {
-                          if (value.trim().isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(value.trim())) {
-                            errorMessage = 'Class name must be a valid identifier (letters, numbers, underscores only)';
-                          } else {
-                            errorMessage = null;
-                          }
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Class Name',
-                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    // Header
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.add_circle_outline,
+                            color: primaryColor,
+                            size: 20,
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Add Class',
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: primaryColor,
+                          ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // Content
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: primaryColor.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: classNameController,
+                        style: GoogleFonts.inter(
+                          color: Colors.black87,
+                          fontSize: 14,
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            if (value.trim().isEmpty || RegExp(r'[^a-zA-Z0-9_]').hasMatch(value.trim())) {
+                              errorMessage = 'Class name must be a valid identifier (letters, numbers, underscores only)';
+                            } else {
+                              errorMessage = null;
+                            }
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Class Name',
+                          labelStyle: GoogleFonts.inter(
+                            color: primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: primaryColor, width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.all(16),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      value: classType,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                      dropdownColor: Theme.of(context).colorScheme.surface,
-                      decoration: InputDecoration(
-                        labelText: 'Class Type',
-                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: primaryColor.withOpacity(0.2),
+                          width: 1,
                         ),
                       ),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'class',
-                          child: Text(
-                            'Class',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      child: DropdownButtonFormField<String>(
+                        value: classType,
+                        style: GoogleFonts.inter(color: Colors.black87),
+                        dropdownColor: Colors.white,
+                        decoration: InputDecoration(
+                          labelText: 'Class Type',
+                          labelStyle: GoogleFonts.inter(
+                            color: primaryColor,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'abstract class',
-                          child: Text(
-                            'Abstract Class',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'interface',
-                          child: Text(
-                            'Interface',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: primaryColor, width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.all(16),
                         ),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          classType = value!;
-                        });
-                      },
+                        items: [
+                          DropdownMenuItem(
+                            value: 'class',
+                            child: Text(
+                              'Class',
+                              style: GoogleFonts.inter(color: Colors.black87),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'abstract class',
+                            child: Text(
+                              'Abstract Class',
+                              style: GoogleFonts.inter(color: Colors.black87),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'interface',
+                            child: Text(
+                              'Interface',
+                              style: GoogleFonts.inter(color: Colors.black87),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            classType = value!;
+                          });
+                        },
+                      ),
                     ),
                     if (errorMessage != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          errorMessage!,
-                          style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.error_outline, color: Colors.red, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  errorMessage!,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
+                    const SizedBox(height: 24),
+                    // Action Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey.shade600,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 2,
+                          child: Material(
+                            borderRadius: BorderRadius.circular(8),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: classNameController.text.trim().isEmpty || errorMessage != null
+                                  ? null
+                                  : () {
+                                      print('Adding class: ${classNameController.text.trim()}');
+                                      Navigator.pop(context);
+                                      onUpdate(plantumlCode.replaceFirst(
+                                        '@enduml',
+                                        '$classType ${classNameController.text.trim()} {\n}\n@enduml',
+                                      ));
+                                      classNameController.clear();
+                                    },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: classNameController.text.trim().isEmpty || errorMessage != null
+                                      ? null
+                                      : LinearGradient(
+                                          colors: [
+                                            primaryColor,
+                                            primaryColor.withBlue((primaryColor.blue + 40).clamp(0, 255)),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                  color: classNameController.text.trim().isEmpty || errorMessage != null
+                                      ? Colors.grey.shade300
+                                      : null,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: classNameController.text.trim().isEmpty || errorMessage != null
+                                      ? null
+                                      : [
+                                          BoxShadow(
+                                            color: primaryColor.withOpacity(0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  'Add',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    color: classNameController.text.trim().isEmpty || errorMessage != null
+                                        ? Colors.grey.shade600
+                                        : Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: classNameController.text.trim().isEmpty || errorMessage != null
-                      ? null
-                      : () {
-                          print('Adding class: ${classNameController.text.trim()}');
-                          Navigator.pop(context);
-                          onUpdate(plantumlCode.replaceFirst(
-                            '@enduml',
-                            '$classType ${classNameController.text.trim()} {\n}\n@enduml',
-                          ));
-                          classNameController.clear();
-                        },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.primary,
-                  ),
-                  child: const Text('Add'),
-                ),
-              ],
             );
           },
         );
@@ -726,53 +1015,194 @@ class MethodManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: methodController,
-          decoration: const InputDecoration(
-            labelText: 'Method (e.g., +getName(): String)',
-            border: OutlineInputBorder(),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: primaryColor.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: TextField(
+            controller: methodController,
+            style: GoogleFonts.inter(
+              color: Colors.black87,
+              fontSize: 14,
+            ),
+            decoration: InputDecoration(
+              labelText: 'Method (e.g., +getName(): String)',
+              labelStyle: GoogleFonts.inter(
+                color: primaryColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: primaryColor, width: 2),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.all(16),
+            ),
           ),
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            onPressed: () => _addMethodDialog(context),
-            child: const Text('Add Method'),
-          ),
+        _buildGradientButton(
+          context: context,
+          text: 'Add Method',
+          icon: Icons.add_circle_outline,
+          onPressed: () => _addMethodDialog(context),
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.blue),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildSecondaryButton(
+                context: context,
+                text: 'Edit',
+                icon: Icons.edit_outlined,
+                onPressed: () => _editMethodDialog(context),
+              ),
             ),
-            onPressed: () => _editMethodDialog(context),
-            child: const Text('Edit Method'),
-          ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(Colors.red),
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildSecondaryButton(
+                context: context,
+                text: 'Delete',
+                icon: Icons.delete_outline,
+                onPressed: () => _deleteMethodDialog(context),
+                isDestructive: true,
+              ),
             ),
-            onPressed: () => _deleteMethodDialog(context),
-            child: const Text('Delete Method'),
-          ),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildGradientButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  primaryColor,
+                  primaryColor.withBlue((primaryColor.blue + 40).clamp(0, 255)),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton({
+    required BuildContext context,
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+    bool isDestructive = false,
+  }) {
+    const primaryColor = Color.fromARGB(255, 0, 54, 218);
+    final color = isDestructive ? Colors.red : primaryColor;
+    
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: color.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: color,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  text,
+                  style: GoogleFonts.inter(
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -1436,12 +1866,12 @@ class RelationshipManagement extends StatelessWidget {
                             newRelationshipLine += ' : $newLabel';
                           }
 
-                          String newCode = plantumlCode.replaceAll(
+                          String newCode = this.plantumlCode.replaceAll(
                             '$fromClass $oldRelationshipLine $toClass',
                             '$fromClass $newRelationshipLine $toClass',
                           );
-                          if (newCode != plantumlCode) {
-                            onUpdate(newCode);
+                          if (newCode != this.plantumlCode) {
+                            this.onUpdate(newCode);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Relationship not found')),
@@ -1504,7 +1934,7 @@ class RelationshipManagement extends StatelessWidget {
                       : () {
                           print('Removing relationship: $fromClass -> $toClass');
                           Navigator.pop(context);
-                          String newCode = plantumlCode.replaceAll(
+                          String newCode = this.plantumlCode.replaceAll(
                             RegExp(
                               r'.*\b' +
                                   RegExp.escape(fromClass) +
@@ -1514,8 +1944,8 @@ class RelationshipManagement extends StatelessWidget {
                             ),
                             '',
                           );
-                          if (newCode != plantumlCode) {
-                            onUpdate(newCode);
+                          if (newCode != this.plantumlCode) {
+                            this.onUpdate(newCode);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Relationship not found')),
